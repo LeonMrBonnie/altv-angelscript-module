@@ -1,0 +1,4 @@
+# Build files
+build
+CMakeFiles
+dist

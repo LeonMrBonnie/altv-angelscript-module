@@ -1,0 +1,3 @@
+[submodule "deps/cpp-sdk"]
+	path = deps/cpp-sdk
+	url = https://github.com/altmp/cpp-sdk.git
