@@ -10,7 +10,8 @@
                 "UNICODE",
                 "_UNICODE",
                 "ALT_SERVER_API",
-                "SERVER_MODULE"
+                "SERVER_MODULE",
+                "AS_GENERATE_DOCUMENTATION"
             ],
             "windowsSdkVersion": "10.0.18362.0",
             "compilerPath": "D:/Programme/Visual Studio/VC/Tools/MSVC/14.28.29333/bin/Hostx64/x64/cl.exe",

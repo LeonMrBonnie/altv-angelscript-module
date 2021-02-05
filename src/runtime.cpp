@@ -3,6 +3,7 @@
 #include "helpers/module.h"
 #include "angelscript/addon/scriptstdstring/scriptstdstring.h"
 #include "angelscript/addon/scripthelper/scripthelper.h"
+#include "helpers/docs.h"
 
 AngelScriptRuntime::AngelScriptRuntime()
 {
@@ -12,8 +13,14 @@ AngelScriptRuntime::AngelScriptRuntime()
     engine->SetMessageCallback(asFUNCTION(Helpers::MessageHandler), 0, asCALL_CDECL);
     RegisterStdString(engine);
 
+    // Create docs
+    Helpers::DocsGenerator altGen("alt");
+
     // Register global alt functions
-    ModuleExtension::RegisterAll("alt", engine);
+    ModuleExtension::RegisterAll("alt", engine, &altGen);
+
+    // Generate docs
+    altGen.Generate();
 }
 
 alt::IResource::Impl* AngelScriptRuntime::CreateImpl(alt::IResource* impl)

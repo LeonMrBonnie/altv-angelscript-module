@@ -4,6 +4,7 @@
 #include "Log.h"
 #include "angelscript/include/angelscript.h"
 #include "../resource.h"
+#include "./docs.h"
 
 #define GLOBAL_FUNC(decl, func, desc) \
     { \
@@ -12,14 +13,22 @@
         { \
             Log::Error << "Failed to register global function '" decl << "'" << Log::Endl; \
         } \
+        else \
+        { \
+            docs->PushDeclaration(decl, desc); \
+        } \
     }
 
-#define FUNCDEF(decl) \
+#define FUNCDEF(decl, desc) \
     { \
         auto r = engine->RegisterFuncdef(decl); \
         if(r < 0) \
         { \
             Log::Error << "Failed to register func def '" decl << "'" << Log::Endl; \
+        } \
+        else \
+        { \
+            docs->PushFuncDef(decl, desc); \
         } \
     }
 
@@ -32,7 +41,7 @@ namespace Helpers
     {
         static std::vector<ModuleExtension*> extensions;
 
-        using CreateCallback = void(*)(asIScriptEngine*);
+        using CreateCallback = void(*)(asIScriptEngine*, DocsGenerator*);
 
         std::string name;
         CreateCallback callback;
@@ -47,17 +56,17 @@ namespace Helpers
             return name;
         }
 
-        void Register(asIScriptEngine* engine)
+        void Register(asIScriptEngine* engine, DocsGenerator* docs)
         {
-            callback(engine);
+            callback(engine, docs);
         }
 
-        static void RegisterAll(std::string name, asIScriptEngine* engine)
+        static void RegisterAll(std::string name, asIScriptEngine* engine, DocsGenerator* docs)
         {
             engine->SetDefaultNamespace(name.c_str());
             for(auto& extension : extensions)
             {
-                if(extension->GetName() == name) extension->Register(engine);
+                if(extension->GetName() == name) extension->Register(engine, docs);
             }
         }
     };

@@ -54,23 +54,23 @@ static void On(std::string& event, asIScriptFunction* callback)
     resource->RegisterEventHandler(event, callback);
 }
 
-static ModuleExtension altExtension("alt", [](asIScriptEngine* engine)
+static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs)
 {
     // Generic
-    FUNCDEF("void GenericCallback()");
+    FUNCDEF("void GenericCallback()", "Generic callback without arguments or return value");
 
     // Logging
-    GLOBAL_FUNC("void log(string)", Log, "Logs the specified message to the console");
-    GLOBAL_FUNC("void logWarning(string)", LogWarning, "Logs the specified message as a warning to the console");
-    GLOBAL_FUNC("void logError(string)", LogError, "Logs the specified message as an error to the console");
+    GLOBAL_FUNC("void log(string msg)", Log, "Logs the specified message to the console");
+    GLOBAL_FUNC("void logWarning(string msg)", LogWarning, "Logs the specified message as a warning to the console");
+    GLOBAL_FUNC("void logError(string msg)", LogError, "Logs the specified message as an error to the console");
 
     // Timers
-    GLOBAL_FUNC("uint setTimeout(GenericCallback@, uint)", SetTimeout, "Sets a timeout");
-    GLOBAL_FUNC("uint setInterval(GenericCallback@, uint)", SetInterval, "Sets a interval");
-    GLOBAL_FUNC("uint nextTick(GenericCallback@)", NextTick, "Sets a next tick handler");
-    GLOBAL_FUNC("uint everyTick(GenericCallback@)", EveryTick, "Sets a every tick handler");
-    GLOBAL_FUNC("void clearTimer(uint)", ClearTimer, "Clears specified timer");
+    GLOBAL_FUNC("uint setTimeout(GenericCallback@ callback, uint timeout)", SetTimeout, "Sets a timeout");
+    GLOBAL_FUNC("uint setInterval(GenericCallback@ callback, uint interval)", SetInterval, "Sets a interval");
+    GLOBAL_FUNC("uint nextTick(GenericCallback@ callback)", NextTick, "Sets a next tick handler");
+    GLOBAL_FUNC("uint everyTick(GenericCallback@ callback)", EveryTick, "Sets a every tick handler");
+    GLOBAL_FUNC("void clearTimer(uint timerId)", ClearTimer, "Clears specified timer");
 
     // Event handling
-    GLOBAL_FUNC("void on(string, GenericCallback@)", On, "Registers a event handler");
+    GLOBAL_FUNC("void on(string event, GenericCallback@ callback)", On, "Registers a event handler");
 });
