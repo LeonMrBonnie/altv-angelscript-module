@@ -78,7 +78,6 @@ namespace Helpers
             file.open(module.append("Docs.as"));
             file << stream.str();
             file.close();
-            Log::Info << "Wrote " << std::to_string(stream.str().length()) << " chars" << Log::Endl;
             #endif
         }
     };
