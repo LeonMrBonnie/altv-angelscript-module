@@ -3,6 +3,7 @@
 #include "angelscript/addon/scriptbuilder/scriptbuilder.h"
 #include "angelscript/addon/scripthelper/scripthelper.h"
 #include "helpers/module.h"
+#include "helpers/events.h"
 
 bool AngelScriptResource::Start()
 {
@@ -88,7 +89,29 @@ bool AngelScriptResource::Stop()
 
 bool AngelScriptResource::OnEvent(const alt::CEvent* ev)
 {
-    // todo: event handling
+    auto event = Helpers::Event::GetEvent(ev->GetType());
+    if(event == nullptr)
+    {
+        Log::Error << "Unhandled event type " << std::to_string((uint16_t)ev->GetType()) << Log::Endl;
+        return true;
+    }
+    auto callbacks = event->GetCallbacks(this, ev);
+    auto args = event->GetArgs(this, ev);
+
+    for(auto callback : callbacks)
+    {
+        auto r = context->Prepare(callback);
+        CHECK_AS_RETURN("Prepare event handler", r, true);
+        for(int i = 0; i < args.size(); i++)
+        {
+            auto arg = args[i];
+            if(arg.second == true) context->SetArgAddress(i, arg.first);
+            else context->SetArgObject(i, arg.first);
+        }
+        r = context->Execute();
+        CHECK_AS_RETURN("Execute event handler", r, true);
+    }
+
     return true;
 }
 

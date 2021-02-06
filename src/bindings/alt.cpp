@@ -48,12 +48,6 @@ static void ClearTimer(uint32_t id)
     resource->RemoveTimer(id);
 }
 
-static void On(std::string& event, asIScriptFunction* callback)
-{
-    GET_RESOURCE();
-    resource->RegisterEventHandler(event, callback);
-}
-
 static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs)
 {
     // Generic
@@ -70,7 +64,4 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_GLOBAL_FUNC("uint nextTick(TimerCallback@ callback)", NextTick, "Sets a next tick handler");
     REGISTER_GLOBAL_FUNC("uint everyTick(TimerCallback@ callback)", EveryTick, "Sets a every tick handler");
     REGISTER_GLOBAL_FUNC("void clearTimer(uint timerId)", ClearTimer, "Clears specified timer");
-
-    // Event handling
-    //REGISTER_GLOBAL_FUNC("void on(string event, GenericCallback@ callback)", On, "Registers a event handler");
 });

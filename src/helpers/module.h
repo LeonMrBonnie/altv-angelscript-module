@@ -12,7 +12,7 @@
         auto r = engine->RegisterGlobalFunction(decl, asFUNCTION(func), asCALL_CDECL); \
         if(r < 0) \
         { \
-            Log::Error << "Failed to register global function '" decl << "'" << Log::Endl; \
+            Log::Error << "Failed to register global function '" << decl << "'" << Log::Endl; \
         } \
         else \
         { \

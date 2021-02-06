@@ -4,6 +4,7 @@
 #include "angelscript/addon/scriptstdstring/scriptstdstring.h"
 #include "angelscript/addon/scripthelper/scripthelper.h"
 #include "helpers/docs.h"
+#include "helpers/events.h"
 
 AngelScriptRuntime::AngelScriptRuntime()
 {
@@ -18,6 +19,9 @@ AngelScriptRuntime::AngelScriptRuntime()
 
     // Register global alt functions
     ModuleExtension::RegisterAll("alt", engine, &altGen);
+
+    // Register events
+    Event::RegisterAll(engine, &altGen);
 
     // Generate docs
     altGen.Generate();

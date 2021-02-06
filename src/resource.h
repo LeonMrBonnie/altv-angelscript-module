@@ -41,6 +41,15 @@ public:
     {
         eventHandlers.emplace_back(std::pair(event, handler));
     }
+    std::vector<asIScriptFunction*> GetEventHandlers(std::string event)
+    {
+        std::vector<asIScriptFunction*> events;
+        for(auto handler : eventHandlers)
+        {
+            if(handler.first == event) events.push_back(handler.second);
+        }
+        return events;
+    }
 
     uint32_t CreateTimer(uint32_t timeout, asIScriptFunction* callback, bool once)
     {

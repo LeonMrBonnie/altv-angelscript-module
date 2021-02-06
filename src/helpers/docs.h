@@ -20,6 +20,7 @@ namespace Helpers
         std::string module;
         std::vector<std::pair<std::string, std::string>> declarations;
         std::vector<std::pair<std::string, std::string>> funcDefs;
+        std::vector<std::pair<std::string, std::string>> eventDeclarations;
     public:
         DocsGenerator(std::string module) : module(module) {};
 
@@ -33,6 +34,12 @@ namespace Helpers
         {
             #ifdef AS_GENERATE_DOCUMENTATION
             funcDefs.push_back(std::pair(funcdef, desc));
+            #endif
+        }
+        void PushEventDeclaration(std::string event, std::string decl)
+        {
+            #ifdef AS_GENERATE_DOCUMENTATION
+            eventDeclarations.push_back(std::pair(event, decl));
             #endif
         }
 
@@ -55,8 +62,8 @@ namespace Helpers
             for(auto def : funcDefs)
             {
                 stream << "\n";
-                stream << PAD_SPACE << "// " << def.second.c_str() << "\n";
-                stream << PAD_SPACE << "funcdef " << def.first.c_str() << ";" << "\n";
+                stream << PAD_SPACE << "// " << def.second << "\n";
+                stream << PAD_SPACE << "funcdef " << def.first << ";" << "\n";
             }
 
             stream << "\n";
@@ -66,8 +73,19 @@ namespace Helpers
             for(auto decl : declarations)
             {
                 stream << "\n";
-                stream << PAD_SPACE << "// " << decl.second.c_str() << "\n";
-                stream << PAD_SPACE << decl.first.c_str() << ";" << "\n";
+                stream << PAD_SPACE << "// " << decl.second << "\n";
+                stream << PAD_SPACE << decl.first << ";" << "\n";
+            }
+
+            stream << "\n";
+
+            // Add event declarations
+            stream << PAD_SPACE << "// ********** Events **********" << "\n";
+            for(auto decl : eventDeclarations)
+            {
+                stream << "\n";
+                stream << PAD_SPACE << "// " << decl.first << "\n";
+                stream << PAD_SPACE << decl.second << ";" << "\n";
             }
 
             // Close namespace
