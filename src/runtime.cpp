@@ -17,6 +17,9 @@ AngelScriptRuntime::AngelScriptRuntime()
     engine = asCreateScriptEngine();
     engine->SetMessageCallback(asFUNCTION(Helpers::MessageHandler), 0, asCALL_CDECL);
 
+    // Optimization
+    engine->SetEngineProperty(asEP_BUILD_WITHOUT_LINE_CUES, true);
+
     // Register add-ons
     RegisterStdString(engine);
     RegisterStdStringUtils(engine);
