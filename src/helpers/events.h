@@ -60,20 +60,20 @@ namespace Helpers
             {
                 std::string uppercased = event.second->eventName;
                 uppercased[0] = toupper(uppercased[0]);
-                std::string decl;
-                decl.append("void ");
-                decl.append(uppercased);
-                decl.append("Callback(");
-                decl.append(event.second->callbackDecl);
-                decl.append(")");
-                if(!event.second->skipDecl) engine->RegisterFuncdef(decl.c_str());
-                docs->PushEventDeclaration(event.second->eventName, decl);
-                std::string onEventDecl;
-                onEventDecl.append("void on(const string &in event, ");
-                onEventDecl.append(uppercased);
-                onEventDecl.append("Callback@ callback"); 
-                onEventDecl.append(")");
-                if(!event.second->skipDecl) REGISTER_GLOBAL_FUNC(onEventDecl.c_str(), &OnEvent, "Registers a event handler");
+                std::stringstream decl;
+                decl << ("void ");
+                decl << (uppercased);
+                decl << ("Callback(");
+                decl << (event.second->callbackDecl);
+                decl << (")");
+                if(!event.second->skipDecl) engine->RegisterFuncdef(decl.str().c_str());
+                docs->PushEventDeclaration(event.second->eventName, decl.str());
+                std::stringstream onEventDecl;
+                onEventDecl << ("void on(const string &in event, ");
+                onEventDecl << (uppercased);
+                onEventDecl << ("Callback@ callback"); 
+                onEventDecl << (")");
+                if(!event.second->skipDecl) REGISTER_GLOBAL_FUNC(onEventDecl.str().c_str(), &OnEvent, "Registers a event handler");
             }
         }
     };
