@@ -2,22 +2,7 @@
 #include "runtime.h"
 #include "angelscript/addon/scriptbuilder/scriptbuilder.h"
 #include "angelscript/addon/scripthelper/scripthelper.h"
-
-#define CHECK_AS_RETURN(type, result) \
-    if(r < 0) \
-    { \
-        Log::Error << type << " error. Error code: " << std::to_string(result) << Log::Endl;\
-        return false;\
-    }
-
-static int Include(const char* include, const char* from, CScriptBuilder* builder, void* data)
-{
-    // todo: add support for relative paths
-    auto resource = static_cast<AngelScriptResource*>(data);
-    auto src = resource->ReadFile(alt::String(include));
-    int r = builder->AddSectionFromMemory(include, src.CStr(), src.GetSize());
-    CHECK_AS_RETURN("Include", r);
-}
+#include "helpers/module.h"
 
 bool AngelScriptResource::Start()
 {
@@ -27,16 +12,17 @@ bool AngelScriptResource::Start()
     // Compile file
     CScriptBuilder builder;
 
-    builder.SetIncludeCallback(Include, this);
+    builder.SetIncludeCallback(Helpers::IncludeHandler, this);
+    builder.SetPragmaCallback(Helpers::PragmaHandler, this);
 
     int r = builder.StartNewModule(runtime->GetEngine(), resource->GetName().CStr());
-    CHECK_AS_RETURN("Builder start", r);
+    CHECK_AS_RETURN("Builder start", r, false);
     
     r = builder.AddSectionFromMemory(resource->GetMain().CStr(), src.CStr(), src.GetSize());
-    CHECK_AS_RETURN("Adding section", r);
+    CHECK_AS_RETURN("Adding section", r, false);
 
     r = builder.BuildModule();
-    CHECK_AS_RETURN("Compilation", r);
+    CHECK_AS_RETURN("Compilation", r, false);
 
     // Start script
     module = builder.GetModule();
@@ -52,7 +38,7 @@ bool AngelScriptResource::Start()
         return false;
     }
     r = context->Prepare(func);
-    CHECK_AS_RETURN("Context prepare", r);
+    CHECK_AS_RETURN("Context prepare", r, false);
 
     // Execute script
     r = context->Execute();
@@ -73,7 +59,7 @@ alt::String AngelScriptResource::ReadFile(alt::String path)
 {
     // Reads file content
     auto pkg = resource->GetPackage();
-    alt::IPackage::File* pkgFile = pkg->OpenFile(resource->GetMain());
+    alt::IPackage::File* pkgFile = pkg->OpenFile(path);
     alt::String src(pkg->GetFileSize(pkgFile));
     pkg->ReadFile(pkgFile, src.GetData(), src.GetSize());
     pkg->CloseFile(pkgFile);
@@ -88,7 +74,7 @@ bool AngelScriptResource::Stop()
     if(func != 0)
     {
         auto r = context->Prepare(func);
-        CHECK_AS_RETURN("Stop function call", r);
+        CHECK_AS_RETURN("Stop function call", r, false);
 
         context->Execute();
     }

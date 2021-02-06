@@ -3,6 +3,7 @@
 #include "cpp-sdk/SDK.h"
 #include "Log.h"
 #include "angelscript/include/angelscript.h"
+#include "angelscript/addon/scriptbuilder/scriptbuilder.h"
 #include "../resource.h"
 #include "./docs.h"
 
@@ -34,6 +35,13 @@
 
 #define GET_RESOURCE() \
     auto resource = static_cast<AngelScriptResource*>(asGetActiveContext()->GetUserData());
+
+#define CHECK_AS_RETURN(type, result, returnOnError) \
+    if(r < 0) \
+    { \
+        Log::Error << type << " error. Error code: " << std::to_string(result) << Log::Endl;\
+        return returnOnError;\
+    }
 
 namespace Helpers
 {
@@ -70,6 +78,24 @@ namespace Helpers
             }
         }
     };
+
+    // Handles includes
+    static int IncludeHandler(const char* include, const char* from, CScriptBuilder* builder, void* data)
+    {
+        // todo: add support for relative paths
+        auto resource = static_cast<AngelScriptResource*>(data);
+        auto src = resource->ReadFile(alt::String(include));
+        int r = builder->AddSectionFromMemory(include, src.CStr(), src.GetSize());
+        CHECK_AS_RETURN("Include", r, -1);
+        return 0;
+    }
+
+    // Handles pragma directives
+    static int PragmaHandler(const std::string &pragmaText, CScriptBuilder& builder, void* data)
+    {
+        auto resource = static_cast<AngelScriptResource*>(data);
+        return 0;
+    }
 
     static void MessageHandler(const asSMessageInfo *msg, void *param)
     {
