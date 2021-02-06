@@ -6,7 +6,7 @@
 #include "../resource.h"
 #include "./docs.h"
 
-#define GLOBAL_FUNC(decl, func, desc) \
+#define REGISTER_GLOBAL_FUNC(decl, func, desc) \
     { \
         auto r = engine->RegisterGlobalFunction(decl, asFUNCTION(func), asCALL_CDECL); \
         if(r < 0) \
@@ -19,7 +19,7 @@
         } \
     }
 
-#define FUNCDEF(decl, desc) \
+#define REGISTER_FUNCDEF(decl, desc) \
     { \
         auto r = engine->RegisterFuncdef(decl); \
         if(r < 0) \
