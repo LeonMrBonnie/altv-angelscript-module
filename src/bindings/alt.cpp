@@ -3,17 +3,17 @@
 
 using namespace Helpers;
 
-static void Log(std::string& msg)
+static void Log(const std::string& msg)
 {
     Log::Colored << msg << Log::Endl;
 }
 
-static void LogWarning(std::string& msg)
+static void LogWarning(const std::string& msg)
 {
     Log::Warning << msg << Log::Endl;
 }
 
-static void LogError(std::string& msg)
+static void LogError(const std::string& msg)
 {
     Log::Error << msg << Log::Endl;
 }

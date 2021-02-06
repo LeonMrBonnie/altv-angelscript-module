@@ -91,7 +91,7 @@ namespace Helpers
     }
 
     // Handles pragma directives
-    static int PragmaHandler(const std::string &pragmaText, CScriptBuilder& builder, void* data)
+    static int PragmaHandler(const std::string& pragmaText, CScriptBuilder& builder, void* data)
     {
         auto resource = static_cast<AngelScriptResource*>(data);
         return 0;
