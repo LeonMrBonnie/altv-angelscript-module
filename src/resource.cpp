@@ -95,7 +95,7 @@ bool AngelScriptResource::OnEvent(const alt::CEvent* ev)
         Log::Error << "Unhandled event type " << std::to_string((uint16_t)ev->GetType()) << Log::Endl;
         return true;
     }
-    auto callbacks = event->GetCallbacks(this, ev);
+    auto callbacks = GetEventHandlers(ev->GetType());
     auto args = event->GetArgs(this, ev);
 
     for(auto callback : callbacks)

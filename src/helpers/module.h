@@ -34,7 +34,7 @@
     }
 
 #define GET_RESOURCE() \
-    auto resource = static_cast<AngelScriptResource*>(asGetActiveContext()->GetUserData());
+    auto resource = static_cast<AngelScriptResource*>(asGetActiveContext()->GetUserData())
 
 #define CHECK_AS_RETURN(type, result, returnOnError) \
     if(r < 0) \

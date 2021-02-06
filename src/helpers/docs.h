@@ -36,10 +36,10 @@ namespace Helpers
             funcDefs.push_back(std::pair(funcdef, desc));
             #endif
         }
-        void PushEventDeclaration(std::string event, std::string decl)
+        void PushEventDeclaration(std::string funcDef, std::string globalFunc)
         {
             #ifdef AS_GENERATE_DOCUMENTATION
-            eventDeclarations.push_back(std::pair(event, decl));
+            eventDeclarations.push_back(std::pair(funcDef.insert(0, "funcdef "), globalFunc));
             #endif
         }
 
@@ -84,7 +84,7 @@ namespace Helpers
             for(auto decl : eventDeclarations)
             {
                 stream << "\n";
-                stream << PAD_SPACE << "// " << decl.first << "\n";
+                stream << PAD_SPACE << decl.first << ";" << "\n";
                 stream << PAD_SPACE << decl.second << ";" << "\n";
             }
 

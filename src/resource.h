@@ -17,7 +17,7 @@ class AngelScriptResource : public alt::IResource::Impl
     std::vector<uint32_t> invalidTimers;
     uint32_t nextTimerId = 1;
 
-    std::vector<std::pair<std::string, asIScriptFunction*>> eventHandlers;
+    std::vector<std::pair<alt::CEvent::Type, asIScriptFunction*>> eventHandlers;
 
 public:
     AngelScriptResource(AngelScriptRuntime* runtime, alt::IResource* resource) : runtime(runtime), resource(resource) {};
@@ -37,11 +37,11 @@ public:
     }
 
     alt::String ReadFile(alt::String path);
-    void RegisterEventHandler(std::string event, asIScriptFunction* handler)
+    void RegisterEventHandler(alt::CEvent::Type event, asIScriptFunction* handler)
     {
         eventHandlers.emplace_back(std::pair(event, handler));
     }
-    std::vector<asIScriptFunction*> GetEventHandlers(std::string event)
+    std::vector<asIScriptFunction*> GetEventHandlers(alt::CEvent::Type event)
     {
         std::vector<asIScriptFunction*> events;
         for(auto handler : eventHandlers)
