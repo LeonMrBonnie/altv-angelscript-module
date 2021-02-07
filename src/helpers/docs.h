@@ -131,17 +131,16 @@ namespace Helpers
                     if(kv.first != obj.first) continue;
                     stream << PAD_SPACE << PAD_SPACE << kv.second << ";\n";
                 }
-                for(auto kv : objectMethods)
-                {
-                    if(kv.first != obj.first) continue;
-                    stream << "\n";
-                    stream << PAD_SPACE << PAD_SPACE << kv.second << ";\n";
-                }
+                stream << "\n";
                 for(auto kv : objectConstructors)
                 {
                     if(kv.first != obj.first) continue;
-                    stream << "\n";
                     stream << PAD_SPACE << PAD_SPACE << obj.first << "(" << kv.second << ");\n"; 
+                }
+                for(auto kv : objectMethods)
+                {
+                    if(kv.first != obj.first) continue;
+                    stream << PAD_SPACE << PAD_SPACE << kv.second << ";\n";
                 }
                 stream << PAD_SPACE << "};\n";
             }

@@ -25,10 +25,8 @@ namespace Helpers
         RegisterAsWorldObject<T>(engine, docs, type);
 
         REGISTER_PROPERTY_WRAPPER_GET(type, "uint", "id", GetID<T>);
-        REGISTER_METHOD_WRAPPER(type, "uint GetID()", GetID<T>);
 
         REGISTER_PROPERTY_WRAPPER_GET(type, "uint", "model", GetModel<T>);
-        REGISTER_METHOD_WRAPPER(type, "uint GetModel()", GetModel<T>);
 
         // todo: add missing methods
     }

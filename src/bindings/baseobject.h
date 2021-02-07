@@ -31,8 +31,7 @@ namespace Helpers
         engine->RegisterObjectBehaviour(type, asBEHAVE_RELEASE, "void f()", asFUNCTION(RemoveRef<T>), asCALL_CDECL_OBJLAST);
 
         REGISTER_PROPERTY_WRAPPER_GET(type, "uint", "type", GetType<T>);
-        REGISTER_METHOD_WRAPPER(type, "uint GetType()", GetType<T>);
-
+        
         // todo: add meta methods
     }
 }

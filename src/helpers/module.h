@@ -72,6 +72,7 @@
 #define REGISTER_PROPERTY_WRAPPER_GET(name, type, prop, getFn) \
     { \
         engine->RegisterObjectMethod(name, ##type##" get_"##prop##"() property", asFUNCTION(getFn), asCALL_CDECL_OBJLAST); \
+        docs->PushObjectProperty(name, ##type##" "##prop##); \
     }
 
 #define REGISTER_PROPERTY_WRAPPER_SET(name, type, prop, setFn) \

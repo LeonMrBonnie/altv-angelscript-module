@@ -46,7 +46,6 @@ namespace Helpers
         */
 
         REGISTER_PROPERTY_WRAPPER_GET(type, "int", "dimension", GetDimension<T>);
-        REGISTER_METHOD_WRAPPER(type, "int GetDimension()", GetDimension<T>);
-        REGISTER_METHOD_WRAPPER(type, "void SetDimension(int dimension)", SetDimension<T>);
+        REGISTER_PROPERTY_WRAPPER_SET(type, "int", "dimension", SetDimension<T>);
     }
 }
