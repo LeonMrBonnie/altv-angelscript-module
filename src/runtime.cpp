@@ -22,8 +22,8 @@ AngelScriptRuntime::AngelScriptRuntime()
 
     // Register add-ons
     RegisterStdString(engine);
-    RegisterStdStringUtils(engine);
     RegisterScriptArray(engine, true);
+    RegisterStdStringUtils(engine);
     RegisterScriptDictionary(engine);
     RegisterScriptMath(engine);
     RegisterScriptAny(engine);
