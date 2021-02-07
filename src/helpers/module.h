@@ -33,9 +33,15 @@
         } \
     }
 
-#define REGISTER_CLASS(name, type, flags, desc) \
+#define REGISTER_VALUE_CLASS(name, type, flags, desc) \
     { \
         engine->RegisterObjectType(name, sizeof(type), flags | asGetTypeTraits<type>()); \
+        docs->PushObjectType(name, desc); \
+    }
+
+#define REGISTER_REF_CLASS(name, type, flags, desc) \
+    { \
+        engine->RegisterObjectType(name, 0, flags); \
         docs->PushObjectType(name, desc); \
     }
 
@@ -55,6 +61,22 @@
     { \
         engine->RegisterObjectMethod(name, decl, asMETHOD(class, method), asCALL_THISCALL); \
         docs->PushObjectMethod(name, decl); \
+    }
+
+#define REGISTER_METHOD_WRAPPER(name, decl, wrapperFn) \
+    { \
+        engine->RegisterObjectMethod(name, decl, asFUNCTION(wrapperFn), asCALL_CDECL_OBJLAST); \
+        docs->PushObjectMethod(name, decl); \
+    }
+
+#define REGISTER_PROPERTY_WRAPPER_GET(name, type, prop, getFn) \
+    { \
+        engine->RegisterObjectMethod(name, ##type##" get_"##prop##"() property", asFUNCTION(getFn), asCALL_CDECL_OBJLAST); \
+    }
+
+#define REGISTER_PROPERTY_WRAPPER_SET(name, type, prop, setFn) \
+    { \
+        engine->RegisterObjectMethod(name, "void set_"##prop##"("##type##") property", asFUNCTION(setFn), asCALL_CDECL_OBJLAST); \
     }
 
 #define GET_RESOURCE() \

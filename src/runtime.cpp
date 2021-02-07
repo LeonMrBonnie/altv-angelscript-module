@@ -3,6 +3,7 @@
 #include "helpers/module.h"
 #include "helpers/docs.h"
 #include "helpers/events.h"
+#include "bindings/vector3.h"
 #include "angelscript/addon/scriptstdstring/scriptstdstring.h"
 #include "angelscript/addon/scripthelper/scripthelper.h"
 #include "angelscript/addon/scriptarray/scriptarray.h"
@@ -30,6 +31,8 @@ AngelScriptRuntime::AngelScriptRuntime()
 
     // Create docs
     Helpers::DocsGenerator altGen("alt");
+
+    Helpers::RegisterVector3(engine, &altGen);
 
     // Register global alt functions
     ModuleExtension::RegisterAll("alt", engine, &altGen);

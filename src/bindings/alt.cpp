@@ -48,9 +48,15 @@ static void ClearTimer(uint32_t id)
     resource->RemoveTimer(id);
 }
 
+static uint32_t Hash(std::string& value)
+{
+    return alt::ICore::Instance().Hash(value);
+}
+
 static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs)
 {
     // Generic
+    REGISTER_GLOBAL_FUNC("uint hash(const string &in value)", Hash, "Hashes the given string using the joaat algorithm");
 
     // Logging
     REGISTER_GLOBAL_FUNC("void log(const string &in msg)", Log, "Logs the specified message to the console");
