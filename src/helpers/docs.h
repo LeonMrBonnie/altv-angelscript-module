@@ -21,6 +21,10 @@ namespace Helpers
         std::vector<std::pair<std::string, std::string>> declarations;
         std::vector<std::pair<std::string, std::string>> funcDefs;
         std::vector<std::pair<std::string, std::string>> eventDeclarations;
+        std::vector<std::pair<std::string, std::string>> objectTypes;
+        std::unordered_multimap<std::string, std::string> objectDeclarations;
+        std::unordered_multimap<std::string, std::string> objectConstructors;
+        std::unordered_multimap<std::string, std::string> objectMethods;
     public:
         DocsGenerator(std::string module) : module(module) {};
 
@@ -40,6 +44,30 @@ namespace Helpers
         {
             #ifdef AS_GENERATE_DOCUMENTATION
             eventDeclarations.push_back(std::pair(funcDef.insert(0, "funcdef "), globalFunc));
+            #endif
+        }
+        void PushObjectType(std::string name, std::string desc)
+        {
+            #ifdef AS_GENERATE_DOCUMENTATION
+            objectTypes.push_back(std::pair(name, desc));
+            #endif
+        }
+        void PushObjectProperty(std::string object, std::string propertyDecl)
+        {
+            #ifdef AS_GENERATE_DOCUMENTATION
+            objectDeclarations.insert({object, propertyDecl});
+            #endif
+        }
+        void PushObjectConstructor(std::string object, std::string constructorDecl)
+        {
+            #ifdef AS_GENERATE_DOCUMENTATION
+            objectConstructors.insert({object, constructorDecl});
+            #endif
+        }
+        void PushObjectMethod(std::string object, std::string methodDecl)
+        {
+            #ifdef AS_GENERATE_DOCUMENTATION
+            objectMethods.insert({object, methodDecl});
             #endif
         }
 
@@ -86,6 +114,36 @@ namespace Helpers
                 stream << "\n";
                 stream << PAD_SPACE << decl.first << ";" << "\n";
                 stream << PAD_SPACE << decl.second << ";" << "\n";
+            }
+
+            stream << "\n";
+
+            // Add object types
+            stream << PAD_SPACE << "// ********** Objects **********\n";
+            for(auto obj : objectTypes)
+            {
+                stream << "\n";
+                stream << PAD_SPACE << "// " << obj.second << "\n";
+                stream << PAD_SPACE << "class " << obj.first << "\n";
+                stream << PAD_SPACE << "{\n";
+                for(auto kv : objectDeclarations)
+                {
+                    if(kv.first != obj.first) continue;
+                    stream << PAD_SPACE << PAD_SPACE << kv.second << ";\n";
+                }
+                for(auto kv : objectMethods)
+                {
+                    if(kv.first != obj.first) continue;
+                    stream << "\n";
+                    stream << PAD_SPACE << PAD_SPACE << kv.second << ";\n";
+                }
+                for(auto kv : objectConstructors)
+                {
+                    if(kv.first != obj.first) continue;
+                    stream << "\n";
+                    stream << PAD_SPACE << PAD_SPACE << obj.first << "(" << kv.second << ");\n"; 
+                }
+                stream << PAD_SPACE << "};\n";
             }
 
             // Close namespace

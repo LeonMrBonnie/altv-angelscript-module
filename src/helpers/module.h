@@ -33,6 +33,30 @@
         } \
     }
 
+#define REGISTER_CLASS(name, type, flags, desc) \
+    { \
+        engine->RegisterObjectType(name, sizeof(type), flags | asGetTypeTraits<type>()); \
+        docs->PushObjectType(name, desc); \
+    }
+
+#define REGISTER_CONSTRUCTOR(name, decl, func) \
+    { \
+        engine->RegisterObjectBehaviour(name, asBEHAVE_CONSTRUCT, "void f("##decl##")", asFUNCTION(func), asCALL_CDECL_OBJLAST); \
+        docs->PushObjectConstructor(name, decl); \
+    }
+
+#define REGISTER_PROPERTY(name, decl, class, property) \
+    { \
+        engine->RegisterObjectProperty(name, decl, asOFFSET(class, property)); \
+        docs->PushObjectProperty(name, decl); \
+    }
+
+#define REGISTER_METHOD(name, decl, class, method) \
+    { \
+        engine->RegisterObjectMethod(name, decl, asMETHOD(class, method), asCALL_THISCALL); \
+        docs->PushObjectMethod(name, decl); \
+    }
+
 #define GET_RESOURCE() \
     auto resource = static_cast<AngelScriptResource*>(asGetActiveContext()->GetUserData())
 
