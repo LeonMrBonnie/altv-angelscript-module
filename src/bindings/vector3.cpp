@@ -37,4 +37,5 @@ static ModuleExtension vector3Extension("alt", [](asIScriptEngine* engine, DocsG
     REGISTER_PROPERTY("Vector3i", "int x", Vector3<int>, x);
     REGISTER_PROPERTY("Vector3i", "int y", Vector3<int>, y);
     REGISTER_PROPERTY("Vector3i", "int z", Vector3<int>, z);
+    REGISTER_METHOD("Vector3i", "float Length()", Vector3<int>, Length);
 });
