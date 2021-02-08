@@ -53,6 +53,8 @@ bool AngelScriptResource::Start()
         }
     }
 
+    RegisterTypeInfos();
+
     return true;
 }
 
@@ -83,6 +85,10 @@ bool AngelScriptResource::Stop()
     // Cleanup
     module->Discard();
     context->Release();
+
+    arrayStringTypeInfo->Release();
+    arrayIntTypeInfo->Release();
+    arrayUintTypeInfo->Release();
 
     return true;
 }
@@ -128,4 +134,34 @@ void AngelScriptResource::OnTick()
             RemoveTimer(timer.first);
         }
     }
+}
+
+void AngelScriptResource::RegisterTypeInfos()
+{
+    arrayStringTypeInfo = module->GetTypeInfoByDecl("array<string>");
+    arrayStringTypeInfo->AddRef();
+    arrayIntTypeInfo = module->GetTypeInfoByDecl("array<int>");
+    arrayIntTypeInfo->AddRef();
+    arrayUintTypeInfo = module->GetTypeInfoByDecl("array<uint>");
+    arrayUintTypeInfo->AddRef();
+
+    Log::Info << arrayStringTypeInfo->GetName() << Log::Endl;
+}
+
+CScriptArray* AngelScriptResource::CreateStringArray(uint32_t len)
+{
+    auto arr = CScriptArray::Create(arrayStringTypeInfo, len);
+    return arr;
+}
+
+CScriptArray* AngelScriptResource::CreateIntArray(uint32_t len)
+{
+    auto arr = CScriptArray::Create(arrayIntTypeInfo, len);
+    return arr;
+}
+
+CScriptArray* AngelScriptResource::CreateUIntArray(uint32_t len)
+{
+    auto arr = CScriptArray::Create(arrayUintTypeInfo, len);
+    return arr;
 }

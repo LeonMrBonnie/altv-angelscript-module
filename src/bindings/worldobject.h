@@ -7,7 +7,8 @@
 template<class T>
 static Vector3<float> GetPosition(T* obj)
 {
-    auto pos = obj->GetPosition();
+    alt::Position pos = obj->GetPosition();
+    Log::Info << std::to_string(pos.x) << " " << std::to_string(pos.y) << " " << std::to_string(pos.z) << Log::Endl;
     return Vector3<float>(pos.x, pos.y, pos.z);
 }
 
