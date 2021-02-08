@@ -88,6 +88,11 @@ bool AngelScriptResource::Stop()
 
     if(context != nullptr) context->Release();
 
+    for(auto pair : eventHandlers)
+    {
+        pair.second->Release();
+    }
+
     UnregisterTypeInfos();
 
     return true;
