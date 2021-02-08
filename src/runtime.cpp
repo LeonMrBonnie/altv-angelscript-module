@@ -48,6 +48,7 @@ void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine, DocsG
     REGISTER_REF_CLASS("WorldObject", alt::IWorldObject, asOBJ_REF, "World object superclass for all alt:V world objects");
     REGISTER_REF_CLASS("Entity", alt::IEntity, asOBJ_REF, "Entity superclass for all alt:V entities");
     REGISTER_REF_CLASS("Player", alt::IPlayer, asOBJ_REF, "alt:V Player Entity");
+    REGISTER_REF_CLASS("Vehicle", alt::IVehicle, asOBJ_REF, "alt:V Vehicle Entity");
 
     // Register extensions
     ModuleExtension::RegisterAll("alt", engine, docs);

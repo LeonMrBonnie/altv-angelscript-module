@@ -51,6 +51,12 @@
         docs->PushObjectConstructor(name, decl); \
     }
 
+#define REGISTER_FACTORY(name, decl, func) \
+    { \
+        engine->RegisterObjectBehaviour(name, asBEHAVE_FACTORY, ##name##"@ f("##decl##")", asFUNCTION(func), asCALL_CDECL); \
+        docs->PushObjectConstructor(name, decl); \
+    }
+
 #define REGISTER_PROPERTY(name, decl, class, property) \
     { \
         engine->RegisterObjectProperty(name, decl, asOFFSET(class, property)); \
