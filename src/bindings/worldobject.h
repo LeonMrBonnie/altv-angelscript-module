@@ -12,9 +12,9 @@ static Vector3<float> GetPosition(T* obj)
 }
 
 template<class T>
-static void SetPosition(float x, float y, float z, T* obj)
+static void SetPosition(Vector3<float> pos, T* obj)
 {
-    obj->SetPosition(alt::Point{x, y, z});
+    obj->SetPosition(alt::Point{pos.x, pos.y, pos.z});
 }
 
 template<class T>
