@@ -3,6 +3,7 @@
 #include "cpp-sdk/SDK.h"
 #include "Log.h"
 #include "angelscript/include/angelscript.h"
+#include "helpers/docs.h"
 
 class AngelScriptResource;
 class AngelScriptRuntime : public alt::IScriptRuntime
@@ -19,7 +20,7 @@ public:
         return engine;
     }
 
-    void RegisterScriptInterfaces(asIScriptEngine* engine, DocsGenerator* docs);
+    void RegisterScriptInterfaces(asIScriptEngine* engine, Helpers::DocsGenerator* docs);
 
     static AngelScriptRuntime& Instance()
 	{

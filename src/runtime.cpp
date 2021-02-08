@@ -1,7 +1,6 @@
 #include "runtime.h"
 #include "resource.h"
 #include "helpers/module.h"
-#include "helpers/docs.h"
 #include "helpers/events.h"
 #include "bindings/vector3.h"
 #include "angelscript/addon/scriptstdstring/scriptstdstring.h"
