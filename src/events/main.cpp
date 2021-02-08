@@ -15,7 +15,7 @@ REGISTER_EVENT_HANDLER(alt::CEvent::Type::RESOURCE_STOP, ResourceStop, "void", "
     args.push_back({(void*)ev->GetResource()->GetName().CStr(), false});
 });
 
-REGISTER_EVENT_HANDLER(alt::CEvent::Type::CONSOLE_COMMAND_EVENT, ConsoleCommand, "bool", "string command, array<string> args",
+REGISTER_EVENT_HANDLER(alt::CEvent::Type::CONSOLE_COMMAND_EVENT, ConsoleCommand, "void", "string command, array<string> args",
 [](AngelScriptResource* resource, const alt::CEvent* event, std::vector<std::pair<void*, bool>>& args) {
     auto ev = static_cast<const alt::CConsoleCommandEvent*>(event);
 
