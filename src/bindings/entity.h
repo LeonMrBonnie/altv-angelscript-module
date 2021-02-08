@@ -34,6 +34,7 @@ template<class T>
 static alt::IPlayer* GetNetOwner(T* obj)
 {
     alt::Ref<alt::IPlayer> player = obj->GetNetworkOwner();
+    if(player.IsEmpty()) return nullptr;
     return player.Get();
 }
 
