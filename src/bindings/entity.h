@@ -50,7 +50,7 @@ static bool GetVisible(T* obj)
 }
 
 template<class T>
-static bool SetVisible(bool toggle, T* obj)
+static void SetVisible(bool toggle, T* obj)
 {
     obj->SetVisible(toggle);
 }
