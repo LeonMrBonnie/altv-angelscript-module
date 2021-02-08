@@ -90,7 +90,7 @@ static CScriptArray* GetAllEntities()
     return arr;
 }
 
-static ModuleExtension altExtension("alt", 9999, [](asIScriptEngine* engine, DocsGenerator* docs)
+static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs)
 {
     // Generic
     REGISTER_GLOBAL_FUNC("uint hash(const string &in value)", Hash, "Hashes the given string using the joaat algorithm");

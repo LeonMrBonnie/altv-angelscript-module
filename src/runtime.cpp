@@ -34,17 +34,22 @@ AngelScriptRuntime::AngelScriptRuntime()
 
     // Create docs
     Helpers::DocsGenerator altGen("alt");
+    auto docs = &altGen;
 
-    Helpers::RegisterVector3(engine, &altGen);
+    Helpers::RegisterVector3(engine, docs);
 
     // Register global alt functions
-    ModuleExtension::RegisterAll("alt", engine, &altGen);
+    REGISTER_REF_CLASS("BaseObject", alt::IBaseObject, asOBJ_REF, "Base object superclass for all alt:V base objects");
+    REGISTER_REF_CLASS("WorldObject", alt::IWorldObject, asOBJ_REF, "World object superclass for all alt:V world objects");
+    REGISTER_REF_CLASS("Entity", alt::IEntity, asOBJ_REF, "Entity superclass for all alt:V entities");
+    REGISTER_REF_CLASS("Player", alt::IPlayer, asOBJ_REF, "alt:V Player Entity");
+    ModuleExtension::RegisterAll("alt", engine, docs);
 
     // Register events
-    Event::RegisterAll(engine, &altGen);
+    Event::RegisterAll(engine, docs);
 
     // Generate docs
-    altGen.Generate();
+    docs->Generate();
 }
 
 alt::IResource::Impl* AngelScriptRuntime::CreateImpl(alt::IResource* impl)

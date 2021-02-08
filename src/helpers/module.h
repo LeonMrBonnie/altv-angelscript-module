@@ -71,7 +71,7 @@
 
 #define REGISTER_PROPERTY_WRAPPER_GET(name, type, prop, getFn) \
     { \
-        engine->RegisterObjectMethod(name, ##type##" get_"##prop##"() property", asFUNCTION(getFn), asCALL_CDECL_OBJLAST); \
+        engine->RegisterObjectMethod(name, ##type##" get_"##prop##"() const property", asFUNCTION(getFn), asCALL_CDECL_OBJLAST); \
         docs->PushObjectProperty(name, ##type##" "##prop##); \
     }
 
@@ -100,9 +100,8 @@ namespace Helpers
 
         std::string name;
         CreateCallback callback;
-        uint32_t order;
     public:
-        ModuleExtension(std::string name, uint32_t order, CreateCallback callback) : name(name), order(order), callback(callback)
+        ModuleExtension(std::string name, CreateCallback callback) : name(name), callback(callback)
         {
             extensions.push_back(this);
         }
@@ -120,7 +119,6 @@ namespace Helpers
         static void RegisterAll(std::string name, asIScriptEngine* engine, DocsGenerator* docs)
         {
             engine->SetDefaultNamespace(name.c_str());
-            std::sort(extensions.begin(), extensions.end(), [](ModuleExtension* a, ModuleExtension* b) { return a->order < b->order; });
             for(auto extension : extensions)
             {
                 if(extension->GetName() == name) extension->Register(engine, docs);
