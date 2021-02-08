@@ -88,9 +88,7 @@ bool AngelScriptResource::Stop()
 
     if(context != nullptr) context->Release();
 
-    if(arrayStringTypeInfo != nullptr) arrayStringTypeInfo->Release();
-    if(arrayIntTypeInfo != nullptr) arrayIntTypeInfo->Release();
-    if(arrayUintTypeInfo != nullptr) arrayUintTypeInfo->Release();
+    UnregisterTypeInfos();
 
     return true;
 }
@@ -153,6 +151,16 @@ void AngelScriptResource::RegisterTypeInfos()
     arrayIntTypeInfo->AddRef();
     arrayUintTypeInfo = module->GetTypeInfoByDecl("array<uint>");
     arrayUintTypeInfo->AddRef();
+    arrayPlayerTypeInfo = module->GetTypeInfoByDecl("array<Player@>");
+    arrayPlayerTypeInfo->AddRef();
+}
+
+void AngelScriptResource::UnregisterTypeInfos()
+{
+    if(arrayStringTypeInfo != nullptr) arrayStringTypeInfo->Release();
+    if(arrayIntTypeInfo != nullptr) arrayIntTypeInfo->Release();
+    if(arrayUintTypeInfo != nullptr) arrayUintTypeInfo->Release();
+    if(arrayPlayerTypeInfo != nullptr) arrayPlayerTypeInfo->Release();
 }
 
 CScriptArray* AngelScriptResource::CreateStringArray(uint32_t len)
@@ -170,5 +178,11 @@ CScriptArray* AngelScriptResource::CreateIntArray(uint32_t len)
 CScriptArray* AngelScriptResource::CreateUIntArray(uint32_t len)
 {
     auto arr = CScriptArray::Create(arrayUintTypeInfo, len);
+    return arr;
+}
+
+CScriptArray* AngelScriptResource::CreatePlayerArray(uint32_t len)
+{
+    auto arr = CScriptArray::Create(arrayPlayerTypeInfo, len);
     return arr;
 }

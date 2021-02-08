@@ -23,6 +23,7 @@ class AngelScriptResource : public alt::IResource::Impl
     asITypeInfo* arrayStringTypeInfo = nullptr;
     asITypeInfo* arrayIntTypeInfo = nullptr;
     asITypeInfo* arrayUintTypeInfo = nullptr;
+    asITypeInfo* arrayPlayerTypeInfo = nullptr;
 
 public:
     AngelScriptResource(AngelScriptRuntime* runtime, alt::IResource* resource) : runtime(runtime), resource(resource) {};
@@ -42,9 +43,11 @@ public:
     }
 
     void RegisterTypeInfos();
+    void UnregisterTypeInfos();
     CScriptArray* CreateStringArray(uint32_t len);
     CScriptArray* CreateIntArray(uint32_t len);
     CScriptArray* CreateUIntArray(uint32_t);
+    CScriptArray* CreatePlayerArray(uint32_t);
 
     alt::String ReadFile(alt::String path);
     void RegisterEventHandler(alt::CEvent::Type event, asIScriptFunction* handler)
