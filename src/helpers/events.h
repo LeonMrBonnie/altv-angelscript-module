@@ -17,7 +17,7 @@
         funcDef << returnType" " << #name << "Callback(" << decl << ")"; \
         engine->RegisterFuncdef(funcDef.str().c_str()); \
         std::stringstream globalFunc; \
-        globalFunc << "void on" << #name << "(" << #name << "Callback@ callback)"; \
+        globalFunc << "void On" << #name << "(" << #name << "Callback@ callback)"; \
         engine->RegisterGlobalFunction(globalFunc.str().c_str(), asFUNCTION(On##name##), asCALL_CDECL); \
         docs->PushEventDeclaration(funcDef.str(), globalFunc.str()); \
     });
