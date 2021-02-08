@@ -57,12 +57,17 @@ static uint32_t Hash(std::string& value)
 static CScriptArray* GetAllPlayers()
 {
     GET_RESOURCE();
-    static asITypeInfo* playerArrayTypeInfo = resource->GetRuntime()->GetEngine()->GetTypeInfoByDecl("array<alt::Player@>");
+    static asITypeInfo* playerArrayTypeInfo = nullptr;
+    if(playerArrayTypeInfo == nullptr) {
+        playerArrayTypeInfo = resource->GetRuntime()->GetEngine()->GetTypeInfoByDecl("array<alt::Player@>");
+        playerArrayTypeInfo->AddRef();
+    }
     auto players = alt::ICore::Instance().GetPlayers();
     auto arr = CScriptArray::Create(playerArrayTypeInfo, players.GetSize());
     for(int i = 0; i < players.GetSize(); i++)
     {
-        arr->SetValue(i, (void*)players[i].Get());
+        void* player = players[i].Get();
+        arr->SetValue(i, &player);
     }
     return arr;
 }
@@ -70,12 +75,17 @@ static CScriptArray* GetAllPlayers()
 static CScriptArray* GetAllEntities()
 {
     GET_RESOURCE();
-    static asITypeInfo* entityArrayTypeInfo = resource->GetRuntime()->GetEngine()->GetTypeInfoByDecl("array<alt::Entity@>");
+    static asITypeInfo* entityArrayTypeInfo = nullptr;
+    if(entityArrayTypeInfo == nullptr) {
+        entityArrayTypeInfo = resource->GetRuntime()->GetEngine()->GetTypeInfoByDecl("array<alt::Entity@>");
+        entityArrayTypeInfo->AddRef();
+    }
     auto entities = alt::ICore::Instance().GetEntities();
     auto arr = CScriptArray::Create(entityArrayTypeInfo, entities.GetSize());
     for(int i = 0; i < entities.GetSize(); i++)
     {
-        arr->SetValue(i, (void*)entities[i].Get());
+        void* entity = entities[i].Get();
+        arr->SetValue(i, &entity);
     }
     return arr;
 }
