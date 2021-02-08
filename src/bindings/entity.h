@@ -17,6 +17,44 @@ static uint32_t GetModel(T* obj)
     return obj->GetModel();
 }
 
+template<class T>
+static Vector3<float> GetRotation(T* obj)
+{
+    alt::Vector3f rot = obj->GetRotation();
+    return Vector3<float>(rot[0], rot[1], rot[2]);
+}
+
+template<class T>
+static void SetRotation(Vector3<float> pos, T* obj)
+{
+    obj->SetRotation(alt::Rotation{pos.x, pos.y, pos.z});
+}
+
+template<class T>
+static alt::IPlayer* GetNetOwner(T* obj)
+{
+    alt::Ref<alt::IPlayer> player = obj->GetNetworkOwner();
+    return player.Get();
+}
+
+template<class T>
+static void SetNetOwner(alt::IPlayer* player, bool disableMigration, T* obj)
+{
+    obj->SetNetworkOwner(alt::Ref<alt::IPlayer>(player), disableMigration);
+}
+
+template<class T>
+static bool GetVisible(T* obj)
+{
+    return obj->GetVisible();
+}
+
+template<class T>
+static bool SetVisible(bool toggle, T* obj)
+{
+    obj->SetVisible(toggle);
+}
+
 namespace Helpers
 {
     template<class T>
@@ -27,6 +65,15 @@ namespace Helpers
         REGISTER_PROPERTY_WRAPPER_GET(type, "uint", "id", GetID<T>);
 
         REGISTER_PROPERTY_WRAPPER_GET(type, "uint", "model", GetModel<T>);
+
+        REGISTER_PROPERTY_WRAPPER_GET(type, "Vector3f", "rot", GetRotation<T>);
+        REGISTER_PROPERTY_WRAPPER_SET(type, "Vector3f", "rot", SetRotation<T>);
+
+        REGISTER_PROPERTY_WRAPPER_GET(type, "bool", "visible", GetVisible<T>);
+        REGISTER_PROPERTY_WRAPPER_SET(type, "bool", "visible", SetVisible<T>);
+
+        REGISTER_METHOD_WRAPPER(type, "Player@+ GetNetOwner()", GetNetOwner<T>);
+        REGISTER_METHOD_WRAPPER(type, "void SetNetOwner(Player@ player, bool disableMigration = false)", SetNetOwner<T>);
 
         // todo: add missing methods
     }
