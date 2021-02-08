@@ -99,22 +99,22 @@ static std::string GetResourceName()
 static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs)
 {
     // Generic
-    REGISTER_GLOBAL_FUNC("uint hash(const string &in value)", Hash, "Hashes the given string using the joaat algorithm");
-    REGISTER_GLOBAL_FUNC("array<Player@>@ getAllPlayers()", GetAllPlayers, "Gets all players on the server");
-    REGISTER_GLOBAL_FUNC("array<Entity@>@ getAllEntities()", GetAllEntities, "Gets all entities on the server");
+    REGISTER_GLOBAL_FUNC("uint Hash(const string &in value)", Hash, "Hashes the given string using the joaat algorithm");
+    REGISTER_GLOBAL_FUNC("array<Player@>@ GetAllPlayers()", GetAllPlayers, "Gets all players on the server");
+    REGISTER_GLOBAL_FUNC("array<Entity@>@ GetAllEntities()", GetAllEntities, "Gets all entities on the server");
 
     REGISTER_GLOBAL_PROPERTY("string", "resourceName", GetResourceName);
 
     // Logging
-    REGISTER_GLOBAL_FUNC("void log(const string &in msg)", Log, "Logs the specified message to the console");
-    REGISTER_GLOBAL_FUNC("void logWarning(const string &in msg)", LogWarning, "Logs the specified message as a warning to the console");
-    REGISTER_GLOBAL_FUNC("void logError(const string &in msg)", LogError, "Logs the specified message as an error to the console");
+    REGISTER_GLOBAL_FUNC("void Log(const string &in msg)", Log, "Logs the specified message to the console");
+    REGISTER_GLOBAL_FUNC("void LogWarning(const string &in msg)", LogWarning, "Logs the specified message as a warning to the console");
+    REGISTER_GLOBAL_FUNC("void LogError(const string &in msg)", LogError, "Logs the specified message as an error to the console");
 
     // Timers
     REGISTER_FUNCDEF("void TimerCallback()", "Callback used for timers");
-    REGISTER_GLOBAL_FUNC("uint setTimeout(TimerCallback@ callback, uint timeout)", SetTimeout, "Sets a timeout");
-    REGISTER_GLOBAL_FUNC("uint setInterval(TimerCallback@ callback, uint interval)", SetInterval, "Sets a interval");
-    REGISTER_GLOBAL_FUNC("uint nextTick(TimerCallback@ callback)", NextTick, "Sets a next tick handler");
-    REGISTER_GLOBAL_FUNC("uint everyTick(TimerCallback@ callback)", EveryTick, "Sets a every tick handler");
-    REGISTER_GLOBAL_FUNC("void clearTimer(uint timerId)", ClearTimer, "Clears specified timer");
+    REGISTER_GLOBAL_FUNC("uint SetTimeout(TimerCallback@ callback, uint timeout)", SetTimeout, "Sets a timeout");
+    REGISTER_GLOBAL_FUNC("uint SetInterval(TimerCallback@ callback, uint interval)", SetInterval, "Sets a interval");
+    REGISTER_GLOBAL_FUNC("uint NextTick(TimerCallback@ callback)", NextTick, "Sets a next tick handler");
+    REGISTER_GLOBAL_FUNC("uint EveryTick(TimerCallback@ callback)", EveryTick, "Sets a every tick handler");
+    REGISTER_GLOBAL_FUNC("void ClearTimer(uint timerId)", ClearTimer, "Clears specified timer");
 });
