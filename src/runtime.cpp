@@ -10,6 +10,7 @@
 #include "angelscript/addon/scriptdictionary/scriptdictionary.h"
 #include "angelscript/addon/scriptmath/scriptmath.h"
 #include "angelscript/addon/scriptany/scriptany.h"
+#include "angelscript/addon/datetime/datetime.h"
 
 AngelScriptRuntime::AngelScriptRuntime()
 {
@@ -28,6 +29,8 @@ AngelScriptRuntime::AngelScriptRuntime()
     RegisterScriptDictionary(engine);
     RegisterScriptMath(engine);
     RegisterScriptAny(engine);
+    RegisterScriptDateTime(engine);
+    RegisterExceptionRoutines(engine);
 
     // Create docs
     Helpers::DocsGenerator altGen("alt");
