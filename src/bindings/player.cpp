@@ -7,7 +7,7 @@ using namespace Helpers;
 
 static std::string GetName(alt::IPlayer* player)
 {
-    return player->GetName().CStr();
+    return player->GetName().ToString();
 }
 
 template<class T>

@@ -19,6 +19,7 @@ namespace Helpers
     {
         std::string module;
         std::vector<std::pair<std::string, std::string>> declarations;
+        std::vector<std::pair<std::string, std::string>> variables;
         std::vector<std::pair<std::string, std::string>> funcDefs;
         std::vector<std::pair<std::string, std::string>> eventDeclarations;
         std::vector<std::pair<std::string, std::string>> objectTypes;
@@ -32,6 +33,12 @@ namespace Helpers
         {
             #ifdef AS_GENERATE_DOCUMENTATION
             declarations.push_back(std::pair(decl, desc));
+            #endif
+        }
+        void PushVariable(std::string type, std::string prop)
+        {
+            #ifdef AS_GENERATE_DOCUMENTATION
+            variables.push_back({type, prop});
             #endif
         }
         void PushFuncDef(std::string funcdef, std::string desc)
@@ -92,6 +99,16 @@ namespace Helpers
                 stream << "\n";
                 stream << PAD_SPACE << "// " << def.second << "\n";
                 stream << PAD_SPACE << "funcdef " << def.first << ";" << "\n";
+            }
+
+            stream << "\n";
+
+            // Add variables
+            stream << PAD_SPACE << "// ********** Global variables **********" << "\n";
+            for(auto variable : variables)
+            {
+                stream << "\n";
+                stream << PAD_SPACE << variable.first << " " << variable.second << ";" << "\n";
             }
 
             stream << "\n";

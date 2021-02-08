@@ -90,12 +90,20 @@ static CScriptArray* GetAllEntities()
     return arr;
 }
 
+static std::string GetResourceName()
+{
+    GET_RESOURCE();
+    return resource->GetResource()->GetName().ToString();
+}
+
 static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs)
 {
     // Generic
     REGISTER_GLOBAL_FUNC("uint hash(const string &in value)", Hash, "Hashes the given string using the joaat algorithm");
     REGISTER_GLOBAL_FUNC("array<Player@>@ getAllPlayers()", GetAllPlayers, "Gets all players on the server");
     REGISTER_GLOBAL_FUNC("array<Entity@>@ getAllEntities()", GetAllEntities, "Gets all entities on the server");
+
+    REGISTER_GLOBAL_PROPERTY("string", "resourceName", GetResourceName);
 
     // Logging
     REGISTER_GLOBAL_FUNC("void log(const string &in msg)", Log, "Logs the specified message to the console");

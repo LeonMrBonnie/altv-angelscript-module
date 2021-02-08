@@ -80,6 +80,12 @@
         engine->RegisterObjectMethod(name, "void set_"##prop##"("##type##") property", asFUNCTION(setFn), asCALL_CDECL_OBJLAST); \
     }
 
+#define REGISTER_GLOBAL_PROPERTY(type, prop, wrapperFn) \
+    { \
+        engine->RegisterGlobalFunction(##type##" get_"##prop##"() property", asFUNCTION(wrapperFn), asCALL_CDECL); \
+        docs->PushVariable(type, prop); \
+    }
+
 #define GET_RESOURCE() \
     auto resource = static_cast<AngelScriptResource*>(asGetActiveContext()->GetUserData())
 
