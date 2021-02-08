@@ -146,8 +146,6 @@ void AngelScriptResource::RegisterTypeInfos()
     arrayIntTypeInfo->AddRef();
     arrayUintTypeInfo = module->GetTypeInfoByDecl("array<uint>");
     arrayUintTypeInfo->AddRef();
-
-    Log::Info << arrayStringTypeInfo->GetName() << Log::Endl;
 }
 
 CScriptArray* AngelScriptResource::CreateStringArray(uint32_t len)

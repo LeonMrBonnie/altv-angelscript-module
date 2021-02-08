@@ -7,14 +7,14 @@
 #include "docs.h"
 #include "module.h"
 
-#define REGISTER_EVENT_HANDLER(type, name, decl, argsGetter) \
+#define REGISTER_EVENT_HANDLER(type, name, returnType, decl, argsGetter) \
     static void On##name##(asIScriptFunction* callback) { \
         GET_RESOURCE(); \
         resource->RegisterEventHandler(type, callback); \
     } \
     static Event Event##name##(type, decl, argsGetter, [](asIScriptEngine* engine, DocsGenerator* docs) { \
         std::stringstream funcDef; \
-        funcDef << "void " << #name << "Callback(" << decl << ")"; \
+        funcDef << returnType" " << #name << "Callback(" << decl << ")"; \
         engine->RegisterFuncdef(funcDef.str().c_str()); \
         std::stringstream globalFunc; \
         globalFunc << "void on" << #name << "(" << #name << "Callback@ callback)"; \
