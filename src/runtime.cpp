@@ -22,6 +22,17 @@ AngelScriptRuntime::AngelScriptRuntime()
     // Optimization
     engine->SetEngineProperty(asEP_BUILD_WITHOUT_LINE_CUES, true);
 
+    // Create docs
+    Helpers::DocsGenerator altGen("alt");
+
+    RegisterScriptInterfaces(engine, &altGen);
+
+    // Generate docs
+    altGen.Generate();
+}
+
+void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine, DocsGenerator* docs)
+{
     // Register add-ons
     RegisterStdString(engine);
     RegisterScriptArray(engine, true);
@@ -32,24 +43,18 @@ AngelScriptRuntime::AngelScriptRuntime()
     RegisterScriptDateTime(engine);
     RegisterExceptionRoutines(engine);
 
-    // Create docs
-    Helpers::DocsGenerator altGen("alt");
-    auto docs = &altGen;
-
+    // Register classes
     Helpers::RegisterVector3(engine, docs);
-
-    // Register global alt functions
     REGISTER_REF_CLASS("BaseObject", alt::IBaseObject, asOBJ_REF, "Base object superclass for all alt:V base objects");
     REGISTER_REF_CLASS("WorldObject", alt::IWorldObject, asOBJ_REF, "World object superclass for all alt:V world objects");
     REGISTER_REF_CLASS("Entity", alt::IEntity, asOBJ_REF, "Entity superclass for all alt:V entities");
     REGISTER_REF_CLASS("Player", alt::IPlayer, asOBJ_REF, "alt:V Player Entity");
+
+    // Register extensions
     ModuleExtension::RegisterAll("alt", engine, docs);
 
     // Register events
     Event::RegisterAll(engine, docs);
-
-    // Generate docs
-    docs->Generate();
 }
 
 alt::IResource::Impl* AngelScriptRuntime::CreateImpl(alt::IResource* impl)

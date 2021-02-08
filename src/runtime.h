@@ -19,6 +19,8 @@ public:
         return engine;
     }
 
+    void RegisterScriptInterfaces(asIScriptEngine* engine, DocsGenerator* docs);
+
     static AngelScriptRuntime& Instance()
 	{
 		static AngelScriptRuntime _instance;
