@@ -12,7 +12,7 @@
         GET_RESOURCE(); \
         resource->RegisterEventHandler(type, callback); \
     } \
-    static Event Event##name##(type, decl, argsGetter, [](asIScriptEngine* engine, DocsGenerator* docs) { \
+    static Event Event##name##(type, returnType, decl, argsGetter, [](asIScriptEngine* engine, DocsGenerator* docs) { \
         std::stringstream funcDef; \
         funcDef << returnType" " << #name << "Callback(" << decl << ")"; \
         engine->RegisterFuncdef(funcDef.str().c_str()); \
@@ -34,17 +34,20 @@ namespace Helpers
         static std::unordered_map<alt::CEvent::Type, Event*> all;
 
         const char* callbackDecl;
+        const char* returnType;
         ArgsGetter argsGetter;
         RegisterCallback registerCallback;
 
     public:
         Event(
             alt::CEvent::Type type, 
+            const char* returnType,
             const char* callbackDecl, 
             ArgsGetter argsGetter,
             RegisterCallback registerCallback
         ) : 
             callbackDecl(callbackDecl),
+            returnType(returnType),
             argsGetter(argsGetter),
             registerCallback(registerCallback)
         {
@@ -56,6 +59,11 @@ namespace Helpers
             std::vector<std::pair<void*, bool>> args;
             argsGetter(resource, event, args);
             return args;
+        }
+
+        const char* GetReturnType()
+        {
+            return returnType;
         }
 
         static Event* GetEvent(alt::CEvent::Type type)

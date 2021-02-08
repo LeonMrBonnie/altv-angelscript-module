@@ -105,6 +105,8 @@ bool AngelScriptResource::OnEvent(const alt::CEvent* ev)
     }
     auto callbacks = GetEventHandlers(ev->GetType());
     auto args = event->GetArgs(this, ev);
+    auto returnType = event->GetReturnType();
+    bool shouldReturn = strcmp(returnType, "bool") == 0;
 
     for(auto callback : callbacks)
     {
@@ -118,6 +120,11 @@ bool AngelScriptResource::OnEvent(const alt::CEvent* ev)
         }
         r = context->Execute();
         CHECK_AS_RETURN("Execute event handler", r, true);
+        if(r == asEXECUTION_FINISHED && shouldReturn)
+        {
+            auto result = context->GetReturnByte();
+            return result == 1 ? true : false;
+        }
     }
 
     return true;
