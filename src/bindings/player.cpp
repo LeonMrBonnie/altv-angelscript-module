@@ -21,11 +21,6 @@ static void SetModel(uint32_t model, alt::IPlayer* player)
     player->SetModel(model);
 }
 
-static void SetModelString(std::string& model, alt::IPlayer* player)
-{
-    player->SetModel(alt::ICore::Instance().Hash(model));
-}
-
 static ModuleExtension playerExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs) {
     RegisterAsEntity<alt::IPlayer>(engine, docs, "Player");
 
