@@ -73,22 +73,24 @@ alt::String AngelScriptResource::ReadFile(alt::String path)
 bool AngelScriptResource::Stop()
 {
     // Gets Stop function and if exists calls it
-    asIScriptFunction* func = module->GetFunctionByDecl("void Stop()");
-    if(func != 0)
+    if(module != nullptr)
     {
-        auto r = context->Prepare(func);
-        CHECK_AS_RETURN("Stop function call", r, false);
+        asIScriptFunction* func = module->GetFunctionByDecl("void Stop()");
+        if(func != 0 && context != nullptr)
+        {
+            auto r = context->Prepare(func);
+            CHECK_AS_RETURN("Stop function call", r, false);
 
-        context->Execute();
+            context->Execute();
+        }
+        module->Discard();
     }
 
-    // Cleanup
-    module->Discard();
-    context->Release();
+    if(context != nullptr) context->Release();
 
-    arrayStringTypeInfo->Release();
-    arrayIntTypeInfo->Release();
-    arrayUintTypeInfo->Release();
+    if(arrayStringTypeInfo != nullptr) arrayStringTypeInfo->Release();
+    if(arrayIntTypeInfo != nullptr) arrayIntTypeInfo->Release();
+    if(arrayUintTypeInfo != nullptr) arrayUintTypeInfo->Release();
 
     return true;
 }

@@ -2,22 +2,27 @@
 
 #include "cpp-sdk/SDK.h"
 #include "Log.h"
-#include "angelscript/include/angelscript.h"
 #include "helpers/timer.h"
+#include "angelscript/include/angelscript.h"
+#include "angelscript/addon/scriptarray/scriptarray.h"
 
 class AngelScriptRuntime;
 class AngelScriptResource : public alt::IResource::Impl
 {  
     AngelScriptRuntime* runtime;
     alt::IResource* resource;
-    asIScriptModule* module;
-    asIScriptContext* context;
+    asIScriptModule* module = nullptr;
+    asIScriptContext* context = nullptr;
 
     std::unordered_map<uint32_t, Helpers::Timer*> timers;
     std::vector<uint32_t> invalidTimers;
     uint32_t nextTimerId = 1;
 
     std::vector<std::pair<alt::CEvent::Type, asIScriptFunction*>> eventHandlers;
+
+    asITypeInfo* arrayStringTypeInfo = nullptr;
+    asITypeInfo* arrayIntTypeInfo = nullptr;
+    asITypeInfo* arrayUintTypeInfo = nullptr;
 
 public:
     AngelScriptResource(AngelScriptRuntime* runtime, alt::IResource* resource) : runtime(runtime), resource(resource) {};
@@ -35,6 +40,11 @@ public:
     {
         return module;
     }
+
+    void RegisterTypeInfos();
+    CScriptArray* CreateStringArray(uint32_t len);
+    CScriptArray* CreateIntArray(uint32_t len);
+    CScriptArray* CreateUIntArray(uint32_t);
 
     alt::String ReadFile(alt::String path);
     void RegisterEventHandler(alt::CEvent::Type event, asIScriptFunction* handler)
