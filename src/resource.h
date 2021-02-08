@@ -23,7 +23,6 @@ class AngelScriptResource : public alt::IResource::Impl
     asITypeInfo* arrayStringTypeInfo = nullptr;
     asITypeInfo* arrayIntTypeInfo = nullptr;
     asITypeInfo* arrayUintTypeInfo = nullptr;
-    asITypeInfo* arrayPlayerTypeInfo = nullptr;
 
 public:
     AngelScriptResource(AngelScriptRuntime* runtime, alt::IResource* resource) : runtime(runtime), resource(resource) {};
@@ -32,6 +31,10 @@ public:
     alt::IResource* GetResource()
     {
         return resource;
+    }
+    AngelScriptRuntime* GetRuntime()
+    {
+        return runtime;
     }
     asIScriptContext* GetContext()
     {

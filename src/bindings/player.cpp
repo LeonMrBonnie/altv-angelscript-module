@@ -26,7 +26,7 @@ static void SetModelString(std::string& model, alt::IPlayer* player)
     player->SetModel(alt::ICore::Instance().Hash(model));
 }
 
-static ModuleExtension playerExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs) {
+static ModuleExtension playerExtension("alt", 4, [](asIScriptEngine* engine, DocsGenerator* docs) {
     REGISTER_REF_CLASS("Player", alt::IPlayer, asOBJ_REF, "alt:V Player Entity");
     RegisterAsEntity<alt::IPlayer>(engine, docs, "Player");
 

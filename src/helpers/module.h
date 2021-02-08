@@ -1,5 +1,5 @@
 #pragma once
-
+#include <algorithm>
 #include "cpp-sdk/SDK.h"
 #include "Log.h"
 #include "angelscript/include/angelscript.h"
@@ -100,10 +100,11 @@ namespace Helpers
 
         std::string name;
         CreateCallback callback;
+        uint32_t order;
     public:
-        ModuleExtension(std::string name, CreateCallback callback) : name(name), callback(callback)
+        ModuleExtension(std::string name, uint32_t order, CreateCallback callback) : name(name), order(order), callback(callback)
         {
-            extensions.emplace_back(this);
+            extensions.push_back(this);
         }
 
         std::string GetName()
@@ -119,7 +120,8 @@ namespace Helpers
         static void RegisterAll(std::string name, asIScriptEngine* engine, DocsGenerator* docs)
         {
             engine->SetDefaultNamespace(name.c_str());
-            for(auto& extension : extensions)
+            std::sort(extensions.begin(), extensions.end(), [](ModuleExtension* a, ModuleExtension* b) { return a->order < b->order; });
+            for(auto extension : extensions)
             {
                 if(extension->GetName() == name) extension->Register(engine, docs);
             }

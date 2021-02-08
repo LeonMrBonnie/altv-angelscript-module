@@ -1,5 +1,6 @@
 #include "Log.h"
 #include "../helpers/module.h"
+#include "../runtime.h"
 
 using namespace Helpers;
 
@@ -53,10 +54,38 @@ static uint32_t Hash(std::string& value)
     return alt::ICore::Instance().Hash(value);
 }
 
-static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs)
+static CScriptArray* GetAllPlayers()
+{
+    GET_RESOURCE();
+    static asITypeInfo* playerArrayTypeInfo = resource->GetRuntime()->GetEngine()->GetTypeInfoByDecl("array<alt::Player@>");
+    auto players = alt::ICore::Instance().GetPlayers();
+    auto arr = CScriptArray::Create(playerArrayTypeInfo, players.GetSize());
+    for(int i = 0; i < players.GetSize(); i++)
+    {
+        arr->SetValue(i, (void*)players[i].Get());
+    }
+    return arr;
+}
+
+static CScriptArray* GetAllEntities()
+{
+    GET_RESOURCE();
+    static asITypeInfo* entityArrayTypeInfo = resource->GetRuntime()->GetEngine()->GetTypeInfoByDecl("array<alt::Entity@>");
+    auto entities = alt::ICore::Instance().GetEntities();
+    auto arr = CScriptArray::Create(entityArrayTypeInfo, entities.GetSize());
+    for(int i = 0; i < entities.GetSize(); i++)
+    {
+        arr->SetValue(i, (void*)entities[i].Get());
+    }
+    return arr;
+}
+
+static ModuleExtension altExtension("alt", 5, [](asIScriptEngine* engine, DocsGenerator* docs)
 {
     // Generic
     REGISTER_GLOBAL_FUNC("uint hash(const string &in value)", Hash, "Hashes the given string using the joaat algorithm");
+    REGISTER_GLOBAL_FUNC("array<Player@>@ getAllPlayers()", GetAllPlayers, "Gets all players on the server");
+    REGISTER_GLOBAL_FUNC("array<Entity@>@ getAllEntities()", GetAllEntities, "Gets all entities on the server");
 
     // Logging
     REGISTER_GLOBAL_FUNC("void log(const string &in msg)", Log, "Logs the specified message to the console");
