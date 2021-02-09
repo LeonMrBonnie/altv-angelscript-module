@@ -23,6 +23,8 @@ namespace Helpers
         std::vector<std::pair<std::string, std::string>> funcDefs;
         std::vector<std::pair<std::string, std::string>> eventDeclarations;
         std::vector<std::pair<std::string, std::string>> objectTypes;
+        std::vector<std::pair<std::string, std::string>> enumTypes;
+        std::unordered_multimap<std::string, std::pair<std::string, int>> enumValues;
         std::unordered_multimap<std::string, std::string> objectDeclarations;
         std::unordered_multimap<std::string, std::string> objectConstructors;
         std::unordered_multimap<std::string, std::string> objectMethods;
@@ -77,6 +79,18 @@ namespace Helpers
             objectMethods.insert({object, methodDecl});
             #endif
         }
+        void PushEnumValue(std::string enumName, std::string name, int value)
+        {
+            #ifdef AS_GENERATE_DOCUMENTATION
+            enumValues.insert({enumName, {name, value}});
+            #endif
+        }
+        void PushEnumType(std::string name, std::string desc)
+        {
+            #ifdef AS_GENERATE_DOCUMENTATION
+            enumTypes.push_back({name, desc});
+            #endif
+        }
 
         void Generate()
         {
@@ -99,6 +113,24 @@ namespace Helpers
                 stream << "\n";
                 stream << PAD_SPACE << "// " << def.second << "\n";
                 stream << PAD_SPACE << "funcdef " << def.first << ";" << "\n";
+            }
+
+            stream << "\n";
+
+            // Add enums
+            stream << PAD_SPACE << "// ********** Enums **********" << "\n";
+            for(auto enumType : enumTypes)
+            {
+                stream << "\n";
+                stream << PAD_SPACE << "// " << enumType.second << "\n";
+                stream << PAD_SPACE << "enum " << enumType.first << "\n";
+                stream << PAD_SPACE << "{" << "\n";
+                for(auto value : enumValues)
+                {
+                    if(value.first != enumType.first) continue;
+                    stream << PAD_SPACE << PAD_SPACE << value.second.first << " = " << std::to_string(value.second.second) << ",\n";
+                }
+                stream << PAD_SPACE << "};" << "\n";
             }
 
             stream << "\n";

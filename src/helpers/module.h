@@ -92,6 +92,18 @@
         docs->PushVariable(type, prop); \
     }
 
+#define REGISTER_ENUM(name, desc) \
+    { \
+        engine->RegisterEnum(name); \
+        docs->PushEnumType(name, desc); \
+    }
+
+#define REGISTER_ENUM_VALUE(enum, name, value) \
+    { \
+        engine->RegisterEnumValue(enum, name, (uint8_t)value); \
+        docs->PushEnumValue(enum, name, (uint8_t)value); \
+    }
+
 #define GET_RESOURCE() \
     auto resource = static_cast<AngelScriptResource*>(asGetActiveContext()->GetUserData())
 
@@ -101,8 +113,8 @@
 #define CHECK_AS_RETURN(type, result, returnOnError) \
     if(r < 0) \
     { \
-        Log::Error << type << " error. Error code: " << std::to_string(result) << Log::Endl;\
-        return returnOnError;\
+        Log::Error << type << " error. Error code: " << std::to_string(result) << Log::Endl; \
+        return returnOnError; \
     }
 
 namespace Helpers
