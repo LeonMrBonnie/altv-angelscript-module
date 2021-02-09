@@ -26,10 +26,10 @@ REGISTER_EVENT_HANDLER(alt::CEvent::Type::VEHICLE_DETACH, VehicleDetach, "void",
     args.push_back({ev->GetDetached().Get(), false});
 });
 
-REGISTER_EVENT_HANDLER(alt::CEvent::Type::NETOWNER_CHANGE, NetOwnerChange, "void", "Vehicle@ vehicle, Player@ newOwner, Player@ oldOwner",
+REGISTER_EVENT_HANDLER(alt::CEvent::Type::NETOWNER_CHANGE, NetOwnerChange, "void", "Vehicle@ vehicle, Player@ oldOwner, Player@ newOwner",
 [](AngelScriptResource* resource, const alt::CEvent* event, std::vector<std::pair<void*, bool>>& args) {
     auto ev = static_cast<const alt::CNetOwnerChangeEvent*>(event);
     args.push_back({ev->GetTarget().Get(), false});
-    args.push_back({ev->GetNewOwner().Get(), false});
     args.push_back({ev->GetOldOwner().Get(), false});
+    args.push_back({ev->GetNewOwner().Get(), false});
 });
