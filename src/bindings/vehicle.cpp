@@ -11,7 +11,7 @@ static alt::IVehicle* VehicleFactory(uint32_t model, Vector3<float> pos, Vector3
     auto vehicle = alt::ICore::Instance().CreateVehicle(model, {pos.x, pos.y, pos.z}, {rot.x, rot.y, rot.z});
     if(vehicle.IsEmpty())
     {
-        resource->GetContext()->SetException("Invalid model hash");
+        THROW_ERROR("Invalid model hash");
         return nullptr;
     }
     vehicle->AddRef();

@@ -196,6 +196,8 @@ void AngelScriptResource::RegisterTypeInfos()
     arrayIntTypeInfo->AddRef();
     arrayUintTypeInfo = module->GetTypeInfoByDecl("array<uint>");
     arrayUintTypeInfo->AddRef();
+    arrayAnyTypeInfo = module->GetTypeInfoByDecl("array<any>");
+    arrayAnyTypeInfo->AddRef();
 }
 
 void AngelScriptResource::UnregisterTypeInfos()
@@ -203,6 +205,7 @@ void AngelScriptResource::UnregisterTypeInfos()
     if(arrayStringTypeInfo != nullptr) arrayStringTypeInfo->Release();
     if(arrayIntTypeInfo != nullptr) arrayIntTypeInfo->Release();
     if(arrayUintTypeInfo != nullptr) arrayUintTypeInfo->Release();
+    if(arrayAnyTypeInfo != nullptr) arrayAnyTypeInfo->Release();
 }
 
 CScriptArray* AngelScriptResource::CreateStringArray(uint32_t len)
@@ -220,5 +223,11 @@ CScriptArray* AngelScriptResource::CreateIntArray(uint32_t len)
 CScriptArray* AngelScriptResource::CreateUIntArray(uint32_t len)
 {
     auto arr = CScriptArray::Create(arrayUintTypeInfo, len);
+    return arr;
+}
+
+CScriptArray* AngelScriptResource::CreateAnyArray(uint32_t len)
+{
+    auto arr = CScriptArray::Create(arrayAnyTypeInfo, len);
     return arr;
 }

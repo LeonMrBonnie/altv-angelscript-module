@@ -1,6 +1,8 @@
 #include "Log.h"
 #include "../helpers/module.h"
 #include "../runtime.h"
+#include "angelscript/addon/scriptdictionary/scriptdictionary.h"
+#include "angelscript/addon/scriptany/scriptany.h"
 
 using namespace Helpers;
 
@@ -96,19 +98,134 @@ static std::string GetResourceName()
     return resource->GetResource()->GetName().ToString();
 }
 
+static std::string GetResourceMain()
+{
+    GET_RESOURCE();
+    return resource->GetResource()->GetMain().ToString();
+}
+
+static std::string GetResourcePath(const std::string& name)
+{
+    auto resource = alt::ICore::Instance().GetResource(name);
+    if(resource == nullptr)
+    {
+        THROW_ERROR("Resource not found");
+        return nullptr;
+    }
+    return resource->GetPath().ToString();
+}
+
+static bool HasResource(const std::string& name)
+{
+    auto resource = alt::ICore::Instance().GetResource(name);
+    return resource != nullptr && resource->IsStarted();
+}
+
+// todo: add get resource exports
+/*
+static CScriptArray* GetResourceExports(const std::string& name)
+{
+    GET_RESOURCE();
+    auto res = alt::ICore::Instance().GetResource(name);
+    if(res == nullptr)
+    {
+        THROW_ERROR("Resource not found");
+        return nullptr;
+    }
+    auto exports = res->GetExports();
+    auto dict = CScriptDictionary::Create(resource->GetRuntime()->GetEngine());
+    for (auto it = exports->Begin(); it; it = exports->Next())
+    {
+        
+    }
+}
+*/
+
+static void StartResource(const std::string& name)
+{
+    alt::ICore::Instance().StartResource(name);
+}
+
+static void StopResource(const std::string& name)
+{
+    alt::ICore::Instance().StopResource(name);
+}
+
+static void RestartResource(const std::string& name)
+{
+    alt::ICore::Instance().RestartResource(name);
+}
+
+static uint32_t GetNetTime()
+{
+    return alt::ICore::Instance().GetNetTime();
+}
+
+static void SetPassword(const std::string& password)
+{
+    alt::ICore::Instance().SetPassword(password);
+}
+
+static std::string GetRootDir()
+{
+    return alt::ICore::Instance().GetRootDirectory().ToString();
+}
+
+static int GetDefaultDimension()
+{
+    return alt::DEFAULT_DIMENSION;
+}
+
+static int GetGlobalDimension()
+{
+    return alt::GLOBAL_DIMENSION;
+}
+
+static std::string GetVersion()
+{
+    return alt::ICore::Instance().GetVersion().ToString();
+}
+
+static std::string GetBranch()
+{
+    return alt::ICore::Instance().GetBranch().ToString();
+}
+
+static uint32_t GetSDKVersion()
+{
+    return alt::ICore::SDK_VERSION;
+}
+
 static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs)
 {
     // Generic
     REGISTER_GLOBAL_FUNC("uint Hash(const string &in value)", Hash, "Hashes the given string using the joaat algorithm");
     REGISTER_GLOBAL_FUNC("array<Player@>@ GetAllPlayers()", GetAllPlayers, "Gets all players on the server");
     REGISTER_GLOBAL_FUNC("array<Entity@>@ GetAllEntities()", GetAllEntities, "Gets all entities on the server");
+    REGISTER_GLOBAL_PROPERTY("string", "rootDir", GetRootDir);
+    REGISTER_GLOBAL_PROPERTY("int", "defaultDimension", GetDefaultDimension);
+    REGISTER_GLOBAL_PROPERTY("int", "globalDimension", GetGlobalDimension);
+    REGISTER_GLOBAL_PROPERTY("string", "version", GetVersion);
+    REGISTER_GLOBAL_PROPERTY("string", "branch", GetBranch);
+    REGISTER_GLOBAL_PROPERTY("uint", "sdkVersion", GetSDKVersion);
 
+    // Resource
+    REGISTER_GLOBAL_FUNC("string GetResourcePath(const string&in name)", GetResourcePath, "Gets the path to the specified resource");
+    REGISTER_GLOBAL_FUNC("bool HasResource(const string&in name)", HasResource, "Returns whether the specified resource exists and is started");
+    REGISTER_GLOBAL_FUNC("void StartResource(const string&in name)", StartResource, "Starts the specified resource");
+    REGISTER_GLOBAL_FUNC("void StopResource(const string&in name)", StopResource, "Stops the specified resource");
+    REGISTER_GLOBAL_FUNC("void RestartResource(const string&in name)", RestartResource, "Restarts the specified resource");
+    REGISTER_GLOBAL_PROPERTY("string", "resourceMain", GetResourceMain);
     REGISTER_GLOBAL_PROPERTY("string", "resourceName", GetResourceName);
 
+    // Server
+    REGISTER_GLOBAL_FUNC("uint GetNetTime()", GetNetTime, "Gets the total time the server has been running for");
+    REGISTER_GLOBAL_FUNC("void SetPassword(const string&in password)", SetPassword, "Sets the current server password");
+
     // Logging
-    REGISTER_GLOBAL_FUNC("void Log(const string &in msg)", Log, "Logs the specified message to the console");
-    REGISTER_GLOBAL_FUNC("void LogWarning(const string &in msg)", LogWarning, "Logs the specified message as a warning to the console");
-    REGISTER_GLOBAL_FUNC("void LogError(const string &in msg)", LogError, "Logs the specified message as an error to the console");
+    REGISTER_GLOBAL_FUNC("void Log(const string&in msg)", Log, "Logs the specified message to the console");
+    REGISTER_GLOBAL_FUNC("void LogWarning(const string&in msg)", LogWarning, "Logs the specified message as a warning to the console");
+    REGISTER_GLOBAL_FUNC("void LogError(const string&in msg)", LogError, "Logs the specified message as an error to the console");
 
     // Timers
     REGISTER_FUNCDEF("void TimerCallback()", "Callback used for timers");
@@ -116,5 +233,9 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_GLOBAL_FUNC("uint SetInterval(TimerCallback@ callback, uint interval)", SetInterval, "Sets a interval");
     REGISTER_GLOBAL_FUNC("uint NextTick(TimerCallback@ callback)", NextTick, "Sets a next tick handler");
     REGISTER_GLOBAL_FUNC("uint EveryTick(TimerCallback@ callback)", EveryTick, "Sets a every tick handler");
+    REGISTER_GLOBAL_FUNC("void ClearTimeout(uint timerId)", ClearTimer, "Clears specified timer");
+    REGISTER_GLOBAL_FUNC("void ClearInterval(uint timerId)", ClearTimer, "Clears specified timer");
+    REGISTER_GLOBAL_FUNC("void ClearNextTick(uint timerId)", ClearTimer, "Clears specified timer");
+    REGISTER_GLOBAL_FUNC("void ClearEveryTick(uint timerId)", ClearTimer, "Clears specified timer");
     REGISTER_GLOBAL_FUNC("void ClearTimer(uint timerId)", ClearTimer, "Clears specified timer");
 });
