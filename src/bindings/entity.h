@@ -73,7 +73,7 @@ namespace Helpers
         REGISTER_PROPERTY_WRAPPER_GET(type, "bool", "visible", GetVisible<T>);
         REGISTER_PROPERTY_WRAPPER_SET(type, "bool", "visible", SetVisible<T>);
 
-        REGISTER_METHOD_WRAPPER(type, "Player@+ GetNetOwner()", GetNetOwner<T>);
+        REGISTER_METHOD_WRAPPER(type, "Player@+ GetNetOwner() const", GetNetOwner<T>);
         REGISTER_METHOD_WRAPPER(type, "void SetNetOwner(Player@ player, bool disableMigration = false)", SetNetOwner<T>);
 
         // todo: add missing methods
