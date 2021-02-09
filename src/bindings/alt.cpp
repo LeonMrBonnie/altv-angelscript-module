@@ -221,7 +221,6 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_GLOBAL_FUNC("uint Hash(const string &in value)", Hash, "Hashes the given string using the joaat algorithm");
     REGISTER_GLOBAL_FUNC("array<Player@>@ GetAllPlayers()", GetAllPlayers, "Gets all players on the server");
     REGISTER_GLOBAL_FUNC("array<Entity@>@ GetAllEntities()", GetAllEntities, "Gets all entities on the server");
-    REGISTER_GLOBAL_PROPERTY("string", "rootDir", GetRootDir);
     REGISTER_GLOBAL_PROPERTY("int", "defaultDimension", GetDefaultDimension);
     REGISTER_GLOBAL_PROPERTY("int", "globalDimension", GetGlobalDimension);
     REGISTER_GLOBAL_PROPERTY("string", "version", GetVersion);
@@ -231,6 +230,7 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     // Filesystem
     REGISTER_GLOBAL_FUNC("string ReadFile(const string&in path)", ReadFile, "Reads the specified file contents");
     REGISTER_GLOBAL_FUNC("bool FileExists(const string&in path)", FileExists, "Checks if the given file exists");
+    REGISTER_GLOBAL_PROPERTY("string", "rootDir", GetRootDir);
 
     // Resource
     REGISTER_GLOBAL_FUNC("string GetResourcePath(const string&in name)", GetResourcePath, "Gets the path to the specified resource");
