@@ -196,6 +196,25 @@ static uint32_t GetSDKVersion()
     return alt::ICore::SDK_VERSION;
 }
 
+static std::string ReadFile(const std::string& path)
+{
+    GET_RESOURCE();
+    auto file = resource->ReadFile(path);
+    if(file.IsEmpty())
+    {
+        THROW_ERROR("File not found");
+        return nullptr;
+    }
+    return file.ToString();
+}
+
+static bool FileExists(const std::string& path)
+{
+    GET_RESOURCE();
+    auto file = resource->ReadFile(path);
+    return !file.IsEmpty();
+}
+
 static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs)
 {
     // Generic
@@ -208,6 +227,10 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_GLOBAL_PROPERTY("string", "version", GetVersion);
     REGISTER_GLOBAL_PROPERTY("string", "branch", GetBranch);
     REGISTER_GLOBAL_PROPERTY("uint", "sdkVersion", GetSDKVersion);
+
+    // Filesystem
+    REGISTER_GLOBAL_FUNC("string ReadFile(const string&in path)", ReadFile, "Reads the specified file contents");
+    REGISTER_GLOBAL_FUNC("bool FileExists(const string&in path)", FileExists, "Checks if the given file exists");
 
     // Resource
     REGISTER_GLOBAL_FUNC("string GetResourcePath(const string&in name)", GetResourcePath, "Gets the path to the specified resource");

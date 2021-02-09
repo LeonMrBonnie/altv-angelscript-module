@@ -65,6 +65,7 @@ alt::String AngelScriptResource::ReadFile(alt::String path)
 {
     // Reads file content
     auto pkg = resource->GetPackage();
+    if(!pkg->FileExists(path)) return alt::String();
     alt::IPackage::File* pkgFile = pkg->OpenFile(path);
     alt::String src(pkg->GetFileSize(pkgFile));
     pkg->ReadFile(pkgFile, src.GetData(), src.GetSize());
