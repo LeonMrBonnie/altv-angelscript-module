@@ -21,8 +21,18 @@ static void SetModel(uint32_t model, alt::IPlayer* player)
     player->SetModel(model);
 }
 
+static std::string ToString(alt::IPlayer* player)
+{
+    std::stringstream str;
+    str << "Player{ id: " << std::to_string(player->GetID()) << ", name: " << player->GetName().ToString() << " }";
+    return str.str();
+}
+
 static ModuleExtension playerExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs) {
     RegisterAsEntity<alt::IPlayer>(engine, docs, "Player");
+
+    // Implicit conversion to string
+    REGISTER_METHOD_WRAPPER("Player", "string opImplConv() const", ToString);
 
     REGISTER_PROPERTY_WRAPPER_GET("Player", "string", "name", GetName);
     REGISTER_PROPERTY_WRAPPER_SET("Player", "uint", "model", SetModel);
