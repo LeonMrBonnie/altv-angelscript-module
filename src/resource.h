@@ -5,6 +5,8 @@
 #include "helpers/timer.h"
 #include "angelscript/include/angelscript.h"
 #include "angelscript/addon/scriptarray/scriptarray.h"
+#include "angelscript/addon/scriptbuilder/scriptbuilder.h"
+#include "angelscript/addon/scripthelper/scripthelper.h"
 
 class AngelScriptRuntime;
 class AngelScriptResource : public alt::IResource::Impl
@@ -45,6 +47,8 @@ public:
         return module;
     }
 
+    // Returns the main function if found, otherwise nullptr
+    asIScriptFunction* RegisterMetadata(CScriptBuilder& builder);
     void RegisterTypeInfos();
     void UnregisterTypeInfos();
     CScriptArray* CreateStringArray(uint32_t len);

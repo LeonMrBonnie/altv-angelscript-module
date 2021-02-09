@@ -1,7 +1,5 @@
 #include "resource.h"
 #include "runtime.h"
-#include "angelscript/addon/scriptbuilder/scriptbuilder.h"
-#include "angelscript/addon/scripthelper/scripthelper.h"
 #include "helpers/module.h"
 #include "helpers/events.h"
 
@@ -30,8 +28,13 @@ bool AngelScriptResource::Start()
     context = runtime->GetEngine()->CreateContext();
     context->SetUserData(this);
 
-    asIScriptFunction* func = module->GetFunctionByDecl("void Start()");
-    if(func == 0)
+    // Get metadata (returns start function)
+    asIScriptFunction* func = RegisterMetadata(builder);
+
+    // Get the global start function if no script class start function was found
+    if(func == nullptr) func = module->GetFunctionByDecl("void Start()");
+    // If main function was still not found, return an error
+    if(func == nullptr)
     {
         Log::Error << "The main entrypoint was not found" << Log::Endl;
         module->Discard();
@@ -146,6 +149,43 @@ void AngelScriptResource::OnTick()
             RemoveTimer(timer.first);
         }
     }
+}
+
+asIScriptFunction* AngelScriptResource::RegisterMetadata(CScriptBuilder& builder)
+{
+    asIScriptFunction* mainFunc = nullptr;
+    // todo: add support meta properly
+    /*
+    uint32_t count = module->GetObjectTypeCount();
+    for(uint32_t i = 0; i < count; i++)
+    {
+        // Get the type for the class
+        auto type = module->GetObjectTypeByIndex(i);
+        // Get metadata for the class
+        std::vector<std::string> metadata = builder.GetMetadataForType(type->GetTypeId());
+        for(auto meta : metadata)
+        {
+            // The metadata equals IServer so its our main server class
+            if(meta == "IServer")
+            {
+                // Get all methods and check their metadata
+                auto methods = type->GetMethodCount();
+                for(uint32_t n = 0; i < methods; i++)
+                {
+                    auto method = type->GetMethodByIndex(n, false);
+                    // Get metadata for the method
+                    std::vector<std::string> methodMetas = builder.GetMetadataForTypeMethod(type->GetTypeId(), method);
+                    for(auto methodMeta : methodMetas)
+                    {
+                        if(methodMeta == "Start") mainFunc = method;
+                    }
+                }
+            }
+        }
+    }
+    */
+
+    return mainFunc;
 }
 
 void AngelScriptResource::RegisterTypeInfos()
