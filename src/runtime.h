@@ -20,8 +20,10 @@ public:
         return engine;
     }
 
+    // Register the script interfaces (the scripting api)
     void RegisterScriptInterfaces(asIScriptEngine* engine, Helpers::DocsGenerator* docs);
 
+    // Gets the current runtime instance or creates one if not exists
     static AngelScriptRuntime& Instance()
 	{
 		static AngelScriptRuntime _instance;

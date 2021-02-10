@@ -36,7 +36,7 @@ bool AngelScriptResource::Start()
     // If main function was still not found, return an error
     if(func == nullptr)
     {
-        Log::Error << "The main entrypoint was not found" << Log::Endl;
+        Log::Error << "The main entrypoint ('void Start()') was not found" << Log::Endl;
         module->Discard();
         context->Release();
         return false;
@@ -56,6 +56,7 @@ bool AngelScriptResource::Start()
         }
     }
 
+    // Cache type infos
     RegisterTypeInfos();
 
     return true;
@@ -63,11 +64,13 @@ bool AngelScriptResource::Start()
 
 alt::String AngelScriptResource::ReadFile(alt::String path)
 {
-    // Reads file content
     auto pkg = resource->GetPackage();
+    // Check if file exists
     if(!pkg->FileExists(path)) return alt::String();
+    // Open file
     alt::IPackage::File* pkgFile = pkg->OpenFile(path);
     alt::String src(pkg->GetFileSize(pkgFile));
+    // Read file content
     pkg->ReadFile(pkgFile, src.GetData(), src.GetSize());
     pkg->CloseFile(pkgFile);
 
@@ -92,11 +95,14 @@ bool AngelScriptResource::Stop()
 
     if(context != nullptr) context->Release();
 
+    // Release the event handler script functions to not create a memory leak
     for(auto pair : eventHandlers)
     {
         pair.second->Release();
     }
+    eventHandlers.clear();
 
+    // Unregister the cached types
     UnregisterTypeInfos();
 
     return true;
@@ -104,17 +110,22 @@ bool AngelScriptResource::Stop()
 
 bool AngelScriptResource::OnEvent(const alt::CEvent* ev)
 {
+    // Get the handler for the specified event
     auto event = Helpers::Event::GetEvent(ev->GetType());
     if(event == nullptr)
     {
         Log::Error << "Unhandled event type " << std::to_string((uint16_t)ev->GetType()) << Log::Endl;
         return true;
     }
+    // Get all script callbacks for the event
     auto callbacks = GetEventHandlers(ev->GetType());
+    // Get the args for the event
     auto args = event->GetArgs(this, ev);
     auto returnType = event->GetReturnType();
+    // If the return type of the event is bool, it should return a value
     bool shouldReturn = strcmp(returnType, "bool") == 0;
 
+    // Loop over all script callbacks and call them with the args
     for(auto callback : callbacks)
     {
         auto r = context->Prepare(callback);
@@ -139,9 +150,11 @@ bool AngelScriptResource::OnEvent(const alt::CEvent* ev)
 
 void AngelScriptResource::OnTick()
 {
+    // Remove all invalid timers
     for (auto &id : invalidTimers) timers.erase(id);
     invalidTimers.clear();
 
+    // Update timers
     for(auto& timer : timers)
     {
         int64_t time = GetTime();
@@ -191,6 +204,7 @@ asIScriptFunction* AngelScriptResource::RegisterMetadata(CScriptBuilder& builder
 
 void AngelScriptResource::RegisterTypeInfos()
 {
+    // Register all commonly used types once to save performance
     arrayStringTypeInfo = module->GetTypeInfoByDecl("array<string>");
     arrayStringTypeInfo->AddRef();
     arrayIntTypeInfo = module->GetTypeInfoByDecl("array<int>");
@@ -203,30 +217,36 @@ void AngelScriptResource::RegisterTypeInfos()
 
 void AngelScriptResource::UnregisterTypeInfos()
 {
+    // Unregister the cached types to not create a memory leak
+    // After calling Release the ref count should be 0, so AngelScript will free the memory
     if(arrayStringTypeInfo != nullptr) arrayStringTypeInfo->Release();
     if(arrayIntTypeInfo != nullptr) arrayIntTypeInfo->Release();
     if(arrayUintTypeInfo != nullptr) arrayUintTypeInfo->Release();
     if(arrayAnyTypeInfo != nullptr) arrayAnyTypeInfo->Release();
 }
 
+// Creates an array of strings
 CScriptArray* AngelScriptResource::CreateStringArray(uint32_t len)
 {
     auto arr = CScriptArray::Create(arrayStringTypeInfo, len);
     return arr;
 }
 
+// Creates an array of ints
 CScriptArray* AngelScriptResource::CreateIntArray(uint32_t len)
 {
     auto arr = CScriptArray::Create(arrayIntTypeInfo, len);
     return arr;
 }
 
+// Creates an array of unsigned ints
 CScriptArray* AngelScriptResource::CreateUIntArray(uint32_t len)
 {
     auto arr = CScriptArray::Create(arrayUintTypeInfo, len);
     return arr;
 }
 
+// Creates an array of any handles
 CScriptArray* AngelScriptResource::CreateAnyArray(uint32_t len)
 {
     auto arr = CScriptArray::Create(arrayAnyTypeInfo, len);

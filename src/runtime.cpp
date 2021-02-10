@@ -15,6 +15,7 @@ AngelScriptRuntime::AngelScriptRuntime()
 {
     using namespace Helpers;
 
+    // Create a new AngelScript engine
     engine = asCreateScriptEngine();
     engine->SetMessageCallback(asFUNCTION(Helpers::MessageHandler), 0, asCALL_CDECL);
 
@@ -23,7 +24,7 @@ AngelScriptRuntime::AngelScriptRuntime()
 
     // Create docs
     Helpers::DocsGenerator altGen("alt");
-
+    
     RegisterScriptInterfaces(engine, &altGen);
 
     // Generate docs

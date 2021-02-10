@@ -7,6 +7,7 @@
 #include "docs.h"
 #include "module.h"
 
+// Registers a new event handler and creates a wrapper function for registering it
 #define REGISTER_EVENT_HANDLER(type, name, returnType, decl, argsGetter) \
     static void On##name##(asIScriptFunction* callback) { \
         GET_RESOURCE(); \

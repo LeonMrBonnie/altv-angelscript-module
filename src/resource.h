@@ -16,12 +16,15 @@ class AngelScriptResource : public alt::IResource::Impl
     asIScriptModule* module = nullptr;
     asIScriptContext* context = nullptr;
 
+    // Timers
     std::unordered_map<uint32_t, Helpers::Timer*> timers;
     std::vector<uint32_t> invalidTimers;
     uint32_t nextTimerId = 1;
 
+    // first = event type, second = script callback
     std::vector<std::pair<alt::CEvent::Type, asIScriptFunction*>> eventHandlers;
 
+    // Types
     asITypeInfo* arrayStringTypeInfo = nullptr;
     asITypeInfo* arrayIntTypeInfo = nullptr;
     asITypeInfo* arrayUintTypeInfo = nullptr;
@@ -58,10 +61,12 @@ public:
     CScriptArray* CreateAnyArray(uint32_t);
 
     alt::String ReadFile(alt::String path);
+    // Registers a new script callback for the specified event
     void RegisterEventHandler(alt::CEvent::Type event, asIScriptFunction* handler)
     {
-        eventHandlers.emplace_back(std::pair(event, handler));
+        eventHandlers.push_back({event, handler});
     }
+    // Gets all script event handlers of the specified type
     std::vector<asIScriptFunction*> GetEventHandlers(alt::CEvent::Type event)
     {
         std::vector<asIScriptFunction*> events;
@@ -72,6 +77,7 @@ public:
         return events;
     }
 
+    // Creates a new timer
     uint32_t CreateTimer(uint32_t timeout, asIScriptFunction* callback, bool once)
     {
 

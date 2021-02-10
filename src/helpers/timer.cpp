@@ -15,6 +15,7 @@ Timer::Timer(AngelScriptResource* resource, asIScriptFunction* callback, uint32_
 bool Timer::Update(int64_t time)
 {
     auto elapsed = time - lastRun;
+    // If the interval has been reached, run the timer callback
     if (elapsed >= interval)
     {
         auto context = resource->GetContext();

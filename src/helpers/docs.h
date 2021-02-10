@@ -13,10 +13,13 @@
 
 #define PAD_SPACE "    "
 
+// The whole docs generator is a mess, but it does the job
+
 namespace Helpers
 {
     class DocsGenerator
     {
+        #ifdef AS_GENERATE_DOCUMENTATION
         std::string module;
         std::vector<std::pair<std::string, std::string>> declarations;
         std::vector<std::pair<std::string, std::string>> variables;
@@ -28,6 +31,7 @@ namespace Helpers
         std::unordered_multimap<std::string, std::string> objectDeclarations;
         std::unordered_multimap<std::string, std::string> objectConstructors;
         std::unordered_multimap<std::string, std::string> objectMethods;
+        #endif
     public:
         DocsGenerator(std::string module) : module(module) {};
 
