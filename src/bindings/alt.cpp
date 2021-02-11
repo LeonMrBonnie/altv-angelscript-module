@@ -3,6 +3,7 @@
 #include "../runtime.h"
 #include "angelscript/addon/scriptdictionary/scriptdictionary.h"
 #include "angelscript/addon/scriptany/scriptany.h"
+#include "../helpers/convert.h"
 
 using namespace Helpers;
 
@@ -215,6 +216,32 @@ static bool FileExists(const std::string& path)
     return !file.IsEmpty();
 }
 
+static void On(const std::string& name, asIScriptFunction* handler)
+{
+    GET_RESOURCE();
+    resource->RegisterCustomEventHandler(name, handler, true);
+}
+
+static void OnClient(const std::string& name, asIScriptFunction* handler)
+{
+    GET_RESOURCE();
+    resource->RegisterCustomEventHandler(name, handler, false);
+}
+
+static void Emit(const std::string& event, CScriptArray* args)
+{
+    GET_RESOURCE();
+    alt::MValueArgs mvalueArgs;
+    for(int i = 0; i < args->GetSize(); i++)
+    {
+        CScriptAny* arg = (CScriptAny*)args->At(i);
+        void* value;
+        arg->Retrieve(value, arg->GetTypeId());
+        mvalueArgs.Push(Helpers::ValueToMValue(resource->GetRuntime()->GetEngine()->GetTypeInfoById(arg->GetTypeId()), value));
+    }
+    alt::ICore::Instance().TriggerLocalEvent(event, mvalueArgs);
+}
+
 static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs)
 {
     // Generic
@@ -261,4 +288,11 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_GLOBAL_FUNC("void ClearNextTick(uint timerId)", ClearTimer, "Clears specified timer");
     REGISTER_GLOBAL_FUNC("void ClearEveryTick(uint timerId)", ClearTimer, "Clears specified timer");
     REGISTER_GLOBAL_FUNC("void ClearTimer(uint timerId)", ClearTimer, "Clears specified timer");
+
+    // Events
+    REGISTER_FUNCDEF("void LocalEventCallback(array<any> args)", "Event callback used for custom events");
+    REGISTER_FUNCDEF("void RemoteEventCallback(Player@ player, array<any>@ args)", "Event callback used for custom events");
+    REGISTER_GLOBAL_FUNC("void On(const string&in event, LocalEventCallback@ callback)", On, "Registers an event handler for a local custom event");
+    REGISTER_GLOBAL_FUNC("void OnClient(const string&in event, RemoteEventCallback@ callback)", OnClient, "Registers an event handler for a remote custom event");
+    REGISTER_GLOBAL_FUNC("void Emit(const string&in event, array<any>@ args)", Emit, "Emits a custom event");
 });

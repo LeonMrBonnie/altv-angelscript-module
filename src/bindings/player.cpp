@@ -3,6 +3,8 @@
 #include "../helpers/module.h"
 #include "entity.h"
 #include "../runtime.h"
+#include "angelscript/addon/scriptany/scriptany.h"
+#include "../helpers/convert.h"
 
 using namespace Helpers;
 
@@ -228,6 +230,20 @@ static std::string GetAuthToken(alt::IPlayer* player)
     return player->GetAuthToken().CStr();
 }
 
+static void Emit(const std::string& event, CScriptArray* args, alt::IPlayer* player)
+{
+    GET_RESOURCE();
+    alt::MValueArgs mvalueArgs;
+    for(int i = 0; i < args->GetSize(); i++)
+    {
+        CScriptAny* arg = (CScriptAny*)args->At(i);
+        void* value;
+        arg->Retrieve(value, arg->GetTypeId());
+        mvalueArgs.Push(Helpers::ValueToMValue(resource->GetRuntime()->GetEngine()->GetTypeInfoById(arg->GetTypeId()), value));
+    }
+    alt::ICore::Instance().TriggerClientEvent(alt::Ref<alt::IPlayer>(player), event, mvalueArgs);
+}
+
 static ModuleExtension playerExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs) {
     RegisterAsEntity<alt::IPlayer>(engine, docs, "Player");
 
@@ -250,7 +266,7 @@ static ModuleExtension playerExtension("alt", [](asIScriptEngine* engine, DocsGe
 
     REGISTER_PROPERTY_WRAPPER_GET("Player", "uint", "weapon", GetCurrentWeapon);
     REGISTER_PROPERTY_WRAPPER_SET("Player", "uint", "weapon", SetCurrentWeapon);
-    REGISTER_PROPERTY_WRAPPER_GET("Player", "array<uint>", "weaponComponents", GetWeaponComponents);
+    REGISTER_PROPERTY_WRAPPER_GET("Player", "array<uint>@", "weaponComponents", GetWeaponComponents);
     REGISTER_PROPERTY_WRAPPER_GET("Player", "uint", "weaponTint", GetCurrentWeaponTint);
 
     REGISTER_PROPERTY_WRAPPER_GET("Player", "bool", "dead", IsDead);
@@ -287,6 +303,8 @@ static ModuleExtension playerExtension("alt", [](asIScriptEngine* engine, DocsGe
 
     REGISTER_METHOD_WRAPPER("Player", "bool HasWeaponComponent(uint weapon, uint component)", HasWeaponComponent);
     REGISTER_METHOD_WRAPPER("Player", "uint GetWeaponTint(uint weapon)", GetWeaponTint);
+
+    REGISTER_METHOD_WRAPPER("Player", "void Emit(const string&in event, array<any>@ args)", Emit);
 
     // todo: add missing methods
 });

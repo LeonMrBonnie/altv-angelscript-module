@@ -23,6 +23,8 @@ class AngelScriptResource : public alt::IResource::Impl
 
     // first = event type, second = script callback
     std::vector<std::pair<alt::CEvent::Type, asIScriptFunction*>> eventHandlers;
+    std::unordered_multimap<std::string, asIScriptFunction*> customLocalEventHandlers;
+    std::unordered_multimap<std::string, asIScriptFunction*> customRemoteEventHandlers;
 
 public:
     AngelScriptResource(AngelScriptRuntime* runtime, alt::IResource* resource) : runtime(runtime), resource(resource) {};
@@ -49,6 +51,7 @@ public:
     asIScriptFunction* RegisterMetadata(CScriptBuilder& builder);
 
     alt::String ReadFile(alt::String path);
+
     // Registers a new script callback for the specified event
     void RegisterEventHandler(alt::CEvent::Type event, asIScriptFunction* handler)
     {
@@ -64,6 +67,28 @@ public:
         }
         return events;
     }
+    
+    void RegisterCustomEventHandler(const std::string& name, asIScriptFunction* handler, bool local = true)
+    {
+        if(local) customLocalEventHandlers.insert({name, handler});
+        else customRemoteEventHandlers.insert({name, handler});
+    }
+    std::vector<asIScriptFunction*> GetCustomEventHandlers(const std::string& name, bool local = true)
+    {
+        std::vector<asIScriptFunction*> arr;
+        if(local) 
+        {
+            auto range = customLocalEventHandlers.equal_range(name);
+            for (auto it = range.first; it != range.second; it++) arr.push_back(it->second);
+        }
+        else
+        {
+            auto range = customRemoteEventHandlers.equal_range(name);
+            for (auto it = range.first; it != range.second; it++) arr.push_back(it->second);
+        }
+        return arr;
+    }
+    void HandleCustomEvent(const alt::CEvent* event, bool local = true);
 
     // Creates a new timer
     uint32_t CreateTimer(uint32_t timeout, asIScriptFunction* callback, bool once)

@@ -2,6 +2,8 @@
 #include "runtime.h"
 #include "helpers/module.h"
 #include "helpers/events.h"
+#include "angelscript/addon/scriptany/scriptany.h"
+#include "helpers/convert.h"
 
 bool AngelScriptResource::Start()
 {
@@ -99,11 +101,33 @@ bool AngelScriptResource::Stop()
     }
     eventHandlers.clear();
 
+    for(auto kv : customLocalEventHandlers)
+    {
+        kv.second->Release();
+    }
+    customLocalEventHandlers.clear();
+
+    for(auto kv : customRemoteEventHandlers)
+    {
+        kv.second->Release();
+    }
+    customRemoteEventHandlers.clear();
+
     return true;
 }
 
 bool AngelScriptResource::OnEvent(const alt::CEvent* ev)
 {
+    if(ev->GetType() == alt::CEvent::Type::SERVER_SCRIPT_EVENT)
+    {
+        HandleCustomEvent(ev, true);
+        return true;
+    }
+    else if(ev->GetType() == alt::CEvent::Type::CLIENT_SCRIPT_EVENT)
+    {
+        HandleCustomEvent(ev, false);
+        return true;
+    }
     // Get the handler for the specified event
     auto event = Helpers::Event::GetEvent(ev->GetType());
     if(event == nullptr)
@@ -140,6 +164,63 @@ bool AngelScriptResource::OnEvent(const alt::CEvent* ev)
     }
 
     return true;
+}
+
+void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local)
+{
+    std::string name;
+    alt::MValueArgs args;
+    if(local)
+    {
+        auto ev = static_cast<const alt::CServerScriptEvent*>(event);
+        name = ev->GetName().ToString();
+        args = ev->GetArgs();
+        CScriptArray* array = runtime->CreateAnyArray(args.GetSize());
+        std::vector<asIScriptFunction*> handlers = GetCustomEventHandlers(name, true);
+        for(int i = 0; i < args.GetSize(); i++)
+        {
+            CScriptAny* any;
+            auto arg = args[i];
+            std::pair<uint32_t, void*> converted = Helpers::GetMValueValue(runtime->GetEngine(), arg);
+            any->Store(converted.second, converted.first);
+            array->SetValue(i, any);
+        }
+        for(auto handler : handlers)
+        {
+            auto r = context->Prepare(handler);
+            CHECK_AS_RETURN("Prepare custom event handler", r);
+            context->SetArgObject(0, array);
+            r = context->Execute();
+            CHECK_AS_RETURN("Execute custom event handler", r);
+        }
+    }
+    else
+    {
+        alt::Ref<alt::IPlayer> player;
+        auto ev = static_cast<const alt::CClientScriptEvent*>(event);
+        name = ev->GetName().ToString();
+        args = ev->GetArgs();
+        player = ev->GetTarget();
+        CScriptArray* array = runtime->CreateAnyArray(args.GetSize());
+        std::vector<asIScriptFunction*> handlers = GetCustomEventHandlers(name, false);
+        for(int i = 0; i < args.GetSize(); i++)
+        {
+            CScriptAny* any;
+            auto arg = args[i];
+            std::pair<uint32_t, void*> converted = Helpers::GetMValueValue(runtime->GetEngine(), arg);
+            any->Store(converted.second, converted.first);
+            array->SetValue(i, any);
+        }
+        for(auto handler : handlers)
+        {
+            auto r = context->Prepare(handler);
+            CHECK_AS_RETURN("Prepare custom event handler", r);
+            context->SetArgObject(0, player.Get());
+            context->SetArgObject(1, array);
+            r = context->Execute();
+            CHECK_AS_RETURN("Execute custom event handler", r);
+        }
+    }
 }
 
 void AngelScriptResource::OnTick()
