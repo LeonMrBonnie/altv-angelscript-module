@@ -56,6 +56,50 @@ void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine, DocsG
 
     // Register events
     Event::RegisterAll(engine, docs);
+
+    // Cache type infos
+    RegisterTypeInfos();
+}
+
+void AngelScriptRuntime::RegisterTypeInfos()
+{
+    // Register all commonly used types once to save performance
+    arrayStringTypeInfo = engine->GetTypeInfoByDecl("array<string>");
+    arrayStringTypeInfo->AddRef();
+    arrayIntTypeInfo = engine->GetTypeInfoByDecl("array<int>");
+    arrayIntTypeInfo->AddRef();
+    arrayUintTypeInfo = engine->GetTypeInfoByDecl("array<uint>");
+    arrayUintTypeInfo->AddRef();
+    arrayAnyTypeInfo = engine->GetTypeInfoByDecl("array<any>");
+    arrayAnyTypeInfo->AddRef();
+}
+
+// Creates an array of strings
+CScriptArray* AngelScriptRuntime::CreateStringArray(uint32_t len)
+{
+    auto arr = CScriptArray::Create(arrayStringTypeInfo, len);
+    return arr;
+}
+
+// Creates an array of ints
+CScriptArray* AngelScriptRuntime::CreateIntArray(uint32_t len)
+{
+    auto arr = CScriptArray::Create(arrayIntTypeInfo, len);
+    return arr;
+}
+
+// Creates an array of unsigned ints
+CScriptArray* AngelScriptRuntime::CreateUIntArray(uint32_t len)
+{
+    auto arr = CScriptArray::Create(arrayUintTypeInfo, len);
+    return arr;
+}
+
+// Creates an array of any handles
+CScriptArray* AngelScriptRuntime::CreateAnyArray(uint32_t len)
+{
+    auto arr = CScriptArray::Create(arrayAnyTypeInfo, len);
+    return arr;
 }
 
 alt::IResource::Impl* AngelScriptRuntime::CreateImpl(alt::IResource* impl)

@@ -1,5 +1,6 @@
 #include "helpers/events.h"
 #include "angelscript/addon/scriptarray/scriptarray.h"
+#include "../runtime.h"
 
 using namespace Helpers;
 
@@ -20,7 +21,7 @@ REGISTER_EVENT_HANDLER(alt::CEvent::Type::CONSOLE_COMMAND_EVENT, ConsoleCommand,
     auto ev = static_cast<const alt::CConsoleCommandEvent*>(event);
 
     auto evArgs = ev->GetArgs();
-    auto arr = resource->CreateStringArray(evArgs.GetSize());
+    auto arr = resource->GetRuntime()->CreateStringArray(evArgs.GetSize());
     for(int i = 0; i < evArgs.GetSize(); i++)
     {
         arr->SetValue(i, &evArgs[i].ToString());

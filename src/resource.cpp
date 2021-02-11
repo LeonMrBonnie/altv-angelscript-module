@@ -56,9 +56,6 @@ bool AngelScriptResource::Start()
         }
     }
 
-    // Cache type infos
-    RegisterTypeInfos();
-
     return true;
 }
 
@@ -101,9 +98,6 @@ bool AngelScriptResource::Stop()
         pair.second->Release();
     }
     eventHandlers.clear();
-
-    // Unregister the cached types
-    UnregisterTypeInfos();
 
     return true;
 }
@@ -200,55 +194,4 @@ asIScriptFunction* AngelScriptResource::RegisterMetadata(CScriptBuilder& builder
     */
 
     return mainFunc;
-}
-
-void AngelScriptResource::RegisterTypeInfos()
-{
-    // Register all commonly used types once to save performance
-    arrayStringTypeInfo = module->GetTypeInfoByDecl("array<string>");
-    arrayStringTypeInfo->AddRef();
-    arrayIntTypeInfo = module->GetTypeInfoByDecl("array<int>");
-    arrayIntTypeInfo->AddRef();
-    arrayUintTypeInfo = module->GetTypeInfoByDecl("array<uint>");
-    arrayUintTypeInfo->AddRef();
-    arrayAnyTypeInfo = module->GetTypeInfoByDecl("array<any>");
-    arrayAnyTypeInfo->AddRef();
-}
-
-void AngelScriptResource::UnregisterTypeInfos()
-{
-    // Unregister the cached types to not create a memory leak
-    // After calling Release the ref count should be 0, so AngelScript will free the memory
-    if(arrayStringTypeInfo != nullptr) arrayStringTypeInfo->Release();
-    if(arrayIntTypeInfo != nullptr) arrayIntTypeInfo->Release();
-    if(arrayUintTypeInfo != nullptr) arrayUintTypeInfo->Release();
-    if(arrayAnyTypeInfo != nullptr) arrayAnyTypeInfo->Release();
-}
-
-// Creates an array of strings
-CScriptArray* AngelScriptResource::CreateStringArray(uint32_t len)
-{
-    auto arr = CScriptArray::Create(arrayStringTypeInfo, len);
-    return arr;
-}
-
-// Creates an array of ints
-CScriptArray* AngelScriptResource::CreateIntArray(uint32_t len)
-{
-    auto arr = CScriptArray::Create(arrayIntTypeInfo, len);
-    return arr;
-}
-
-// Creates an array of unsigned ints
-CScriptArray* AngelScriptResource::CreateUIntArray(uint32_t len)
-{
-    auto arr = CScriptArray::Create(arrayUintTypeInfo, len);
-    return arr;
-}
-
-// Creates an array of any handles
-CScriptArray* AngelScriptResource::CreateAnyArray(uint32_t len)
-{
-    auto arr = CScriptArray::Create(arrayAnyTypeInfo, len);
-    return arr;
 }

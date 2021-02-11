@@ -24,12 +24,6 @@ class AngelScriptResource : public alt::IResource::Impl
     // first = event type, second = script callback
     std::vector<std::pair<alt::CEvent::Type, asIScriptFunction*>> eventHandlers;
 
-    // Types
-    asITypeInfo* arrayStringTypeInfo = nullptr;
-    asITypeInfo* arrayIntTypeInfo = nullptr;
-    asITypeInfo* arrayUintTypeInfo = nullptr;
-    asITypeInfo* arrayAnyTypeInfo = nullptr;
-
 public:
     AngelScriptResource(AngelScriptRuntime* runtime, alt::IResource* resource) : runtime(runtime), resource(resource) {};
     ~AngelScriptResource() = default;
@@ -53,12 +47,6 @@ public:
 
     // Returns the main function if found, otherwise nullptr
     asIScriptFunction* RegisterMetadata(CScriptBuilder& builder);
-    void RegisterTypeInfos();
-    void UnregisterTypeInfos();
-    CScriptArray* CreateStringArray(uint32_t len);
-    CScriptArray* CreateIntArray(uint32_t len);
-    CScriptArray* CreateUIntArray(uint32_t);
-    CScriptArray* CreateAnyArray(uint32_t);
 
     alt::String ReadFile(alt::String path);
     // Registers a new script callback for the specified event

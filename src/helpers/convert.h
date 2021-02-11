@@ -23,8 +23,8 @@ namespace Helpers
             //case alt::IMValue::Type::RGBA: return engine->GetTypeInfoByName("RGBA");
         }
     }
-    alt::MValue GetMValueFromTypeInfo(asITypeInfo* type)
+    /*alt::MValue GetMValueFromTypeInfo(asITypeInfo* type)
     {
         // todo: implement this
-    }
+    }*/
 }

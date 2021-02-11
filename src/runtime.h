@@ -10,6 +10,12 @@ class AngelScriptRuntime : public alt::IScriptRuntime
 {
     asIScriptEngine* engine;
 
+    // Types
+    asITypeInfo* arrayStringTypeInfo = nullptr;
+    asITypeInfo* arrayIntTypeInfo = nullptr;
+    asITypeInfo* arrayUintTypeInfo = nullptr;
+    asITypeInfo* arrayAnyTypeInfo = nullptr;
+
 public:
     AngelScriptRuntime();
     alt::IResource::Impl* CreateImpl(alt::IResource* resource) override;
@@ -20,6 +26,11 @@ public:
         return engine;
     }
 
+    CScriptArray* CreateStringArray(uint32_t len);
+    CScriptArray* CreateIntArray(uint32_t len);
+    CScriptArray* CreateUIntArray(uint32_t);
+    CScriptArray* CreateAnyArray(uint32_t);
+    void RegisterTypeInfos();
     // Register the script interfaces (the scripting api)
     void RegisterScriptInterfaces(asIScriptEngine* engine, Helpers::DocsGenerator* docs);
 

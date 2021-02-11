@@ -1,6 +1,7 @@
 #pragma once
 #include "Log.h"
 #include "../helpers/module.h"
+//#include "../helpers/convert.h"
 
 using namespace Helpers;
 
@@ -22,6 +23,35 @@ static uint32_t GetType(T* obj)
     return (uint8_t)obj->GetType();
 }
 
+/*
+template<class T>
+static void GetMeta(const std::string& key, void* ref, int typeId, T* obj)
+{
+    GET_RESOURCE();
+    if(!obj->HasMetaData(key))
+    {
+        THROW_ERROR("The specified meta key does not exist on the object");
+        return;
+    }
+
+    // Dereference received handles to get the object
+	if(typeId & asTYPEID_OBJHANDLE )
+	{
+		// Store the actual reference
+		ref = *(void**)ref;
+		typeId &= ~asTYPEID_OBJHANDLE;
+	}
+    asITypeInfo* type = resource->GetRuntime()->GetEngine()->GetTypeInfoById(typeId);
+    auto mvalue = obj->GetMetaData(key);
+    asITypeInfo* mvalueType = Helpers::GetTypeInfoFromMValue(resource->GetRuntime()->GetEngine(), mvalue);
+    if(type != mvalueType)
+    {
+        THROW_ERROR("The specified output value for the meta data does not have the correct type");
+        return;
+    }
+}
+*/
+
 namespace Helpers
 {
     template<class T>
@@ -33,5 +63,6 @@ namespace Helpers
         REGISTER_PROPERTY_WRAPPER_GET(type, "int", "type", GetType<T>);
         
         // todo: add meta methods
+        //REGISTER_METHOD_WRAPPER(type, "void GetMeta(string key, ?&out outValue)", GetMeta<T>);
     }
 }

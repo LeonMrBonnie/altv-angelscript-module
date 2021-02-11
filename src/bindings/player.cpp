@@ -2,6 +2,7 @@
 #include "Log.h"
 #include "../helpers/module.h"
 #include "entity.h"
+#include "../runtime.h"
 
 using namespace Helpers;
 
@@ -77,7 +78,7 @@ static CScriptArray* GetWeaponComponents(alt::IPlayer* player)
 {
     GET_RESOURCE();
     auto components = player->GetCurrentWeaponComponents();
-    auto arr = resource->CreateUIntArray(components.GetSize());
+    auto arr = resource->GetRuntime()->CreateUIntArray(components.GetSize());
     for(int i = 0; i < components.GetSize(); i++)
     {
         arr->SetValue(i, &components[i]);
