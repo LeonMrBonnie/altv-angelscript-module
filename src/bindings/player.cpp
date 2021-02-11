@@ -100,6 +100,11 @@ static uint32_t GetCurrentWeapon(alt::IPlayer* player)
     return player->GetCurrentWeapon();
 }
 
+static void SetCurrentWeapon(uint32_t weapon, alt::IPlayer* player)
+{
+    player->SetCurrentWeapon(weapon);
+}
+
 static bool IsDead(alt::IPlayer* player)
 {
     return player->IsDead();
@@ -187,6 +192,41 @@ static void Despawn(alt::IPlayer* player)
     player->Despawn();
 }
 
+static bool IsConnected(alt::IPlayer* player)
+{
+    return player->IsConnected();
+}
+
+static uint32_t GetPing(alt::IPlayer* player)
+{
+    return player->GetPing();
+}
+
+static std::string GetIP(alt::IPlayer* player)
+{
+    return player->GetIP().CStr();
+}
+
+static uint64_t GetSocialID(alt::IPlayer* player)
+{
+    return player->GetSocialID();
+}
+
+static uint64_t GetHwidHash(alt::IPlayer* player)
+{
+    return player->GetHwidHash();
+}
+
+static uint64_t GetHwidExHash(alt::IPlayer* player)
+{
+    return player->GetHwidExHash();
+}
+
+static std::string GetAuthToken(alt::IPlayer* player)
+{
+    return player->GetAuthToken().CStr();
+}
+
 static ModuleExtension playerExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs) {
     RegisterAsEntity<alt::IPlayer>(engine, docs, "Player");
 
@@ -208,6 +248,7 @@ static ModuleExtension playerExtension("alt", [](asIScriptEngine* engine, DocsGe
     REGISTER_PROPERTY_WRAPPER_SET("Player", "uint", "maxArmour", SetMaxArmour);
 
     REGISTER_PROPERTY_WRAPPER_GET("Player", "uint", "weapon", GetCurrentWeapon);
+    REGISTER_PROPERTY_WRAPPER_SET("Player", "uint", "weapon", SetCurrentWeapon);
     REGISTER_PROPERTY_WRAPPER_GET("Player", "array<uint>", "weaponComponents", GetWeaponComponents);
     REGISTER_PROPERTY_WRAPPER_GET("Player", "uint", "weaponTint", GetCurrentWeaponTint);
 
@@ -217,6 +258,7 @@ static ModuleExtension playerExtension("alt", [](asIScriptEngine* engine, DocsGe
     REGISTER_PROPERTY_WRAPPER_GET("Player", "bool", "aiming", IsAiming);
     REGISTER_PROPERTY_WRAPPER_GET("Player", "bool", "shooting", IsShooting);
     REGISTER_PROPERTY_WRAPPER_GET("Player", "bool", "reloading", IsReloading);
+    REGISTER_PROPERTY_WRAPPER_GET("Player", "bool", "connected", IsConnected);
 
     REGISTER_PROPERTY_WRAPPER_GET("Player", "float", "moveSpeed", GetMoveSpeed);
     REGISTER_PROPERTY_WRAPPER_GET("Player", "Vector3f", "aimPos", GetAimPos);
@@ -230,6 +272,13 @@ static ModuleExtension playerExtension("alt", [](asIScriptEngine* engine, DocsGe
     REGISTER_PROPERTY_WRAPPER_GET("Player", "Vector3f", "entityAimOffset", GetEntityAimOffset);
 
     REGISTER_PROPERTY_WRAPPER_GET("Player", "bool", "flashlightActive", IsFlashlightActive);
+
+    REGISTER_PROPERTY_WRAPPER_GET("Player", "uint", "ping", GetPing);
+    REGISTER_PROPERTY_WRAPPER_GET("Player", "string", "ip", GetIP);
+    REGISTER_PROPERTY_WRAPPER_GET("Player", "uint64", "socialId", GetSocialID);
+    REGISTER_PROPERTY_WRAPPER_GET("Player", "uint64", "hwid", GetHwidHash);
+    REGISTER_PROPERTY_WRAPPER_GET("Player", "uint64", "hwidEx", GetHwidExHash);
+    REGISTER_PROPERTY_WRAPPER_GET("Player", "string", "authToken", GetAuthToken);
     
     REGISTER_METHOD_WRAPPER("Player", "void Spawn(float x, float y, float z, uint delay)", SpawnPlayer<float>);
     REGISTER_METHOD_WRAPPER("Player", "void Spawn(int x, int y, int z, uint delay)", SpawnPlayer<int>);
