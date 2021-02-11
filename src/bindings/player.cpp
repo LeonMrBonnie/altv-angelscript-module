@@ -237,8 +237,13 @@ static void Emit(const std::string& event, CScriptArray* args, alt::IPlayer* pla
     for(int i = 0; i < args->GetSize(); i++)
     {
         CScriptAny* arg = (CScriptAny*)args->At(i);
-        void* value;
-        arg->Retrieve(value, arg->GetTypeId());
+        void* value = nullptr;
+        arg->Retrieve(&value, arg->GetTypeId());
+        if(value == nullptr)
+        {
+            THROW_ERROR("Invalid args passed");
+            return;
+        }
         mvalueArgs.Push(Helpers::ValueToMValue(resource->GetRuntime()->GetEngine()->GetTypeInfoById(arg->GetTypeId()), value));
     }
     alt::ICore::Instance().TriggerClientEvent(alt::Ref<alt::IPlayer>(player), event, mvalueArgs);
