@@ -60,6 +60,13 @@ namespace Helpers
             return Vector3<T>(x * value, y * value, z * value);
         }
 
+        std::string ToString()
+        {
+            std::stringstream str;
+            str << "Vector3{ x: " << x << ", y: " << y << ", z: " << z << " }";
+            return str.str();
+        }
+
         static void Construct(T x, T y, T z, void* memory)
         {
             new(memory) Vector3<T>(x, y, z);
@@ -83,6 +90,8 @@ namespace Helpers
         REGISTER_METHOD("Vector3f", "Vector3f Mult(Vector3f vector)", Vector3<float>, MultVector);
         REGISTER_METHOD("Vector3f", "Vector3f Mult(float x, float y, float z)", Vector3<float>, MultValues);
         REGISTER_METHOD("Vector3f", "Vector3f Mult(float value)", Vector3<float>, MultValue);
+        // Implicit conversion to string
+        REGISTER_METHOD("Vector3f", "string opImplConv() const", Vector3<float>, ToString);
 
         REGISTER_VALUE_CLASS("Vector3i", Vector3<int>, asOBJ_VALUE | asOBJ_POD, "Three-dimensional integer vector");
         REGISTER_CONSTRUCTOR("Vector3i", "int x, int y, int z", Vector3<int>::Construct);
@@ -99,5 +108,7 @@ namespace Helpers
         REGISTER_METHOD("Vector3i", "Vector3i Mult(Vector3i vector)", Vector3<int>, MultVector);
         REGISTER_METHOD("Vector3i", "Vector3i Mult(int x, int y, int z)", Vector3<int>, MultValues);
         REGISTER_METHOD("Vector3i", "Vector3i Mult(int value)", Vector3<int>, MultValue);
+        // Implicit conversion to string
+        REGISTER_METHOD("Vector3i", "string opImplConv() const", Vector3<int>, ToString);
     }
 }

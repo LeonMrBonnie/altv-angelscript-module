@@ -59,6 +59,13 @@ namespace Helpers
             return Vector2<T>(x * value, y * value);
         }
 
+        std::string ToString()
+        {
+            std::stringstream str;
+            str << "Vector2{ x: " << x << ", y: " << y << " }";
+            return str.str();
+        }
+
         static void Construct(T x, T y, void* memory)
         {
             new(memory) Vector2<T>(x, y);
@@ -81,6 +88,8 @@ namespace Helpers
         REGISTER_METHOD("Vector2f", "Vector2f Mult(Vector2f vector)", Vector2<float>, MultVector);
         REGISTER_METHOD("Vector2f", "Vector2f Mult(float x, float y)", Vector2<float>, MultValues);
         REGISTER_METHOD("Vector2f", "Vector2f Mult(float value)", Vector2<float>, MultValue);
+        // Implicit conversion to string
+        REGISTER_METHOD("Vector2f", "string opImplConv() const", Vector2<float>, ToString);
 
         REGISTER_VALUE_CLASS("Vector2i", Vector2<int>, asOBJ_VALUE | asOBJ_POD, "Two-dimensional integer vector");
         REGISTER_CONSTRUCTOR("Vector2i", "int x, int y, int z", Vector2<int>::Construct);
@@ -96,5 +105,7 @@ namespace Helpers
         REGISTER_METHOD("Vector2i", "Vector2i Mult(Vector2i vector)", Vector2<int>, MultVector);
         REGISTER_METHOD("Vector2i", "Vector2i Mult(int x, int y)", Vector2<int>, MultValues);
         REGISTER_METHOD("Vector2i", "Vector2i Mult(int value)", Vector2<int>, MultValue);
+        // Implicit conversion to string
+        REGISTER_METHOD("Vector2i", "string opImplConv() const", Vector2<int>, ToString);
     }
 }
