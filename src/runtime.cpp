@@ -3,6 +3,7 @@
 #include "helpers/module.h"
 #include "helpers/events.h"
 #include "bindings/vector3.h"
+#include "bindings/vector2.h"
 #include "angelscript/addon/scriptstdstring/scriptstdstring.h"
 #include "angelscript/addon/scripthelper/scripthelper.h"
 #include "angelscript/addon/scriptarray/scriptarray.h"
@@ -45,6 +46,7 @@ void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine, DocsG
 
     // Register classes
     Helpers::RegisterVector3(engine, docs);
+    Helpers::RegisterVector2(engine, docs);
     REGISTER_REF_CLASS("BaseObject", alt::IBaseObject, asOBJ_REF, "Base object superclass for all alt:V base objects");
     REGISTER_REF_CLASS("WorldObject", alt::IWorldObject, asOBJ_REF, "World object superclass for all alt:V world objects");
     REGISTER_REF_CLASS("Entity", alt::IEntity, asOBJ_REF, "Entity superclass for all alt:V entities");
