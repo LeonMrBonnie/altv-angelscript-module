@@ -34,6 +34,37 @@ public:
     // Register the script interfaces (the scripting api)
     void RegisterScriptInterfaces(asIScriptEngine* engine, Helpers::DocsGenerator* docs);
 
+    int GetStringTypeId()
+    {
+        static int stringType = engine->GetTypeIdByDecl("string");
+        return stringType;
+    }
+    int GetBaseObjectTypeId()
+    {
+        static int baseObjectType = engine->GetTypeIdByDecl("BaseObject");
+        return baseObjectType;
+    }
+    int GetWorldObjectTypeId()
+    {
+        static int worldObjectType = engine->GetTypeIdByDecl("WorldObject");
+        return worldObjectType;
+    }
+    int GetEntityTypeId()
+    {
+        static int entityType = engine->GetTypeIdByDecl("Entity");
+        return entityType;
+    }
+    int GetPlayerTypeId()
+    {
+        static int playerType = engine->GetTypeIdByDecl("Player");
+        return playerType;
+    }
+    int GetVehicleTypeId()
+    {
+        static int vehicleType = engine->GetTypeIdByDecl("Vehicle");
+        return vehicleType;
+    }
+
     // Gets the current runtime instance or creates one if not exists
     static AngelScriptRuntime& Instance()
 	{

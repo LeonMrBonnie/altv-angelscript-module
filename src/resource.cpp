@@ -181,12 +181,16 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
         {
             CScriptAny* any;
             auto arg = args[i];
-            std::pair<uint32_t, void*> converted = Helpers::GetMValueValue(runtime->GetEngine(), arg);
-            any->Store(converted.second, converted.first);
-            array->SetValue(i, any);
+            std::pair<uint32_t, void*> converted = Helpers::MValueToValue(runtime, arg);
+            Log::Info << "Type: " << converted.first << Log::Endl;
+            any->Store((void*)converted.second, converted.first);
+            Log::Info << "Stored" << Log::Endl;
+            array->SetValue(i, (void*)any);
+            Log::Info << "Set" << Log::Endl;
         }
         for(auto handler : handlers)
         {
+            Log::Info << "Handler" << Log::Endl;
             auto r = context->Prepare(handler);
             CHECK_AS_RETURN("Prepare custom event handler", r);
             context->SetArgObject(0, array);
@@ -207,7 +211,7 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
         {
             CScriptAny* any;
             auto arg = args[i];
-            std::pair<uint32_t, void*> converted = Helpers::GetMValueValue(runtime->GetEngine(), arg);
+            std::pair<uint32_t, void*> converted = Helpers::MValueToValue(runtime, arg);
             any->Store(converted.second, converted.first);
             array->SetValue(i, any);
         }

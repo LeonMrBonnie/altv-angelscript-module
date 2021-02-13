@@ -244,7 +244,7 @@ static void Emit(const std::string& event, CScriptArray* args, alt::IPlayer* pla
             THROW_ERROR("Invalid args passed");
             return;
         }
-        mvalueArgs.Push(Helpers::ValueToMValue(resource->GetRuntime()->GetEngine()->GetTypeInfoById(arg->GetTypeId()), value));
+        mvalueArgs.Push(Helpers::ValueToMValue(arg->GetTypeId(), value));
     }
     alt::ICore::Instance().TriggerClientEvent(alt::Ref<alt::IPlayer>(player), event, mvalueArgs);
 }

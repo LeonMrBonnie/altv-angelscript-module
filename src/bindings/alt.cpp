@@ -228,18 +228,23 @@ static void OnClient(const std::string& name, asIScriptFunction* handler)
     resource->RegisterCustomEventHandler(name, handler, false);
 }
 
-static void Emit(const std::string& event, CScriptArray* args)
+static void Emit(asIScriptGeneric* gen)
 {
     GET_RESOURCE();
-    alt::MValueArgs mvalueArgs;
-    for(int i = 0; i < args->GetSize(); i++)
+    void* ref = gen->GetArgAddress(0);
+	int typeId = 0;
+	std::string event = *static_cast<std::string*>(ref);
+    alt::MValueArgs args;
+
+    for(int i = 1; i < gen->GetArgCount(); i++)
     {
-        CScriptAny* arg = (CScriptAny*)args->At(i);
-        void* value;
-        arg->Retrieve(value, arg->GetTypeId());
-        mvalueArgs.Push(Helpers::ValueToMValue(resource->GetRuntime()->GetEngine()->GetTypeInfoById(arg->GetTypeId()), value));
+        ref = gen->GetArgAddress(i);
+        typeId = gen->GetArgTypeId(i);
+        if(typeId == resource->GetRuntime()->GetStringTypeId() && *static_cast<std::string*>(ref) == VARIADIC_ARG_INVALID) continue;
+        auto mvalue = Helpers::ValueToMValue(typeId, ref);
+        args.Push(mvalue);
     }
-    alt::ICore::Instance().TriggerLocalEvent(event, mvalueArgs);
+    alt::ICore::Instance().TriggerLocalEvent(event, args);
 }
 
 static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs)
@@ -294,5 +299,5 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_FUNCDEF("void RemoteEventCallback(Player@ player, array<any>@ args)", "Event callback used for custom events");
     REGISTER_GLOBAL_FUNC("void On(const string&in event, LocalEventCallback@ callback)", On, "Registers an event handler for a local custom event");
     REGISTER_GLOBAL_FUNC("void OnClient(const string&in event, RemoteEventCallback@ callback)", OnClient, "Registers an event handler for a remote custom event");
-    REGISTER_GLOBAL_FUNC("void Emit(const string&in event, array<any>@ args)", Emit, "Emits a custom event");
+    REGISTER_VARIADIC_FUNC("void", "Emit", "string&in event", 32, Emit, "Emits a local event (Max 32 args)");
 });
