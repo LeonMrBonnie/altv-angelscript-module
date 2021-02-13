@@ -216,9 +216,18 @@ static bool FileExists(const std::string& path)
     return !file.IsEmpty();
 }
 
-static void On(const std::string& name, asIScriptFunction* handler)
+static void On(const std::string& name, const std::string& handlerName)
 {
     GET_RESOURCE();
+    auto handler = resource->GetModule()->GetFunctionByName(handlerName.c_str());
+    Log::Info << handlerName << Log::Endl;
+    Log::Info << handler << Log::Endl;
+    if(handler == nullptr)
+    {
+        THROW_ERROR("Invalid handler function");
+        return;
+    }
+    handler->AddRef();
     resource->RegisterCustomEventHandler(name, handler, true);
 }
 
@@ -240,7 +249,7 @@ static void Emit(asIScriptGeneric* gen)
     {
         ref = gen->GetArgAddress(i);
         typeId = gen->GetArgTypeId(i);
-        if(typeId == resource->GetRuntime()->GetStringTypeId() && *static_cast<std::string*>(ref) == VARIADIC_ARG_INVALID) continue;
+        if(typeId == asTYPEID_VOID) continue;
         auto mvalue = Helpers::ValueToMValue(typeId, ref);
         args.Push(mvalue);
     }
@@ -295,9 +304,9 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_GLOBAL_FUNC("void ClearTimer(uint timerId)", ClearTimer, "Clears specified timer");
 
     // Events
-    REGISTER_FUNCDEF("void LocalEventCallback(array<any> args)", "Event callback used for custom events");
-    REGISTER_FUNCDEF("void RemoteEventCallback(Player@ player, array<any>@ args)", "Event callback used for custom events");
-    REGISTER_GLOBAL_FUNC("void On(const string&in event, LocalEventCallback@ callback)", On, "Registers an event handler for a local custom event");
-    REGISTER_GLOBAL_FUNC("void OnClient(const string&in event, RemoteEventCallback@ callback)", OnClient, "Registers an event handler for a remote custom event");
-    REGISTER_VARIADIC_FUNC("void", "Emit", "string&in event", 32, Emit, "Emits a local event (Max 32 args)");
+    //REGISTER_FUNCDEF("void LocalEventCallback(array<any> args)", "Event callback used for custom events");
+    //REGISTER_FUNCDEF("void RemoteEventCallback(Player@ player, array<any>@ args)", "Event callback used for custom events");
+    REGISTER_GLOBAL_FUNC("void On(const string&in event, const string&in handlerName)", On, "Registers an event handler for a local custom event");
+    //REGISTER_GLOBAL_FUNC("void OnClient(const string&in event, RemoteEventCallback@ callback)", OnClient, "Registers an event handler for a remote custom event");
+    REGISTER_VARIADIC_FUNC("void", "Emit", "const string&in event", 32, Emit, "Emits a local event (Max 32 args)");
 });

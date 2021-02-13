@@ -57,6 +57,7 @@ bool AngelScriptResource::Start()
             break;
         }
     }
+    context->Unprepare();
 
     return true;
 }
@@ -161,6 +162,7 @@ bool AngelScriptResource::OnEvent(const alt::CEvent* ev)
             auto result = context->GetReturnByte();
             return result == 1 ? true : false;
         }
+        context->Unprepare();
     }
 
     return true;
@@ -175,25 +177,36 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
         auto ev = static_cast<const alt::CServerScriptEvent*>(event);
         name = ev->GetName().ToString();
         args = ev->GetArgs();
-        CScriptArray* array = runtime->CreateAnyArray(args.GetSize());
         std::vector<asIScriptFunction*> handlers = GetCustomEventHandlers(name, true);
-        for(int i = 0; i < args.GetSize(); i++)
+        if(handlers.size() == 0) return;
+
+        alt::Array<std::pair<int, void*>> handlerArgs;
+        for(auto arg : args)
         {
-            CScriptAny* any = new CScriptAny(runtime->GetEngine());
-            auto arg = args[i];
             std::pair<int, void*> converted = Helpers::MValueToValue(runtime, arg);
-            any->Store(converted.second, converted.first);
-            array->SetValue(i, (void*)any);
-            // Free the memory again
-            if(converted.first != runtime->GetBaseObjectTypeId()) delete converted.second;
+            handlerArgs.Push(converted);
         }
+
         for(auto handler : handlers)
         {
             auto r = context->Prepare(handler);
             CHECK_AS_RETURN("Prepare custom event handler", r);
-            context->SetArgObject(0, array);
+            for(int i = 0; i < handlerArgs.GetSize(); i++)
+            {
+                auto arg = handlerArgs[i];
+                int ret;
+                if(Helpers::IsTypePrimitive(arg.first)) ret = context->SetArgAddress(i, arg.second);
+                else ret = context->SetArgObject(i, arg.second);
+                CHECK_AS_RETURN("Set custom event handler arg", ret);
+            }
             r = context->Execute();
             CHECK_AS_RETURN("Execute custom event handler", r);
+        }
+
+        context->Unprepare();
+        for(auto arg : handlerArgs)
+        {
+            if(arg.first != runtime->GetBaseObjectTypeId()) delete arg.second;
         }
     }
     else
@@ -203,26 +216,37 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
         name = ev->GetName().ToString();
         args = ev->GetArgs();
         player = ev->GetTarget();
-        CScriptArray* array = runtime->CreateAnyArray(args.GetSize());
         std::vector<asIScriptFunction*> handlers = GetCustomEventHandlers(name, false);
-        for(int i = 0; i < args.GetSize(); i++)
+        if(handlers.size() == 0) return;
+
+        alt::Array<std::pair<int, void*>> handlerArgs;
+        for(auto arg : args)
         {
-            CScriptAny* any = new CScriptAny(runtime->GetEngine());
-            auto arg = args[i];
             std::pair<int, void*> converted = Helpers::MValueToValue(runtime, arg);
-            any->Store(converted.second, converted.first);
-            array->SetValue(i, (void*)any);
-            // Free the memory again
-            if(converted.first != runtime->GetBaseObjectTypeId()) delete converted.second;
+            handlerArgs.Push(converted);
         }
+
         for(auto handler : handlers)
         {
             auto r = context->Prepare(handler);
             CHECK_AS_RETURN("Prepare custom event handler", r);
             context->SetArgObject(0, player.Get());
-            context->SetArgObject(1, array);
+            for(int i = 0; i < handlerArgs.GetSize(); i++)
+            {
+                auto arg = handlerArgs[i];
+                int ret;
+                if(Helpers::IsTypePrimitive(arg.first)) ret = context->SetArgAddress(i + 1, arg.second);
+                else ret = context->SetArgObject(i + 1, arg.second);
+                CHECK_AS_RETURN("Set custom event handler arg", ret);
+            }
             r = context->Execute();
             CHECK_AS_RETURN("Execute custom event handler", r);
+        }
+
+        context->Unprepare();
+        for(auto arg : handlerArgs)
+        {
+            if(arg.first != runtime->GetBaseObjectTypeId()) delete arg.second;
         }
     }
 }

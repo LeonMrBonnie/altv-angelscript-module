@@ -118,17 +118,15 @@
         docs->PushEnumValue(enum, name, (uint8_t)value); \
     }
 
-#define VARIADIC_ARG_INVALID "INVALID_VARIADIC_ARG"
 #define REGISTER_VARIADIC_FUNC(type, name, defaultArgs, argCount, func, desc) \
     { \
         std::stringstream stream; \
         stream << ##type## << " " << ##name## << "(" << ##defaultArgs##; \
         for(int i = 0; i < argCount; i++) \
         { \
-            stream << ", ?&in = \"" VARIADIC_ARG_INVALID "\""; \
+            stream << ", ?&in arg" + std::to_string(i); \
+            engine->RegisterGlobalFunction((stream.str() + ")").c_str(), asFUNCTION(func), asCALL_GENERIC); \
         } \
-        stream << ")"; \
-        engine->RegisterGlobalFunction(stream.str().c_str(), asFUNCTION(func), asCALL_GENERIC); \
         docs->PushDeclaration(##type##" "##name##"("##defaultArgs##", ...)", desc); \
     }
 

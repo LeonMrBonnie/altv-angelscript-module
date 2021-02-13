@@ -36,14 +36,14 @@ namespace Helpers
             case alt::IMValue::Type::BOOL: 
             {
                 type = asTYPEID_BOOL;
-                auto value = val.As<alt::IMValueBool>()->Value();
-                valuePtr = &value;
+                auto value = new bool(val.As<alt::IMValueBool>()->Value());
+                valuePtr = value;
                 break;
             }
             case alt::IMValue::Type::INT:
             {
                 type = asTYPEID_INT64;
-                auto value = new uint64_t(val.As<alt::IMValueInt>()->Value());
+                auto value = new int64_t(val.As<alt::IMValueInt>()->Value());
                 valuePtr = value;
                 break;
             }
@@ -65,8 +65,8 @@ namespace Helpers
             case alt::IMValue::Type::STRING:
             {
                 type = runtime->GetStringTypeId();
-                auto value = new std::string(val.As<alt::IMValueString>()->Value().CStr());
-                valuePtr = value;
+                auto str = new std::string(val.As<alt::IMValueString>()->Value().ToString());
+                valuePtr = str;
                 break;
             }
             case alt::IMValue::Type::LIST:
@@ -129,8 +129,20 @@ namespace Helpers
         
         return core.CreateMValueNil();
     }
-    /*alt::MValue GetMValueFromTypeInfo(asITypeInfo* type)
+    static bool IsTypePrimitive(int type)
     {
-        // todo: implement this
-    }*/
+        switch(type)
+        {
+            case asTYPEID_BOOL: 
+            case asTYPEID_INT32:
+            case asTYPEID_INT64:
+            case asTYPEID_UINT32:
+            case asTYPEID_UINT64:
+            case asTYPEID_FLOAT:
+            case asTYPEID_DOUBLE:
+                return true;
+            default: 
+                return false;
+        }
+    }
 }
