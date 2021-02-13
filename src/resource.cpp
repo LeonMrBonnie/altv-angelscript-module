@@ -179,18 +179,16 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
         std::vector<asIScriptFunction*> handlers = GetCustomEventHandlers(name, true);
         for(int i = 0; i < args.GetSize(); i++)
         {
-            CScriptAny* any;
+            CScriptAny* any = new CScriptAny(runtime->GetEngine());
             auto arg = args[i];
-            std::pair<uint32_t, void*> converted = Helpers::MValueToValue(runtime, arg);
-            Log::Info << "Type: " << converted.first << Log::Endl;
-            any->Store((void*)converted.second, converted.first);
-            Log::Info << "Stored" << Log::Endl;
+            std::pair<int, void*> converted = Helpers::MValueToValue(runtime, arg);
+            any->Store(converted.second, converted.first);
             array->SetValue(i, (void*)any);
-            Log::Info << "Set" << Log::Endl;
+            // Free the memory again
+            if(converted.first != runtime->GetBaseObjectTypeId()) delete converted.second;
         }
         for(auto handler : handlers)
         {
-            Log::Info << "Handler" << Log::Endl;
             auto r = context->Prepare(handler);
             CHECK_AS_RETURN("Prepare custom event handler", r);
             context->SetArgObject(0, array);
@@ -209,11 +207,13 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
         std::vector<asIScriptFunction*> handlers = GetCustomEventHandlers(name, false);
         for(int i = 0; i < args.GetSize(); i++)
         {
-            CScriptAny* any;
+            CScriptAny* any = new CScriptAny(runtime->GetEngine());
             auto arg = args[i];
-            std::pair<uint32_t, void*> converted = Helpers::MValueToValue(runtime, arg);
+            std::pair<int, void*> converted = Helpers::MValueToValue(runtime, arg);
             any->Store(converted.second, converted.first);
-            array->SetValue(i, any);
+            array->SetValue(i, (void*)any);
+            // Free the memory again
+            if(converted.first != runtime->GetBaseObjectTypeId()) delete converted.second;
         }
         for(auto handler : handlers)
         {

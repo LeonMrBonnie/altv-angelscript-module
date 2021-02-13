@@ -44,8 +44,6 @@ namespace Helpers
             {
                 type = asTYPEID_INT64;
                 auto value = new uint64_t(val.As<alt::IMValueInt>()->Value());
-                Log::Info << "Val: " << *value << Log::Endl;
-                Log::Info << "Actual val: " << val.As<alt::IMValueInt>()->Value() << Log::Endl;
                 valuePtr = value;
                 break;
             }
@@ -60,15 +58,15 @@ namespace Helpers
             case alt::IMValue::Type::DOUBLE:
             {
                 type = asTYPEID_DOUBLE;
-                auto value = val.As<alt::IMValueDouble>()->Value();
-                valuePtr = &value;
+                auto value = new double(val.As<alt::IMValueDouble>()->Value());
+                valuePtr = value;
                 break;
             }
             case alt::IMValue::Type::STRING:
             {
                 type = runtime->GetStringTypeId();
-                auto value = val.As<alt::IMValueString>()->Value().CStr();
-                valuePtr = &value;
+                auto value = new std::string(val.As<alt::IMValueString>()->Value().CStr());
+                valuePtr = value;
                 break;
             }
             case alt::IMValue::Type::LIST:
@@ -98,14 +96,14 @@ namespace Helpers
             {
                 type = runtime->GetEngine()->GetTypeInfoByName("Vector3f")->GetTypeId();
                 auto value = val.As<alt::IMValueVector3>()->Value();
-                valuePtr = &Vector3<float>(value[0], value[1], value[2]);
+                valuePtr = new Vector3<float>(value[0], value[1], value[2]);
                 break;
             }
             case alt::IMValue::Type::VECTOR2:
             {
                 type = runtime->GetEngine()->GetTypeInfoByName("Vector2f")->GetTypeId();
                 auto value = val.As<alt::IMValueVector2>()->Value();
-                valuePtr = &Vector2<float>(value[0], value[1]);
+                valuePtr = new Vector2<float>(value[0], value[1]);
                 break;
             }
             //case alt::IMValue::Type::RGBA: return engine->GetTypeInfoByName("RGBA");
@@ -115,11 +113,7 @@ namespace Helpers
     static alt::MValue ValueToMValue(int type, void* value)
     {
         auto& runtime = AngelScriptRuntime::Instance();
-        Log::Info << "ValueToMValue" << Log::Endl;
         auto& core = alt::ICore::Instance();
-
-        Log::Info << std::to_string(type) << Log::Endl;
-        Log::Info << value << Log::Endl;
 
         if(type == asTYPEID_BOOL) return core.CreateMValueBool(*static_cast<bool*>(value));
         else if(type == asTYPEID_INT32    /*|| type == asTYPEID_INT64*/)  return core.CreateMValueInt(*static_cast<int32_t*>(value));
