@@ -140,7 +140,7 @@
 
 // Checks the return from the angelscript function and if necessary logs an error
 #define CHECK_AS_RETURN(type, result, returnOnError) \
-    if(r < 0) \
+    if(result < 0) \
     { \
         Log::Error << type << " error. Error code: " << std::to_string(result) << Log::Endl; \
         return returnOnError; \
