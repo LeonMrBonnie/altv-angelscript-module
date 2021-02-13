@@ -94,14 +94,14 @@ namespace Helpers
             }
             case alt::IMValue::Type::VECTOR3:
             {
-                type = runtime->GetEngine()->GetTypeInfoByName("Vector3f")->GetTypeId();
+                type = runtime->GetVector3TypeId();
                 auto value = val.As<alt::IMValueVector3>()->Value();
                 valuePtr = new Vector3<float>(value[0], value[1], value[2]);
                 break;
             }
             case alt::IMValue::Type::VECTOR2:
             {
-                type = runtime->GetEngine()->GetTypeInfoByName("Vector2f")->GetTypeId();
+                type = runtime->GetVector2TypeId();
                 auto value = val.As<alt::IMValueVector2>()->Value();
                 valuePtr = new Vector2<float>(value[0], value[1]);
                 break;
@@ -120,6 +120,16 @@ namespace Helpers
         else if(type == asTYPEID_UINT32   /*|| type == asTYPEID_UINT64*/) return core.CreateMValueUInt(*static_cast<uint32_t*>(value));
         else if(type == asTYPEID_FLOAT    /*|| type == asTYPEID_DOUBLE*/) return core.CreateMValueDouble(*(float*)value);
         else if(type == runtime.GetStringTypeId()) return core.CreateMValueString(*static_cast<std::string*>(value));
+        else if(type == runtime.GetVector3TypeId())
+        {
+            auto vector = *static_cast<Vector3<float>*>(value);
+            return core.CreateMValueVector3({vector.x, vector.y, vector.z});
+        }
+        else if(type == runtime.GetVector2TypeId())
+        {
+            auto vector = *static_cast<Vector2<float>*>(value);
+            return core.CreateMValueVector2({vector.x, vector.y});
+        }
         else if(type == runtime.GetBaseObjectTypeId()  || 
                 type == runtime.GetWorldObjectTypeId() || 
                 type == runtime.GetEntityTypeId()      || 

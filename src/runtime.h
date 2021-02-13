@@ -64,6 +64,18 @@ public:
         static int vehicleType = engine->GetTypeIdByDecl("Vehicle");
         return vehicleType;
     }
+    // returns the Vector3 float type
+    int GetVector3TypeId()
+    {
+        static int vector3Type = engine->GetTypeIdByDecl("Vector3f");
+        return vector3Type;
+    }
+    // returns the Vector2 float type
+    int GetVector2TypeId()
+    {
+        static int vector2Type = engine->GetTypeIdByDecl("Vector2f");
+        return vector2Type;
+    }
 
     // Gets the current runtime instance or creates one if not exists
     static AngelScriptRuntime& Instance()
