@@ -220,8 +220,6 @@ static void On(const std::string& name, const std::string& handlerName)
 {
     GET_RESOURCE();
     auto handler = resource->GetModule()->GetFunctionByName(handlerName.c_str());
-    Log::Info << handlerName << Log::Endl;
-    Log::Info << handler << Log::Endl;
     if(handler == nullptr)
     {
         THROW_ERROR("Invalid handler function");
