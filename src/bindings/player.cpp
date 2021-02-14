@@ -143,16 +143,16 @@ static float GetMoveSpeed(alt::IPlayer* player)
     return player->GetMoveSpeed();
 }
 
-static Vector3<float> GetAimPos(alt::IPlayer* player)
+static Vector3 GetAimPos(alt::IPlayer* player)
 {
     alt::Vector3f vector = player->GetAimPos();
-    return Vector3<float>(vector[0], vector[1], vector[2]);
+    return Vector3(vector[0], vector[1], vector[2]);
 }
 
-static Vector3<float> GetHeadRotation(alt::IPlayer* player)
+static Vector3 GetHeadRotation(alt::IPlayer* player)
 {
     alt::Vector3f vector = player->GetHeadRotation();
-    return Vector3<float>(vector[0], vector[1], vector[2]);
+    return Vector3(vector[0], vector[1], vector[2]);
 }
 
 static bool IsInVehicle(alt::IPlayer* player)
@@ -179,10 +179,10 @@ static alt::IEntity* GetEntityAimingAt(alt::IPlayer* player)
     return entity.Get();
 }
 
-static Vector3<float> GetEntityAimOffset(alt::IPlayer* player)
+static Vector3 GetEntityAimOffset(alt::IPlayer* player)
 {
     alt::Vector3f vector = player->GetEntityAimOffset();
-    return Vector3<float>(vector[0], vector[1], vector[2]);
+    return Vector3(vector[0], vector[1], vector[2]);
 }
 
 static bool IsFlashlightActive(alt::IPlayer* player)
@@ -283,7 +283,7 @@ static ModuleExtension playerExtension("alt", [](asIScriptEngine* engine, DocsGe
     REGISTER_PROPERTY_WRAPPER_GET("Player", "bool", "connected", IsConnected);
 
     REGISTER_PROPERTY_WRAPPER_GET("Player", "float", "moveSpeed", GetMoveSpeed);
-    REGISTER_PROPERTY_WRAPPER_GET("Player", "Vector3f", "aimPos", GetAimPos);
+    REGISTER_PROPERTY_WRAPPER_GET("Player", "Vector3", "aimPos", GetAimPos);
     REGISTER_PROPERTY_WRAPPER_GET("Player", "bool", "headRot", GetHeadRotation);
 
     REGISTER_PROPERTY_WRAPPER_GET("Player", "bool", "inVehicle", IsInVehicle);
@@ -291,7 +291,7 @@ static ModuleExtension playerExtension("alt", [](asIScriptEngine* engine, DocsGe
     REGISTER_PROPERTY_WRAPPER_GET("Player", "uint", "seat", GetSeat);
 
     REGISTER_PROPERTY_WRAPPER_GET("Player", "Entity@", "entityAimingAt", GetEntityAimingAt);
-    REGISTER_PROPERTY_WRAPPER_GET("Player", "Vector3f", "entityAimOffset", GetEntityAimOffset);
+    REGISTER_PROPERTY_WRAPPER_GET("Player", "Vector3", "entityAimOffset", GetEntityAimOffset);
 
     REGISTER_PROPERTY_WRAPPER_GET("Player", "bool", "flashlightActive", IsFlashlightActive);
 

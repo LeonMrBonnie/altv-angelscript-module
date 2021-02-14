@@ -12,7 +12,7 @@ static std::string ToString(alt::IVehicle* vehicle)
     return str.str();
 }
 
-static alt::IVehicle* VehicleFactory(uint32_t model, Vector3<float> pos, Vector3<float> rot)
+static alt::IVehicle* VehicleFactory(uint32_t model, Vector3 pos, Vector3 rot)
 {
     GET_RESOURCE();
     auto vehicle = alt::ICore::Instance().CreateVehicle(model, {pos.x, pos.y, pos.z}, {rot.x, rot.y, rot.z});
@@ -28,7 +28,7 @@ static alt::IVehicle* VehicleFactory(uint32_t model, Vector3<float> pos, Vector3
 static ModuleExtension playerExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs) {
     RegisterAsEntity<alt::IVehicle>(engine, docs, "Vehicle");
 
-    REGISTER_FACTORY("Vehicle", "uint model, Vector3f pos, Vector3f rot", VehicleFactory);
+    REGISTER_FACTORY("Vehicle", "uint model, Vector3 pos, Vector3 rot", VehicleFactory);
 
     // Implicit conversion to string
     REGISTER_METHOD_WRAPPER("Vehicle", "string opImplConv() const", ToString);

@@ -64,16 +64,14 @@ public:
         static int vehicleType = engine->GetTypeIdByDecl("Vehicle");
         return vehicleType;
     }
-    // returns the Vector3 float type
     int GetVector3TypeId()
     {
-        static int vector3Type = engine->GetTypeIdByDecl("Vector3f");
+        static int vector3Type = engine->GetTypeIdByDecl("Vector3");
         return vector3Type;
     }
-    // returns the Vector2 float type
     int GetVector2TypeId()
     {
-        static int vector2Type = engine->GetTypeIdByDecl("Vector2f");
+        static int vector2Type = engine->GetTypeIdByDecl("Vector2");
         return vector2Type;
     }
 

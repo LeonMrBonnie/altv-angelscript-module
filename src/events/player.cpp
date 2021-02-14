@@ -45,7 +45,7 @@ REGISTER_EVENT_HANDLER(alt::CEvent::Type::PLAYER_WEAPON_CHANGE, PlayerWeaponChan
     args.push_back({(void*)ev->GetNewWeapon(), true});
 });
 
-REGISTER_EVENT_HANDLER(alt::CEvent::Type::WEAPON_DAMAGE_EVENT, WeaponDamage, "void", "Player@ source, Entity@ target, uint weapon, uint damage, Vector3f offset, uint bodyPart",
+REGISTER_EVENT_HANDLER(alt::CEvent::Type::WEAPON_DAMAGE_EVENT, WeaponDamage, "void", "Player@ source, Entity@ target, uint weapon, uint damage, Vector3 offset, uint bodyPart",
 [](AngelScriptResource* resource, const alt::CEvent* event, std::vector<std::pair<void*, bool>>& args) {
     auto ev = static_cast<const alt::CWeaponDamageEvent*>(event);
     args.push_back({ev->GetSource().Get(), false});
@@ -53,7 +53,7 @@ REGISTER_EVENT_HANDLER(alt::CEvent::Type::WEAPON_DAMAGE_EVENT, WeaponDamage, "vo
     args.push_back({(void*)ev->GetWeaponHash(), true});
     args.push_back({(void*)ev->GetDamageValue(), true});
     auto offset = ev->GetShotOffset();
-    args.push_back({&Vector3<float>(offset[0], offset[1], offset[2]), false});
+    args.push_back({&Vector3(offset[0], offset[1], offset[2]), false});
     args.push_back({(void*)ev->GetBodyPart(), true});
 });
 

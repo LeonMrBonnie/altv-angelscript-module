@@ -18,14 +18,14 @@ static uint32_t GetModel(T* obj)
 }
 
 template<class T>
-static Vector3<float> GetRotation(T* obj)
+static Vector3 GetRotation(T* obj)
 {
     alt::Vector3f rot = obj->GetRotation();
-    return Vector3<float>(rot[0], rot[1], rot[2]);
+    return Vector3(rot[0], rot[1], rot[2]);
 }
 
 template<class T>
-static void SetRotation(Vector3<float> pos, T* obj)
+static void SetRotation(Vector3 pos, T* obj)
 {
     obj->SetRotation(alt::Rotation{pos.x, pos.y, pos.z});
 }
@@ -67,8 +67,8 @@ namespace Helpers
 
         REGISTER_PROPERTY_WRAPPER_GET(type, "uint", "model", GetModel<T>);
 
-        REGISTER_PROPERTY_WRAPPER_GET(type, "Vector3f", "rot", GetRotation<T>);
-        REGISTER_PROPERTY_WRAPPER_SET(type, "Vector3f", "rot", SetRotation<T>);
+        REGISTER_PROPERTY_WRAPPER_GET(type, "Vector3", "rot", GetRotation<T>);
+        REGISTER_PROPERTY_WRAPPER_SET(type, "Vector3", "rot", SetRotation<T>);
 
         REGISTER_PROPERTY_WRAPPER_GET(type, "bool", "visible", GetVisible<T>);
         REGISTER_PROPERTY_WRAPPER_SET(type, "bool", "visible", SetVisible<T>);

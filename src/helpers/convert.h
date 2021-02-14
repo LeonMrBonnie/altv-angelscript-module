@@ -21,8 +21,8 @@ namespace Helpers
             case alt::IMValue::Type::LIST: return engine->GetTypeInfoByName("array");
             case alt::IMValue::Type::DICT: return engine->GetTypeInfoByName("dict");
             case alt::IMValue::Type::BASE_OBJECT: return engine->GetTypeInfoByName("BaseObject");
-            case alt::IMValue::Type::VECTOR3: return engine->GetTypeInfoByName("Vector3f");
-            //case alt::IMValue::Type::VECTOR2: return engine->GetTypeInfoByName("Vector2f");
+            case alt::IMValue::Type::VECTOR3: return engine->GetTypeInfoByName("Vector3");
+            //case alt::IMValue::Type::VECTOR2: return engine->GetTypeInfoByName("Vector2");
             //case alt::IMValue::Type::RGBA: return engine->GetTypeInfoByName("RGBA");
         }
     }
@@ -96,14 +96,14 @@ namespace Helpers
             {
                 type = runtime->GetVector3TypeId();
                 auto value = val.As<alt::IMValueVector3>()->Value();
-                valuePtr = new Vector3<float>(value[0], value[1], value[2]);
+                valuePtr = new Vector3(value[0], value[1], value[2]);
                 break;
             }
             case alt::IMValue::Type::VECTOR2:
             {
                 type = runtime->GetVector2TypeId();
                 auto value = val.As<alt::IMValueVector2>()->Value();
-                valuePtr = new Vector2<float>(value[0], value[1]);
+                valuePtr = new Vector2(value[0], value[1]);
                 break;
             }
             //case alt::IMValue::Type::RGBA: return engine->GetTypeInfoByName("RGBA");
@@ -122,12 +122,12 @@ namespace Helpers
         else if(type == runtime.GetStringTypeId()) return core.CreateMValueString(*static_cast<std::string*>(value));
         else if(type == runtime.GetVector3TypeId())
         {
-            auto vector = *static_cast<Vector3<float>*>(value);
+            auto vector = *static_cast<Vector3*>(value);
             return core.CreateMValueVector3({vector.x, vector.y, vector.z});
         }
         else if(type == runtime.GetVector2TypeId())
         {
-            auto vector = *static_cast<Vector2<float>*>(value);
+            auto vector = *static_cast<Vector2*>(value);
             return core.CreateMValueVector2({vector.x, vector.y});
         }
         else if(type == runtime.GetBaseObjectTypeId()  || 
