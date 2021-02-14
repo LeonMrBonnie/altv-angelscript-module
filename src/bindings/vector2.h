@@ -12,7 +12,8 @@ namespace Helpers
         float x;
         float y;
 
-        Vector2(float x, float y) : x(x), y(y) {};
+        Vector2(float x, float y) : x(x), y(y) {}
+        Vector2(int x, int y) : x(x), y(y) {}
 
         float Length()
         {
@@ -65,7 +66,8 @@ namespace Helpers
             return str.str();
         }
 
-        static void Construct(float x, float y, void* memory)
+        template<typename T>
+        static void Construct(T x, T y, void* memory)
         {
             new(memory) Vector2(x, y);
         }
@@ -74,7 +76,8 @@ namespace Helpers
     static void RegisterVector2(asIScriptEngine* engine, DocsGenerator* docs)
     {
         REGISTER_VALUE_CLASS("Vector2", Vector2, asOBJ_VALUE | asOBJ_POD, "Two-dimensional vector");
-        REGISTER_CONSTRUCTOR("Vector2", "float x, float y", Vector2::Construct);
+        REGISTER_CONSTRUCTOR("Vector2", "float x, float y", Vector2::Construct<float>);
+        REGISTER_CONSTRUCTOR("Vector2", "int x, int y", Vector2::Construct<int>);
         REGISTER_PROPERTY("Vector2", "float x", Vector2, x);
         REGISTER_PROPERTY("Vector2", "float y", Vector2, y);
         REGISTER_METHOD("Vector2", "float Length()", Vector2, Length);

@@ -13,7 +13,8 @@ namespace Helpers
         float y;
         float z;
 
-        Vector3(float x, float y, float z) : x(x), y(y), z(z) {};
+        Vector3(float x, float y, float z) : x(x), y(y), z(z) {}
+        Vector3(int x, int y, int z) : x(x), y(y), z(z) {};
 
         float Length()
         {
@@ -66,7 +67,8 @@ namespace Helpers
             return str.str();
         }
 
-        static void Construct(float x, float y, float z, void* memory)
+        template<typename T>
+        static void Construct(T x, T y, T z, void* memory)
         {
             new(memory) Vector3(x, y, z);
         }
@@ -75,7 +77,8 @@ namespace Helpers
     static void RegisterVector3(asIScriptEngine* engine, DocsGenerator* docs)
     {
         REGISTER_VALUE_CLASS("Vector3", Vector3, asOBJ_VALUE | asOBJ_POD, "Three-dimensional vector");
-        REGISTER_CONSTRUCTOR("Vector3", "float x, float y, float z", Vector3::Construct);
+        REGISTER_CONSTRUCTOR("Vector3", "float x, float y, float z", Vector3::Construct<float>);
+        REGISTER_CONSTRUCTOR("Vector3", "int x, int y, int z", Vector3::Construct<int>);
         REGISTER_PROPERTY("Vector3", "float x", Vector3, x);
         REGISTER_PROPERTY("Vector3", "float y", Vector3, y);
         REGISTER_PROPERTY("Vector3", "float z", Vector3, z);
