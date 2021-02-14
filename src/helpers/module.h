@@ -52,7 +52,7 @@
 // Registers a new class constructor
 #define REGISTER_CONSTRUCTOR(name, decl, func) \
     { \
-        engine->RegisterObjectBehaviour(name, asBEHAVE_CONSTRUCT, "void f("##decl##")", asFUNCTION(func), asCALL_CDECL_OBJLAST); \
+        engine->RegisterObjectBehaviour(name, asBEHAVE_CONSTRUCT, "void f("##decl##")", asFUNCTION(func), asCALL_CDECL_OBJFIRST); \
         docs->PushObjectConstructor(name, decl); \
     }
 
@@ -185,6 +185,13 @@ namespace Helpers
             }
         }
     };
+
+    // Generic Wrapper for class methods
+    template<typename FC, typename TC, auto Func, typename R = void, typename ...Args>
+    static R GenericWrapper(FC* c, Args... args)
+    {
+        return std::invoke(Func, dynamic_cast<TC*>(c), args...);
+    }
 
     // Handles includes
     static int IncludeHandler(const char* include, const char* from, CScriptBuilder* builder, void* data)

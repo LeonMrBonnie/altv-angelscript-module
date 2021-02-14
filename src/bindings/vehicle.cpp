@@ -12,7 +12,7 @@ static std::string ToString(alt::IVehicle* vehicle)
     return str.str();
 }
 
-static alt::IVehicle* VehicleFactory(uint32_t model, Vector3 pos, Vector3 rot)
+static alt::IVehicle* VehicleFactory(uint32_t model, Vector3& pos, Vector3& rot)
 {
     GET_RESOURCE();
     auto vehicle = alt::ICore::Instance().CreateVehicle(model, {pos.x, pos.y, pos.z}, {rot.x, rot.y, rot.z});

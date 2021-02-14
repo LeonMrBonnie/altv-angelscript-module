@@ -41,7 +41,9 @@ namespace Helpers
         REGISTER_PROPERTY_WRAPPER_GET(type, "Vector3", "pos", GetPosition<T>);
         REGISTER_PROPERTY_WRAPPER_SET(type, "Vector3", "pos", SetPosition<T>);
 
-        REGISTER_PROPERTY_WRAPPER_GET(type, "int", "dimension", GetDimension<T>);
-        REGISTER_PROPERTY_WRAPPER_SET(type, "int", "dimension", SetDimension<T>);
+        REGISTER_PROPERTY_WRAPPER_GET(type, "int", "dimension", (GenericWrapper<T, alt::IWorldObject, &alt::IWorldObject::GetDimension, int32_t>));
+        REGISTER_PROPERTY_WRAPPER_SET(type, "int", "dimension", (GenericWrapper<T, alt::IWorldObject, &alt::IWorldObject::SetDimension, void, int32_t>));
+        //REGISTER_PROPERTY_WRAPPER_GET(type, "int", "dimension", GetDimension<T>);
+        //REGISTER_PROPERTY_WRAPPER_SET(type, "int", "dimension", SetDimension<T>);
     }
 }

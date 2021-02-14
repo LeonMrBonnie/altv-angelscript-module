@@ -6,18 +6,6 @@
 using namespace Helpers;
 
 template<class T>
-static uint32_t GetID(T* obj)
-{
-    return obj->GetID();
-}
-
-template<class T>
-static uint32_t GetModel(T* obj)
-{
-    return obj->GetModel();
-}
-
-template<class T>
 static Vector3 GetRotation(T* obj)
 {
     alt::Vector3f rot = obj->GetRotation();
@@ -44,18 +32,6 @@ static void SetNetOwner(alt::IPlayer* player, bool disableMigration, T* obj)
     obj->SetNetworkOwner(alt::Ref<alt::IPlayer>(player), disableMigration);
 }
 
-template<class T>
-static bool GetVisible(T* obj)
-{
-    return obj->GetVisible();
-}
-
-template<class T>
-static void SetVisible(bool toggle, T* obj)
-{
-    obj->SetVisible(toggle);
-}
-
 namespace Helpers
 {
     template<class T>
@@ -63,15 +39,15 @@ namespace Helpers
     {
         RegisterAsWorldObject<T>(engine, docs, type);
 
-        REGISTER_PROPERTY_WRAPPER_GET(type, "uint", "id", GetID<T>);
+        REGISTER_PROPERTY_WRAPPER_GET(type, "uint16", "id", (GenericWrapper<T, alt::IEntity, &alt::IEntity::GetID, uint16_t>));
 
-        REGISTER_PROPERTY_WRAPPER_GET(type, "uint", "model", GetModel<T>);
+        REGISTER_PROPERTY_WRAPPER_GET(type, "uint", "model", (GenericWrapper<T, alt::IEntity, &alt::IEntity::GetModel, uint32_t>));
 
         REGISTER_PROPERTY_WRAPPER_GET(type, "Vector3", "rot", GetRotation<T>);
         REGISTER_PROPERTY_WRAPPER_SET(type, "Vector3", "rot", SetRotation<T>);
 
-        REGISTER_PROPERTY_WRAPPER_GET(type, "bool", "visible", GetVisible<T>);
-        REGISTER_PROPERTY_WRAPPER_SET(type, "bool", "visible", SetVisible<T>);
+        REGISTER_PROPERTY_WRAPPER_GET(type, "bool", "visible", (GenericWrapper<T, alt::IEntity, &alt::IEntity::GetVisible, bool>));
+        REGISTER_PROPERTY_WRAPPER_SET(type, "bool", "visible", (GenericWrapper<T, alt::IEntity, &alt::IEntity::SetVisible, void, bool>));
 
         REGISTER_METHOD_WRAPPER(type, "Player@+ GetNetOwner() const", GetNetOwner<T>);
         REGISTER_METHOD_WRAPPER(type, "void SetNetOwner(Player@ player, bool disableMigration = false)", SetNetOwner<T>);
