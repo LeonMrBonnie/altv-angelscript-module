@@ -106,7 +106,13 @@ namespace Helpers
                 valuePtr = new Vector2(value[0], value[1]);
                 break;
             }
-            //case alt::IMValue::Type::RGBA: return engine->GetTypeInfoByName("RGBA");
+            case alt::IMValue::Type::RGBA:
+            {
+                type = runtime->GetRGBATypeId();
+                auto value = val.As<alt::IMValueRGBA>()->Value();
+                valuePtr = new alt::RGBA(value.r, value.g, value.b, value.a);
+                break;
+            }
         }
         return {type, valuePtr};
     }
@@ -129,6 +135,11 @@ namespace Helpers
         {
             auto vector = *static_cast<Vector2*>(value);
             return core.CreateMValueVector2({vector.x, vector.y});
+        }
+        else if(type == runtime.GetRGBATypeId())
+        {
+            auto rgba = *static_cast<alt::RGBA*>(value);
+            return core.CreateMValueRGBA(rgba);
         }
         else if(type == runtime.GetBaseObjectTypeId()  || 
                 type == runtime.GetWorldObjectTypeId() || 

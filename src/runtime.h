@@ -74,6 +74,11 @@ public:
         static int vector2Type = engine->GetTypeIdByDecl("Vector2");
         return vector2Type;
     }
+    int GetRGBATypeId()
+    {
+        static int rgbaType = engine->GetTypeIdByDecl("RGBA");
+        return rgbaType;
+    }
 
     // Gets the current runtime instance or creates one if not exists
     static AngelScriptRuntime& Instance()
