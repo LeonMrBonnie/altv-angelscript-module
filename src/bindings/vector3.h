@@ -68,7 +68,7 @@ namespace Helpers
         }
 
         template<typename T>
-        static void Construct(T x, T y, T z, void* memory)
+        static void Construct(void* memory, T x, T y, T z)
         {
             new(memory) Vector3(x, y, z);
         }

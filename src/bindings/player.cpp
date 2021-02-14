@@ -21,59 +21,9 @@ static std::string GetName(alt::IPlayer* player)
 }
 
 template<class T>
-static void SpawnPlayer(T x, T y, T z, uint32_t delay, alt::IPlayer* player)
+static void SpawnPlayer(alt::IPlayer* player, T x, T y, T z, uint32_t delay)
 {
     player->Spawn({x, y, z}, delay);
-}
-
-static void SetModel(uint32_t model, alt::IPlayer* player)
-{
-    player->SetModel(model);
-}
-
-static uint32_t GetHealth(alt::IPlayer* player)
-{
-    return player->GetHealth();
-}
-
-static void SetHealth(uint32_t value, alt::IPlayer* player)
-{
-    player->SetHealth(value);
-}
-
-static uint32_t GetMaxHealth(alt::IPlayer* player)
-{
-    return player->GetMaxHealth();
-}
-
-static void SetMaxHealth(uint32_t value, alt::IPlayer* player)
-{
-    player->SetMaxHealth(value);
-}
-
-static uint32_t GetArmour(alt::IPlayer* player)
-{
-    return player->GetArmour();
-}
-
-static void SetArmour(uint32_t value, alt::IPlayer* player)
-{
-    player->SetArmour(value);
-}
-
-static uint32_t GetMaxArmour(alt::IPlayer* player)
-{
-    return player->GetMaxArmour();
-}
-
-static void SetMaxArmour(uint32_t value, alt::IPlayer* player)
-{
-    player->SetMaxArmour(value);
-}
-
-static bool HasWeaponComponent(uint32_t weapon, uint32_t comp, alt::IPlayer* player)
-{
-    return player->HasWeaponComponent(weapon, comp);
 }
 
 static CScriptArray* GetWeaponComponents(alt::IPlayer* player)
@@ -88,61 +38,6 @@ static CScriptArray* GetWeaponComponents(alt::IPlayer* player)
     return arr;
 }
 
-static uint32_t GetWeaponTint(uint32_t weapon, alt::IPlayer* player)
-{
-    return player->GetWeaponTintIndex(weapon);
-}
-
-static uint32_t GetCurrentWeaponTint(alt::IPlayer* player)
-{
-    return player->GetCurrentWeaponTintIndex();
-}
-
-static uint32_t GetCurrentWeapon(alt::IPlayer* player)
-{
-    return player->GetCurrentWeapon();
-}
-
-static void SetCurrentWeapon(uint32_t weapon, alt::IPlayer* player)
-{
-    player->SetCurrentWeapon(weapon);
-}
-
-static bool IsDead(alt::IPlayer* player)
-{
-    return player->IsDead();
-}
-
-static bool IsJumping(alt::IPlayer* player)
-{
-    return player->IsJumping();
-}
-
-static bool IsInRagdoll(alt::IPlayer* player)
-{
-    return player->IsInRagdoll();
-}
-
-static bool IsAiming(alt::IPlayer* player)
-{
-    return player->IsAiming();
-}
-
-static bool IsShooting(alt::IPlayer* player)
-{
-    return player->IsShooting();
-}
-
-static bool IsReloading(alt::IPlayer* player)
-{
-    return player->IsReloading();
-}
-
-static float GetMoveSpeed(alt::IPlayer* player)
-{
-    return player->GetMoveSpeed();
-}
-
 static Vector3 GetAimPos(alt::IPlayer* player)
 {
     alt::Vector3f vector = player->GetAimPos();
@@ -155,21 +50,11 @@ static Vector3 GetHeadRotation(alt::IPlayer* player)
     return Vector3(vector[0], vector[1], vector[2]);
 }
 
-static bool IsInVehicle(alt::IPlayer* player)
-{
-    return player->IsInVehicle();
-}
-
 static alt::IVehicle* GetVehicle(alt::IPlayer* player)
 {
     auto vehicle = player->GetVehicle();
     if(vehicle.IsEmpty()) return nullptr;
     return vehicle.Get();
-}
-
-static uint32_t GetSeat(alt::IPlayer* player)
-{
-    return player->GetSeat();
 }
 
 static alt::IEntity* GetEntityAimingAt(alt::IPlayer* player)
@@ -185,44 +70,9 @@ static Vector3 GetEntityAimOffset(alt::IPlayer* player)
     return Vector3(vector[0], vector[1], vector[2]);
 }
 
-static bool IsFlashlightActive(alt::IPlayer* player)
-{
-    return player->IsFlashlightActive();
-}
-
-static void Despawn(alt::IPlayer* player)
-{
-    player->Despawn();
-}
-
-static bool IsConnected(alt::IPlayer* player)
-{
-    return player->IsConnected();
-}
-
-static uint32_t GetPing(alt::IPlayer* player)
-{
-    return player->GetPing();
-}
-
 static std::string GetIP(alt::IPlayer* player)
 {
     return player->GetIP().ToString();
-}
-
-static uint64_t GetSocialID(alt::IPlayer* player)
-{
-    return player->GetSocialID();
-}
-
-static uint64_t GetHwidHash(alt::IPlayer* player)
-{
-    return player->GetHwidHash();
-}
-
-static uint64_t GetHwidExHash(alt::IPlayer* player)
-{
-    return player->GetHwidExHash();
 }
 
 static std::string GetAuthToken(alt::IPlayer* player)
@@ -230,7 +80,7 @@ static std::string GetAuthToken(alt::IPlayer* player)
     return player->GetAuthToken().ToString();
 }
 
-static void Emit(const std::string& event, CScriptArray* args, alt::IPlayer* player)
+static void Emit(alt::IPlayer* player, const std::string& event, CScriptArray* args)
 {
     GET_RESOURCE();
     alt::MValueArgs mvalueArgs;

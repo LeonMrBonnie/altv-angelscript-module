@@ -12,7 +12,7 @@ static Vector3 GetPosition(T* obj)
 }
 
 template<class T>
-static void SetPosition(Vector3 pos, T* obj)
+static void SetPosition(T* obj, Vector3 pos)
 {
     obj->SetPosition(alt::Point{pos.x, pos.y, pos.z});
 }
@@ -24,7 +24,7 @@ static int GetDimension(T* obj)
 }
 
 template<class T>
-static void SetDimension(int dimension, T* obj)
+static void SetDimension(T* obj, int dimension)
 {
     obj->SetDimension(dimension);
 }

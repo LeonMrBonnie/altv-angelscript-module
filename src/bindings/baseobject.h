@@ -17,12 +17,6 @@ static void RemoveRef(T* obj)
     obj->RemoveRef();
 }
 
-template<class T>
-static uint8_t GetType(T* obj)
-{
-    return (uint8_t)obj->GetType();
-}
-
 /*
 template<class T>
 static void GetMeta(const std::string& key, void* ref, int typeId, T* obj)

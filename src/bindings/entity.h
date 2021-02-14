@@ -13,7 +13,7 @@ static Vector3 GetRotation(T* obj)
 }
 
 template<class T>
-static void SetRotation(Vector3 pos, T* obj)
+static void SetRotation(T* obj, Vector3& pos)
 {
     obj->SetRotation(alt::Rotation{pos.x, pos.y, pos.z});
 }
@@ -27,7 +27,7 @@ static alt::IPlayer* GetNetOwner(T* obj)
 }
 
 template<class T>
-static void SetNetOwner(alt::IPlayer* player, bool disableMigration, T* obj)
+static void SetNetOwner(T* obj, alt::IPlayer* player, bool disableMigration)
 {
     obj->SetNetworkOwner(alt::Ref<alt::IPlayer>(player), disableMigration);
 }

@@ -80,21 +80,21 @@
 // Registers a new method with a wrapper for the ref type class
 #define REGISTER_METHOD_WRAPPER(name, decl, wrapperFn) \
     { \
-        engine->RegisterObjectMethod(name, decl, asFUNCTION(wrapperFn), asCALL_CDECL_OBJLAST); \
+        engine->RegisterObjectMethod(name, decl, asFUNCTION(wrapperFn), asCALL_CDECL_OBJFIRST); \
         docs->PushObjectMethod(name, decl); \
     }
 
 // Registers a new property getter wrapper for the class
 #define REGISTER_PROPERTY_WRAPPER_GET(name, type, prop, getFn) \
     { \
-        engine->RegisterObjectMethod(name, ##type##" get_"##prop##"() const property", asFUNCTION(getFn), asCALL_CDECL_OBJLAST); \
+        engine->RegisterObjectMethod(name, ##type##" get_"##prop##"() const property", asFUNCTION(getFn), asCALL_CDECL_OBJFIRST); \
         docs->PushObjectProperty(name, ##type##" "##prop##); \
     }
 
 // Registers a new property setter wrapper for the class
 #define REGISTER_PROPERTY_WRAPPER_SET(name, type, prop, setFn) \
     { \
-        engine->RegisterObjectMethod(name, "void set_"##prop##"("##type##") property", asFUNCTION(setFn), asCALL_CDECL_OBJLAST); \
+        engine->RegisterObjectMethod(name, "void set_"##prop##"("##type##") property", asFUNCTION(setFn), asCALL_CDECL_OBJFIRST); \
     }
 
 // Registers a global property (e.g. 'alt::resourceName')
