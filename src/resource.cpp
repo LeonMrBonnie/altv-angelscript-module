@@ -1,3 +1,4 @@
+#pragma warning(disable : 4003)
 #include "resource.h"
 #include "runtime.h"
 #include "helpers/module.h"

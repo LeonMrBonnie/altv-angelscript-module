@@ -1,4 +1,5 @@
 #pragma once
+#pragma warning(disable : 4244) // Disable warnings about loss of data in type conversion
 #include "Log.h"
 #include "../helpers/module.h"
 
