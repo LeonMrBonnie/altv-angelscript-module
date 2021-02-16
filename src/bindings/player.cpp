@@ -89,7 +89,7 @@ static void Emit(alt::IPlayer* player, const std::string& event, CScriptArray* a
 {
     GET_RESOURCE();
     alt::MValueArgs mvalueArgs;
-    for(int i = 0; i < args->GetSize(); i++)
+    for(uint32_t i = 0; i < args->GetSize(); i++)
     {
         CScriptAny* arg = (CScriptAny*)args->At(i);
         void* value = nullptr;
@@ -162,10 +162,31 @@ static ModuleExtension playerExtension("alt", [](asIScriptEngine* engine, DocsGe
     REGISTER_METHOD_WRAPPER("Player", "void Spawn(Vector3 pos, uint delay = 0)", SpawnPlayer);
     REGISTER_METHOD_WRAPPER("Player", "void Despawn()", (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::Despawn>));
 
-    REGISTER_METHOD_WRAPPER("Player", "bool HasWeaponComponent(uint weapon, uint component)", (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::HasWeaponComponent, bool, uint32_t, uint32_t>));
-    REGISTER_METHOD_WRAPPER("Player", "uint GetWeaponTint(uint weapon)", (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::GetWeaponTintIndex, uint32_t, uint32_t>));
+    REGISTER_METHOD_WRAPPER("Player", "bool HasWeaponComponent(uint weapon, uint component)", 
+        (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::HasWeaponComponent, bool, uint32_t, uint32_t>));
+    REGISTER_METHOD_WRAPPER("Player", "uint GetWeaponTint(uint weapon)", 
+        (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::GetWeaponTintIndex, uint32_t, uint32_t>));
+    REGISTER_METHOD_WRAPPER("Player", "void SetWeaponTint(uint weapon, uint8 tint)", 
+        (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::SetWeaponTintIndex, void, uint32_t, uint8_t>));
+    REGISTER_METHOD_WRAPPER("Player", "void AddWeaponComponent(uint weapon, uint component)",
+        (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::AddWeaponComponent, void, uint32_t, uint32_t>));
+    REGISTER_METHOD_WRAPPER("Player", "void RemoveWeaponComponent(uint weapon, uint component)",
+        (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::RemoveWeaponComponent, void, uint32_t, uint32_t>));
+    REGISTER_METHOD_WRAPPER("Player", "void GiveWeapon(uint weapon, int ammo, bool equipNow = false)",
+        (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::GiveWeapon, void, uint32_t, int32_t, bool>));
+    REGISTER_METHOD_WRAPPER("Player", "bool RemoveWeapon(uint weapon)",
+        (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::RemoveWeapon, bool, uint32_t>));
+    REGISTER_METHOD_WRAPPER("Player", "void RemoveAllWeapons()", (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::RemoveAllWeapons>));
+
+    REGISTER_METHOD_WRAPPER("Player", "void ClearBloodDamage()", (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::ClearBloodDamage>));
+    REGISTER_METHOD_WRAPPER("Player", "void SetDateTime(uint8 day, uint8 month, uint8 year, uint8 hour, uint8 minute, uint8 second)",
+        (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::SetDateTime, void, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t>));
+    REGISTER_METHOD_WRAPPER("Player", "void SetWeather(uint8 weather)", (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::SetWeather, void, uint8_t>));
+    REGISTER_METHOD_WRAPPER("Player", "void Kick(const string&in reason = \"Kicked\")", (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::Kick, void, std::string&>));
+    REGISTER_METHOD_WRAPPER("Player", "bool IsEntityInStreamRange(Entity@ entity)", 
+        (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::IsEntityInStreamingRange, bool, alt::IEntity*>));
 
     REGISTER_METHOD_WRAPPER("Player", "void Emit(const string&in event, array<any>@ args)", Emit);
 
-    // todo: add missing methods
+    // todo: add clothes and props methods
 });
