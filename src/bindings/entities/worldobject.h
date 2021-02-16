@@ -1,8 +1,8 @@
 #pragma once
 #include "Log.h"
-#include "../helpers/module.h"
+#include "../../helpers/module.h"
 #include "baseobject.h"
-#include "vector3.h"
+#include "../vector3.h"
 
 template<class T>
 static Vector3 GetPosition(T* obj)

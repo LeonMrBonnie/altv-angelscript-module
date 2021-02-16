@@ -1,10 +1,10 @@
 #pragma once
 #include "Log.h"
-#include "../helpers/module.h"
+#include "../../helpers/module.h"
 #include "entity.h"
-#include "../runtime.h"
+#include "../../runtime.h"
 #include "angelscript/addon/scriptany/scriptany.h"
-#include "../helpers/convert.h"
+#include "../../helpers/convert.h"
 
 using namespace Helpers;
 
