@@ -27,7 +27,7 @@ namespace Helpers
 {
     using CallbacksGetter = std::vector<asIScriptFunction*>(*)(AngelScriptResource* resource, const alt::CEvent* event, std::string name);
     // args.pair.first = pointer to object, args.pair.second = boolean whether the value is a primitive
-    using ArgsGetter = void(*)(AngelScriptResource* resource, const alt::CEvent* event, std::vector<std::pair<void*, bool>>& args);
+    using ExecuteCallback = int(*)(AngelScriptResource* resource, const alt::CEvent* event, asIScriptContext* context);
     using RegisterCallback = void(*)(asIScriptEngine* engine, DocsGenerator* docs);
 
     class Event
@@ -36,7 +36,7 @@ namespace Helpers
 
         const char* callbackDecl;
         const char* returnType;
-        ArgsGetter argsGetter;
+        ExecuteCallback executeCallback;
         RegisterCallback registerCallback;
 
     public:
@@ -44,22 +44,20 @@ namespace Helpers
             alt::CEvent::Type type, 
             const char* returnType,
             const char* callbackDecl, 
-            ArgsGetter argsGetter,
+            ExecuteCallback executeCallback,
             RegisterCallback registerCallback
         ) : 
             callbackDecl(callbackDecl),
             returnType(returnType),
-            argsGetter(argsGetter),
+            executeCallback(executeCallback),
             registerCallback(registerCallback)
         {
             all.insert({type, this});
         };
 
-        std::vector<std::pair<void*, bool>> GetArgs(AngelScriptResource* resource, const alt::CEvent* event)
+        int Execute(AngelScriptResource* resource, const alt::CEvent* event)
         {
-            std::vector<std::pair<void*, bool>> args;
-            argsGetter(resource, event, args);
-            return args;
+            return executeCallback(resource, event, resource->GetContext());
         }
 
         const char* GetReturnType()

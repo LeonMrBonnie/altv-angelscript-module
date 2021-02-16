@@ -7,29 +7,37 @@
 using namespace Helpers;
 
 REGISTER_EVENT_HANDLER(alt::CEvent::Type::VEHICLE_DESTROY, VehicleDestroy, "void", "Vehicle@ vehicle",
-[](AngelScriptResource* resource, const alt::CEvent* event, std::vector<std::pair<void*, bool>>& args) {
+[](AngelScriptResource* resource, const alt::CEvent* event, asIScriptContext* context) {
     auto ev = static_cast<const alt::CVehicleDestroyEvent*>(event);
-    args.push_back({ev->GetTarget().Get(), false});
+
+    context->SetArgObject(0, ev->GetTarget().Get());
+    return context->Execute();
 });
 
 REGISTER_EVENT_HANDLER(alt::CEvent::Type::VEHICLE_ATTACH, VehicleAttach, "void", "Vehicle@ vehicle, Vehicle@ attachedVehicle",
-[](AngelScriptResource* resource, const alt::CEvent* event, std::vector<std::pair<void*, bool>>& args) {
+[](AngelScriptResource* resource, const alt::CEvent* event, asIScriptContext* context) {
     auto ev = static_cast<const alt::CVehicleAttachEvent*>(event);
-    args.push_back({ev->GetTarget().Get(), false});
-    args.push_back({ev->GetAttached().Get(), false});
+
+    context->SetArgObject(0, ev->GetTarget().Get());
+    context->SetArgObject(1, ev->GetAttached().Get());
+    return context->Execute();
 });
 
 REGISTER_EVENT_HANDLER(alt::CEvent::Type::VEHICLE_DETACH, VehicleDetach, "void", "Vehicle@ vehicle, Vehicle@ detachedVehicle",
-[](AngelScriptResource* resource, const alt::CEvent* event, std::vector<std::pair<void*, bool>>& args) {
+[](AngelScriptResource* resource, const alt::CEvent* event, asIScriptContext* context) {
     auto ev = static_cast<const alt::CVehicleDetachEvent*>(event);
-    args.push_back({ev->GetTarget().Get(), false});
-    args.push_back({ev->GetDetached().Get(), false});
+
+    context->SetArgObject(0, ev->GetTarget().Get());
+    context->SetArgObject(1, ev->GetDetached().Get());
+    return context->Execute();
 });
 
 REGISTER_EVENT_HANDLER(alt::CEvent::Type::NETOWNER_CHANGE, NetOwnerChange, "void", "Vehicle@ vehicle, Player@ oldOwner, Player@ newOwner",
-[](AngelScriptResource* resource, const alt::CEvent* event, std::vector<std::pair<void*, bool>>& args) {
+[](AngelScriptResource* resource, const alt::CEvent* event, asIScriptContext* context) {
     auto ev = static_cast<const alt::CNetOwnerChangeEvent*>(event);
-    args.push_back({ev->GetTarget().Get(), false});
-    args.push_back({ev->GetOldOwner().Get(), false});
-    args.push_back({ev->GetNewOwner().Get(), false});
+
+    context->SetArgObject(0, ev->GetTarget().Get());
+    context->SetArgObject(1, ev->GetOldOwner().Get());
+    context->SetArgObject(2, ev->GetNewOwner().Get());
+    return context->Execute();
 });

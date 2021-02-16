@@ -139,8 +139,6 @@ bool AngelScriptResource::OnEvent(const alt::CEvent* ev)
     }
     // Get all script callbacks for the event
     auto callbacks = GetEventHandlers(ev->GetType());
-    // Get the args for the event
-    auto args = event->GetArgs(this, ev);
     auto returnType = event->GetReturnType();
     // If the return type of the event is bool, it should return a value
     bool shouldReturn = strcmp(returnType, "bool") == 0;
@@ -150,13 +148,8 @@ bool AngelScriptResource::OnEvent(const alt::CEvent* ev)
     {
         auto r = context->Prepare(callback);
         CHECK_AS_RETURN("Prepare event handler", r, true);
-        for(int i = 0; i < args.size(); i++)
-        {
-            auto arg = args[i];
-            if(arg.second == true) context->SetArgAddress(i, arg.first);
-            else context->SetArgObject(i, arg.first);
-        }
-        r = context->Execute();
+        // Set the event args and execute callback
+        r = event->Execute(this, ev);
         CHECK_AS_RETURN("Execute event handler", r, true);
         if(r == asEXECUTION_FINISHED && shouldReturn)
         {

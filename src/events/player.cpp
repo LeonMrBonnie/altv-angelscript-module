@@ -8,84 +8,117 @@
 using namespace Helpers;
 
 REGISTER_EVENT_HANDLER(alt::CEvent::Type::PLAYER_CONNECT, PlayerConnect, "void", "Player@ player",
-[](AngelScriptResource* resource, const alt::CEvent* event, std::vector<std::pair<void*, bool>>& args) {
+[](AngelScriptResource* resource, const alt::CEvent* event, asIScriptContext* context) {
     auto ev = static_cast<const alt::CPlayerConnectEvent*>(event);
-    args.push_back({ev->GetTarget().Get(), false});
+
+    context->SetArgObject(0, ev->GetTarget().Get());
+    return context->Execute();
 });
 
 REGISTER_EVENT_HANDLER(alt::CEvent::Type::PLAYER_DISCONNECT, PlayerDisconnect, "void", "Player@ player, string reason",
-[](AngelScriptResource* resource, const alt::CEvent* event, std::vector<std::pair<void*, bool>>& args) {
+[](AngelScriptResource* resource, const alt::CEvent* event, asIScriptContext* context) {
     auto ev = static_cast<const alt::CPlayerDisconnectEvent*>(event);
-    args.push_back({ev->GetTarget().Get(), false});
-    args.push_back({(void*)ev->GetReason().CStr(), false});
+
+    context->SetArgObject(0, ev->GetTarget().Get());
+    context->SetArgObject(1, (void*)ev->GetReason().CStr());
+    return context->Execute();
 });
 
-REGISTER_EVENT_HANDLER(alt::CEvent::Type::PLAYER_DAMAGE, PlayerDamage, "void", "Player@ player, Entity@ attacker, uint damage, uint weapon",
-[](AngelScriptResource* resource, const alt::CEvent* event, std::vector<std::pair<void*, bool>>& args) {
+REGISTER_EVENT_HANDLER(alt::CEvent::Type::PLAYER_DAMAGE, PlayerDamage, "void", "Player@ player, Entity@ attacker, uint&in damage, uint&in weapon",
+[](AngelScriptResource* resource, const alt::CEvent* event, asIScriptContext* context) {
     auto ev = static_cast<const alt::CPlayerDamageEvent*>(event);
-    args.push_back({ev->GetTarget().Get(), false});
-    args.push_back({ev->GetAttacker().Get(), false});
-    args.push_back({(void*)ev->GetDamage(), true});
-    args.push_back({(void*)ev->GetWeapon(), true});
+
+    context->SetArgObject(0, ev->GetTarget().Get());
+    context->SetArgObject(1, ev->GetAttacker().Get());
+    auto dmg = ev->GetDamage();
+    context->SetArgAddress(2, &dmg);
+    auto weapon = ev->GetWeapon();
+    context->SetArgAddress(3, &weapon);
+    return context->Execute();
 });
 
-REGISTER_EVENT_HANDLER(alt::CEvent::Type::PLAYER_DEATH, PlayerDeath, "void", "Player@ player, Entity@ killer, uint weapon",
-[](AngelScriptResource* resource, const alt::CEvent* event, std::vector<std::pair<void*, bool>>& args) {
+REGISTER_EVENT_HANDLER(alt::CEvent::Type::PLAYER_DEATH, PlayerDeath, "void", "Player@ player, Entity@ killer, uint&in weapon",
+[](AngelScriptResource* resource, const alt::CEvent* event, asIScriptContext* context) {
     auto ev = static_cast<const alt::CPlayerDeathEvent*>(event);
-    args.push_back({ev->GetTarget().Get(), false});
-    args.push_back({ev->GetKiller().Get(), false});
-    args.push_back({(void*)ev->GetWeapon(), true});
+
+    context->SetArgObject(0, ev->GetTarget().Get());
+    context->SetArgObject(1, ev->GetKiller().Get());
+    auto weapon = ev->GetWeapon();
+    context->SetArgAddress(2, &weapon);
+    return context->Execute();
 });
 
-REGISTER_EVENT_HANDLER(alt::CEvent::Type::PLAYER_WEAPON_CHANGE, PlayerWeaponChange, "void", "Player@ player, uint oldWeapon, uint newWeapon",
-[](AngelScriptResource* resource, const alt::CEvent* event, std::vector<std::pair<void*, bool>>& args) {
+REGISTER_EVENT_HANDLER(alt::CEvent::Type::PLAYER_WEAPON_CHANGE, PlayerWeaponChange, "void", "Player@ player, uint&in oldWeapon, uint&in newWeapon",
+[](AngelScriptResource* resource, const alt::CEvent* event, asIScriptContext* context) {
     auto ev = static_cast<const alt::CPlayerWeaponChangeEvent*>(event);
-    args.push_back({ev->GetTarget().Get(), false});
-    args.push_back({(void*)ev->GetOldWeapon(), true});
-    args.push_back({(void*)ev->GetNewWeapon(), true});
+
+    context->SetArgObject(0, ev->GetTarget().Get());
+    auto old = ev->GetOldWeapon();
+    context->SetArgAddress(1, &old);
+    auto newWep = ev->GetNewWeapon();
+    context->SetArgAddress(2, &newWep);
+    return context->Execute();
 });
 
-REGISTER_EVENT_HANDLER(alt::CEvent::Type::WEAPON_DAMAGE_EVENT, WeaponDamage, "void", "Player@ source, Entity@ target, uint weapon, uint damage, Vector3 offset, uint bodyPart",
-[](AngelScriptResource* resource, const alt::CEvent* event, std::vector<std::pair<void*, bool>>& args) {
+REGISTER_EVENT_HANDLER(alt::CEvent::Type::WEAPON_DAMAGE_EVENT, WeaponDamage, "void", "Player@ source, Entity@ target, uint&in weapon, uint&in damage, Vector3 offset, uint&in bodyPart",
+[](AngelScriptResource* resource, const alt::CEvent* event, asIScriptContext* context) {
     auto ev = static_cast<const alt::CWeaponDamageEvent*>(event);
-    args.push_back({ev->GetSource().Get(), false});
-    args.push_back({ev->GetTarget().Get(), false});
-    args.push_back({(void*)ev->GetWeaponHash(), true});
-    args.push_back({(void*)ev->GetDamageValue(), true});
+
+    context->SetArgObject(0, ev->GetSource().Get());
+    context->SetArgObject(1, ev->GetTarget().Get());
+    auto hash = ev->GetWeaponHash();
+    context->SetArgAddress(2, &hash);
+    auto value = ev->GetDamageValue();
+    context->SetArgAddress(3, &value);
     auto offset = ev->GetShotOffset();
-    args.push_back({&Vector3(offset[0], offset[1], offset[2]), false});
-    args.push_back({(void*)ev->GetBodyPart(), true});
+    context->SetArgObject(4, &Vector3(offset[0], offset[1], offset[2]));
+    auto bodypart = ev->GetBodyPart();
+    context->SetArgAddress(5, &bodypart);
+    return context->Execute();
 });
 
-REGISTER_EVENT_HANDLER(alt::CEvent::Type::PLAYER_ENTER_VEHICLE, PlayerEnteredVehicle, "void", "Player@ player, Vehicle@ vehicle, uint seat",
-[](AngelScriptResource* resource, const alt::CEvent* event, std::vector<std::pair<void*, bool>>& args) {
+REGISTER_EVENT_HANDLER(alt::CEvent::Type::PLAYER_ENTER_VEHICLE, PlayerEnteredVehicle, "void", "Player@ player, Vehicle@ vehicle, uint8&in seat",
+[](AngelScriptResource* resource, const alt::CEvent* event, asIScriptContext* context) {
     auto ev = static_cast<const alt::CPlayerEnterVehicleEvent*>(event);
-    args.push_back({ev->GetPlayer().Get(), false});
-    args.push_back({ev->GetTarget().Get(), false});
-    args.push_back({(void*)ev->GetSeat(), true});
+
+    context->SetArgObject(0, ev->GetPlayer().Get());
+    context->SetArgObject(1, ev->GetTarget().Get());
+    auto seat = ev->GetSeat();
+    context->SetArgAddress(2, &seat);
+    return context->Execute();
 });
 
-REGISTER_EVENT_HANDLER(alt::CEvent::Type::PLAYER_ENTERING_VEHICLE, PlayerEnteringVehicle, "void", "Player@ player, Vehicle@ vehicle, uint seat",
-[](AngelScriptResource* resource, const alt::CEvent* event, std::vector<std::pair<void*, bool>>& args) {
+REGISTER_EVENT_HANDLER(alt::CEvent::Type::PLAYER_ENTERING_VEHICLE, PlayerEnteringVehicle, "void", "Player@ player, Vehicle@ vehicle, uint8&in seat",
+[](AngelScriptResource* resource, const alt::CEvent* event, asIScriptContext* context) {
     auto ev = static_cast<const alt::CPlayerEnteringVehicleEvent*>(event);
-    args.push_back({ev->GetPlayer().Get(), false});
-    args.push_back({ev->GetTarget().Get(), false});
-    args.push_back({(void*)ev->GetSeat(), true});
+
+    context->SetArgObject(0, ev->GetPlayer().Get());
+    context->SetArgObject(1, ev->GetTarget().Get());
+    auto seat = ev->GetSeat();
+    context->SetArgAddress(2, &seat);
+    return context->Execute();
 });
 
-REGISTER_EVENT_HANDLER(alt::CEvent::Type::PLAYER_LEAVE_VEHICLE, PlayerLeaveVehicle, "void", "Player@ player, Vehicle@ vehicle, uint seat",
-[](AngelScriptResource* resource, const alt::CEvent* event, std::vector<std::pair<void*, bool>>& args) {
+REGISTER_EVENT_HANDLER(alt::CEvent::Type::PLAYER_LEAVE_VEHICLE, PlayerLeaveVehicle, "void", "Player@ player, Vehicle@ vehicle, uint8&in seat",
+[](AngelScriptResource* resource, const alt::CEvent* event, asIScriptContext* context) {
     auto ev = static_cast<const alt::CPlayerLeaveVehicleEvent*>(event);
-    args.push_back({ev->GetPlayer().Get(), false});
-    args.push_back({ev->GetTarget().Get(), false});
-    args.push_back({(void*)ev->GetSeat(), true});
+
+    context->SetArgObject(0, ev->GetPlayer().Get());
+    context->SetArgObject(1, ev->GetTarget().Get());
+    auto seat = ev->GetSeat();
+    context->SetArgAddress(2, &seat);
+    return context->Execute();
 });
 
-REGISTER_EVENT_HANDLER(alt::CEvent::Type::PLAYER_CHANGE_VEHICLE_SEAT, PlayerChangedVehicleSeat, "void", "Player@ player, Vehicle@ vehicle, uint oldSeat, uint newSeat",
-[](AngelScriptResource* resource, const alt::CEvent* event, std::vector<std::pair<void*, bool>>& args) {
+REGISTER_EVENT_HANDLER(alt::CEvent::Type::PLAYER_CHANGE_VEHICLE_SEAT, PlayerChangedVehicleSeat, "void", "Player@ player, Vehicle@ vehicle, uint&in oldSeat, uint&in newSeat",
+[](AngelScriptResource* resource, const alt::CEvent* event, asIScriptContext* context) {
     auto ev = static_cast<const alt::CPlayerChangeVehicleSeatEvent*>(event);
-    args.push_back({ev->GetPlayer().Get(), false});
-    args.push_back({ev->GetTarget().Get(), false});
-    args.push_back({(void*)ev->GetOldSeat(), true});
-    args.push_back({(void*)ev->GetNewSeat(), true});
+
+    context->SetArgObject(0, ev->GetPlayer().Get());
+    context->SetArgObject(1, ev->GetTarget().Get());
+    auto oldSeat = ev->GetOldSeat();
+    context->SetArgAddress(2, &oldSeat);
+    auto newSeat = ev->GetNewSeat();
+    context->SetArgAddress(3, &newSeat);
+    return context->Execute();
 });
