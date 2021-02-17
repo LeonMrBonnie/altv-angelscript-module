@@ -75,6 +75,24 @@ static CScriptArray* GetAllPlayers()
     return arr;
 }
 
+static CScriptArray* GetAllVehicles()
+{
+    GET_RESOURCE();
+    static asITypeInfo* vehicleArrayTypeInfo = nullptr;
+    if(vehicleArrayTypeInfo == nullptr) {
+        vehicleArrayTypeInfo = resource->GetRuntime()->GetEngine()->GetTypeInfoByDecl("array<alt::Vehicle@>");
+        vehicleArrayTypeInfo->AddRef();
+    }
+    auto vehicles = alt::ICore::Instance().GetVehicles();
+    auto arr = CScriptArray::Create(vehicleArrayTypeInfo, vehicles.GetSize());
+    for(int i = 0; i < vehicles.GetSize(); i++)
+    {
+        void* vehicle = vehicles[i].Get();
+        arr->SetValue(i, &vehicle);
+    }
+    return arr;
+}
+
 static CScriptArray* GetAllEntities()
 {
     GET_RESOURCE();
@@ -266,6 +284,7 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     // Generic
     REGISTER_GLOBAL_FUNC("uint Hash(const string &in value)", Hash, "Hashes the given string using the joaat algorithm");
     REGISTER_GLOBAL_FUNC("array<Player@>@ GetAllPlayers()", GetAllPlayers, "Gets all players on the server");
+    REGISTER_GLOBAL_FUNC("array<Vehicle@>@ GetAllVehicles()", GetAllVehicles, "Gets all vehicles on the server");
     REGISTER_GLOBAL_FUNC("array<Entity@>@ GetAllEntities()", GetAllEntities, "Gets all entities on the server");
     REGISTER_GLOBAL_PROPERTY("int", "defaultDimension", GetDefaultDimension);
     REGISTER_GLOBAL_PROPERTY("int", "globalDimension", GetGlobalDimension);
