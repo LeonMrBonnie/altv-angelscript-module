@@ -1,6 +1,6 @@
 #include "helpers/events.h"
 #include "cpp-sdk/events/CPlayerWeaponChangeEvent.h"
-#include "../bindings/vector3.h"
+#include "../bindings/data/vector3.h"
 #include "cpp-sdk/events/CPlayerEnteringVehicleEvent.h"
 #include "cpp-sdk/events/CPlayerLeaveVehicleEvent.h"
 #include "cpp-sdk/events/CPlayerChangeVehicleSeatEvent.h"

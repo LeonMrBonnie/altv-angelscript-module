@@ -2,7 +2,7 @@
 #include "Log.h"
 #include "../../helpers/module.h"
 #include "baseObject.h"
-#include "../vector3.h"
+#include "../data/vector3.h"
 
 template<class T>
 static Vector3 GetPosition(T* obj)

@@ -3,8 +3,8 @@
 #include "cpp-sdk/SDK.h"
 #include "Log.h"
 #include "angelscript/include/angelscript.h"
-#include "../bindings/vector3.h"
-#include "../bindings/vector2.h"
+#include "../bindings/data/vector3.h"
+#include "../bindings/data/vector2.h"
 #include "../runtime.h"
 
 namespace Helpers

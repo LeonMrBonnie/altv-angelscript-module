@@ -1,7 +1,7 @@
 #pragma once
 #include "Log.h"
 #include "../../helpers/module.h"
-#include "worldobject.h"
+#include "worldObject.h"
 
 using namespace Helpers;
 
