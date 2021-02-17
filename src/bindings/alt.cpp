@@ -229,9 +229,16 @@ static void On(const std::string& name, const std::string& handlerName)
     resource->RegisterCustomEventHandler(name, handler, true);
 }
 
-static void OnClient(const std::string& name, asIScriptFunction* handler)
+static void OnClient(const std::string& name, const std::string& handlerName)
 {
     GET_RESOURCE();
+    auto handler = resource->GetModule()->GetFunctionByName(handlerName.c_str());
+    if(handler == nullptr)
+    {
+        THROW_ERROR("Invalid handler function");
+        return;
+    }
+    handler->AddRef();
     resource->RegisterCustomEventHandler(name, handler, false);
 }
 
@@ -302,9 +309,7 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_GLOBAL_FUNC("void ClearTimer(uint timerId)", ClearTimer, "Clears specified timer");
 
     // Events
-    //REGISTER_FUNCDEF("void LocalEventCallback(array<any> args)", "Event callback used for custom events");
-    //REGISTER_FUNCDEF("void RemoteEventCallback(Player@ player, array<any>@ args)", "Event callback used for custom events");
     REGISTER_GLOBAL_FUNC("void On(const string&in event, const string&in handlerName)", On, "Registers an event handler for a local custom event");
-    //REGISTER_GLOBAL_FUNC("void OnClient(const string&in event, RemoteEventCallback@ callback)", OnClient, "Registers an event handler for a remote custom event");
+    REGISTER_GLOBAL_FUNC("void OnClient(const string&in event, const string&in handlerName)", OnClient, "Registers an event handler for a remote custom event");
     REGISTER_VARIADIC_FUNC("void", "Emit", "const string&in event", 32, Emit, "Emits a local event (Max 32 args)");
 });
