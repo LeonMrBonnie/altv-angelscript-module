@@ -14,19 +14,7 @@ static Vector3 GetPosition(T* obj)
 template<class T>
 static void SetPosition(T* obj, Vector3 pos)
 {
-    obj->SetPosition(alt::Point{pos.x, pos.y, pos.z});
-}
-
-template<class T>
-static int GetDimension(T* obj)
-{
-    return obj->GetDimension();
-}
-
-template<class T>
-static void SetDimension(T* obj, int dimension)
-{
-    obj->SetDimension(dimension);
+    obj->SetPosition(alt::Position{pos.x, pos.y, pos.z});
 }
 
 using namespace Helpers;
@@ -43,7 +31,5 @@ namespace Helpers
 
         REGISTER_PROPERTY_WRAPPER_GET(type, "int", "dimension", (GenericWrapper<T, alt::IWorldObject, &alt::IWorldObject::GetDimension, int32_t>));
         REGISTER_PROPERTY_WRAPPER_SET(type, "int", "dimension", (GenericWrapper<T, alt::IWorldObject, &alt::IWorldObject::SetDimension, void, int32_t>));
-        //REGISTER_PROPERTY_WRAPPER_GET(type, "int", "dimension", GetDimension<T>);
-        //REGISTER_PROPERTY_WRAPPER_SET(type, "int", "dimension", SetDimension<T>);
     }
 }

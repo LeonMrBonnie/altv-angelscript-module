@@ -54,7 +54,6 @@ namespace Helpers
         engine->RegisterObjectBehaviour(type, asBEHAVE_ADDREF, "void f()", asFUNCTION(AddRef<T>), asCALL_CDECL_OBJLAST);
         engine->RegisterObjectBehaviour(type, asBEHAVE_RELEASE, "void f()", asFUNCTION(RemoveRef<T>), asCALL_CDECL_OBJLAST);
 
-        //REGISTER_PROPERTY_WRAPPER_GET(type, "uint8", "type", GetType<T>);
         REGISTER_PROPERTY_WRAPPER_GET(type, "uint8", "type", (GenericWrapper<T, alt::IBaseObject, &alt::IBaseObject::GetType, alt::IBaseObject::Type>));
         
         // todo: add meta methods
