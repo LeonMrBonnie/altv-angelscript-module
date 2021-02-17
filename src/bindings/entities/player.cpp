@@ -182,11 +182,27 @@ static ModuleExtension playerExtension("alt", [](asIScriptEngine* engine, DocsGe
     REGISTER_METHOD_WRAPPER("Player", "void SetDateTime(uint8 day, uint8 month, uint8 year, uint8 hour, uint8 minute, uint8 second)",
         (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::SetDateTime, void, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t>));
     REGISTER_METHOD_WRAPPER("Player", "void SetWeather(uint8 weather)", (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::SetWeather, void, uint8_t>));
-    REGISTER_METHOD_WRAPPER("Player", "void Kick(const string&in reason = \"Kicked\")", (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::Kick, void, std::string&>));
+    REGISTER_METHOD_WRAPPER("Player", "void Kick(const string&in reason = \"Kicked\")", (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::Kick, void, const std::string&>));
     REGISTER_METHOD_WRAPPER("Player", "bool IsEntityInStreamRange(Entity@ entity)", 
         (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::IsEntityInStreamingRange, bool, alt::IEntity*>));
 
     REGISTER_METHOD_WRAPPER("Player", "void Emit(const string&in event, array<any>@ args)", Emit);
 
-    // todo: add clothes and props methods
+    REGISTER_METHOD_WRAPPER("Player", "Cloth GetClothes(uint8 component)", 
+        (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::GetClothes, alt::Cloth, uint8_t>));
+    REGISTER_METHOD_WRAPPER("Player", "DlcCloth GetDlcClothes(uint8 component)", 
+        (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::GetDlcClothes, alt::DlcCloth, uint8_t>));
+    REGISTER_METHOD_WRAPPER("Player", "void SetClothes(uint8 component, uint16 drawable, uint8 texture, uint8 palette = 2)", 
+        (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::SetClothes, void, uint8_t, uint16_t, uint8_t, uint8_t>));
+    REGISTER_METHOD_WRAPPER("Player", "void SetDlcClothes(uint8 component, uint16 drawable, uint8 texture, uint8 palette, uint dlc)", 
+        (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::SetDlcClothes, void, uint8_t, uint16_t, uint8_t, uint8_t, uint32_t>));
+
+    REGISTER_METHOD_WRAPPER("Player", "Prop GetProps(uint8 component)", 
+        (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::GetProps, alt::Prop, uint8_t>));
+    REGISTER_METHOD_WRAPPER("Player", "DlcProp GetDlcProps(uint8 component)", 
+        (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::GetDlcProps, alt::DlcProp, uint8_t>));
+    REGISTER_METHOD_WRAPPER("Player", "void SetProps(uint8 component, uint16 drawable, uint8 texture, uint8 palette = 2)", 
+        (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::SetProps, void, uint8_t, uint16_t, uint8_t>));
+    REGISTER_METHOD_WRAPPER("Player", "void SetDlcProps(uint8 component, uint16 drawable, uint8 texture, uint8 palette, uint dlc)", 
+        (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::SetDlcProps, void, uint8_t, uint16_t, uint8_t, uint32_t>));
 });
