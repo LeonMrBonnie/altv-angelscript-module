@@ -122,6 +122,7 @@
     { \
         std::stringstream stream; \
         stream << ##type## << " " << ##name## << "(" << ##defaultArgs##; \
+        engine->RegisterGlobalFunction((stream.str() + ")").c_str(), asFUNCTION(func), asCALL_GENERIC); \
         for(int i = 0; i < argCount; i++) \
         { \
             stream << ", ?&in arg" + std::to_string(i); \
