@@ -1,7 +1,7 @@
 #pragma once
 #include "Log.h"
 #include "../../helpers/module.h"
-#include "baseobject.h"
+#include "baseObject.h"
 #include "../vector3.h"
 
 template<class T>
