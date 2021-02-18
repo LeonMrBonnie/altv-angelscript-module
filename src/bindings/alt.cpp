@@ -279,6 +279,14 @@ static void Emit(asIScriptGeneric* gen)
     alt::ICore::Instance().TriggerLocalEvent(event, args);
 }
 
+template<class T>
+static T* GetByID(uint16_t id)
+{
+    auto ent = alt::ICore::Instance().GetEntityByID(id);
+    if(ent.IsEmpty()) return nullptr;
+    else return dynamic_cast<T*>(ent.Get());
+}
+
 static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs)
 {
     // Generic
@@ -286,6 +294,9 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_GLOBAL_FUNC("array<Player@>@ GetAllPlayers()", GetAllPlayers, "Gets all players on the server");
     REGISTER_GLOBAL_FUNC("array<Vehicle@>@ GetAllVehicles()", GetAllVehicles, "Gets all vehicles on the server");
     REGISTER_GLOBAL_FUNC("array<Entity@>@ GetAllEntities()", GetAllEntities, "Gets all entities on the server");
+    REGISTER_GLOBAL_FUNC("Player@ GetPlayerByID(uint16 id)", (GetByID<alt::IPlayer>), "Gets the player with the specified ID");
+    REGISTER_GLOBAL_FUNC("Vehicle@ GetVehicleByID(uint16 id)", (GetByID<alt::IVehicle>), "Gets the vehicle with the specified ID");
+    REGISTER_GLOBAL_FUNC("Entity@ GetEntityByID(uint16 id)", (GetByID<alt::IEntity>), "Gets the entity with the specified ID");
     REGISTER_GLOBAL_PROPERTY("int", "defaultDimension", GetDefaultDimension);
     REGISTER_GLOBAL_PROPERTY("int", "globalDimension", GetGlobalDimension);
     REGISTER_GLOBAL_PROPERTY("string", "version", GetVersion);
