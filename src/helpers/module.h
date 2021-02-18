@@ -131,6 +131,19 @@
         docs->PushDeclaration(##type##" "##name##"("##defaultArgs##", ...)", desc); \
     }
 
+#define REGISTER_VARIADIC_METHOD(class, type, name, defaultArgs, argCount, func) \
+    { \
+        std::stringstream stream; \
+        stream << ##type## << " " << ##name## << "(" << ##defaultArgs##; \
+        engine->RegisterObjectMethod(class, (stream.str() + ")").c_str(), asFUNCTION(func), asCALL_GENERIC); \
+        for(int i = 0; i < argCount; i++) \
+        { \
+            stream << ", ?&in arg" + std::to_string(i); \
+            engine->RegisterObjectMethod(class, (stream.str() + ")").c_str(), asFUNCTION(func), asCALL_GENERIC); \
+        } \
+        docs->PushObjectMethod(class, ##type##" "##name##"("##defaultArgs##", ...)"); \
+    }
+
 // Gets the currently active resource
 #define GET_RESOURCE() \
     auto resource = static_cast<AngelScriptResource*>(asGetActiveContext()->GetUserData())

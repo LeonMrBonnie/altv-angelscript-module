@@ -85,23 +85,30 @@ static std::string GetAuthToken(alt::IPlayer* player)
     return player->GetAuthToken().ToString();
 }
 
-static void Emit(alt::IPlayer* player, const std::string& event, CScriptArray* args)
+static void Emit(asIScriptGeneric* gen)
 {
     GET_RESOURCE();
-    alt::MValueArgs mvalueArgs;
-    for(uint32_t i = 0; i < args->GetSize(); i++)
+    alt::IPlayer* player = static_cast<alt::IPlayer*>(asGetActiveContext()->GetThisPointer());
+    void* ref = gen->GetArgAddress(0);
+	int typeId = 0;
+	std::string event = *static_cast<std::string*>(ref);
+    alt::MValueArgs args;
+    
+    for(int i = 1; i < gen->GetArgCount(); i++)
     {
-        CScriptAny* arg = (CScriptAny*)args->At(i);
-        void* value = nullptr;
-        arg->Retrieve(&value, arg->GetTypeId());
-        if(value == nullptr)
+        ref = gen->GetArgAddress(i);
+        typeId = gen->GetArgTypeId(i);
+        if(typeId & asTYPEID_OBJHANDLE)
         {
-            THROW_ERROR("Invalid args passed");
-            return;
+            // We're receiving a reference to the handle, so we need to dereference it
+            ref = *(void**)ref;
+            resource->GetRuntime()->GetEngine()->AddRefScriptObject(ref, resource->GetRuntime()->GetEngine()->GetTypeInfoById(typeId));
         }
-        mvalueArgs.Push(Helpers::ValueToMValue(arg->GetTypeId(), value));
+        if(typeId == asTYPEID_VOID) continue;
+        auto mvalue = Helpers::ValueToMValue(typeId, ref);
+        args.Push(mvalue);
     }
-    alt::ICore::Instance().TriggerClientEvent(alt::Ref<alt::IPlayer>(player), event, mvalueArgs);
+    alt::ICore::Instance().TriggerClientEvent(player, event, args);
 }
 
 static ModuleExtension playerExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs) {
@@ -186,7 +193,7 @@ static ModuleExtension playerExtension("alt", [](asIScriptEngine* engine, DocsGe
     REGISTER_METHOD_WRAPPER("Player", "bool IsEntityInStreamRange(Entity@ entity)", 
         (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::IsEntityInStreamingRange, bool, alt::IEntity*>));
 
-    REGISTER_METHOD_WRAPPER("Player", "void Emit(const string&in event, array<any>@ args)", Emit);
+    REGISTER_VARIADIC_METHOD("Player", "void", "Emit", "const string&in event", 32, Emit);
 
     REGISTER_METHOD_WRAPPER("Player", "Cloth GetClothes(uint8 component)", 
         (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::GetClothes, alt::Cloth, uint8_t>));
