@@ -9,23 +9,6 @@
 
 namespace Helpers
 {
-    static asITypeInfo* GetTypeInfoFromMValue(asIScriptEngine* engine, alt::MValueConst& val)
-    {
-        switch(val->GetType())
-        {
-            case alt::IMValue::Type::BOOL: return engine->GetTypeInfoByName("bool");
-            case alt::IMValue::Type::INT: return engine->GetTypeInfoByName("int");
-            case alt::IMValue::Type::UINT: return engine->GetTypeInfoByName("uint");
-            case alt::IMValue::Type::DOUBLE: return engine->GetTypeInfoByName("double");
-            case alt::IMValue::Type::STRING: return engine->GetTypeInfoByName("string");
-            case alt::IMValue::Type::LIST: return engine->GetTypeInfoByName("array");
-            case alt::IMValue::Type::DICT: return engine->GetTypeInfoByName("dict");
-            case alt::IMValue::Type::BASE_OBJECT: return engine->GetTypeInfoByName("BaseObject");
-            case alt::IMValue::Type::VECTOR3: return engine->GetTypeInfoByName("Vector3");
-            //case alt::IMValue::Type::VECTOR2: return engine->GetTypeInfoByName("Vector2");
-            //case alt::IMValue::Type::RGBA: return engine->GetTypeInfoByName("RGBA");
-        }
-    }
     // first = typeId, second = value
     static std::pair<int, void*> MValueToValue(AngelScriptRuntime* runtime, alt::MValueConst& val)
     {
@@ -49,9 +32,8 @@ namespace Helpers
             }
             case alt::IMValue::Type::UINT:
             {
-                // any doesn't support uints so we have to store it as an int64 instead
-                type = asTYPEID_INT64;
-                auto value = new int64_t(val.As<alt::IMValueUInt>()->Value());
+                type = asTYPEID_UINT64;
+                auto value = new uint64_t(val.As<alt::IMValueUInt>()->Value());
                 valuePtr = value;
                 break;
             }
