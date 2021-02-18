@@ -264,8 +264,8 @@ static void Emit(asIScriptGeneric* gen)
 {
     GET_RESOURCE();
     void* ref = gen->GetArgAddress(0);
-	int typeId = 0;
-	std::string event = *static_cast<std::string*>(ref);
+    int typeId = 0;
+    std::string event = *static_cast<std::string*>(ref);
     alt::MValueArgs args;
     
     for(int i = 1; i < gen->GetArgCount(); i++)
