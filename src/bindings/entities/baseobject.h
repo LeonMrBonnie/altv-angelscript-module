@@ -1,7 +1,7 @@
 #pragma once
 #include "Log.h"
 #include "../../helpers/module.h"
-//#include "../../helpers/convert.h"
+#include "../../helpers/convert.h"
 
 using namespace Helpers;
 
@@ -17,9 +17,8 @@ static void RemoveRef(T* obj)
     obj->RemoveRef();
 }
 
-/*
 template<class T>
-static void GetMeta(const std::string& key, void* ref, int typeId, T* obj)
+static void GetMeta(T* obj, const std::string& key, void* ref, int typeId)
 {
     GET_RESOURCE();
     if(!obj->HasMetaData(key))
@@ -27,24 +26,43 @@ static void GetMeta(const std::string& key, void* ref, int typeId, T* obj)
         THROW_ERROR("The specified meta key does not exist on the object");
         return;
     }
-
-    // Dereference received handles to get the object
-	if(typeId & asTYPEID_OBJHANDLE )
-	{
-		// Store the actual reference
-		ref = *(void**)ref;
-		typeId &= ~asTYPEID_OBJHANDLE;
-	}
-    asITypeInfo* type = resource->GetRuntime()->GetEngine()->GetTypeInfoById(typeId);
+    
     auto mvalue = obj->GetMetaData(key);
-    asITypeInfo* mvalueType = Helpers::GetTypeInfoFromMValue(resource->GetRuntime()->GetEngine(), mvalue);
-    if(type != mvalueType)
+    auto value = Helpers::MValueToValue(resource->GetRuntime(), mvalue);
+
+    auto engine = resource->GetRuntime()->GetEngine();
+    if(typeId & asTYPEID_OBJHANDLE && value.first & asTYPEID_MASK_OBJECT)
+	{
+        // RefCastObject will increment the refCount of the returned pointer if successful
+        engine->RefCastObject(value.second, engine->GetTypeInfoById(value.first), engine->GetTypeInfoById(typeId), reinterpret_cast<void**>(ref));
+	}
+	else if(typeId & asTYPEID_MASK_OBJECT && value.first == typeId)
+	{
+        engine->AssignScriptObject(ref, value.second, engine->GetTypeInfoById(value.first));
+	}
+    else
     {
-        THROW_ERROR("The specified output value for the meta data does not have the correct type");
-        return;
+        if(typeId != value.first)
+        {
+            THROW_ERROR("The specified output value for the meta data does not have the correct type");
+            return;
+        }
+        int size = engine->GetSizeOfPrimitiveType(typeId);
+        memcpy(ref, value.second, size);
     }
 }
-*/
+
+template<class T>
+static void SetMeta(T* obj, const std::string& key, void* ref, int typeId)
+{
+    auto mvalue = Helpers::ValueToMValue(typeId, ref);
+    if(mvalue->GetType() == alt::IMValue::Type::NIL)
+    {
+        THROW_ERROR("Invalid value passed to SetMeta");
+        return;
+    }
+    obj->SetMetaData(key, mvalue);
+}
 
 namespace Helpers
 {
@@ -55,8 +73,10 @@ namespace Helpers
         engine->RegisterObjectBehaviour(type, asBEHAVE_RELEASE, "void f()", asFUNCTION(RemoveRef<T>), asCALL_CDECL_OBJLAST);
 
         REGISTER_PROPERTY_WRAPPER_GET(type, "uint8", "type", (GenericWrapper<T, alt::IBaseObject, &alt::IBaseObject::GetType, alt::IBaseObject::Type>));
-        
-        // todo: add meta methods
-        //REGISTER_METHOD_WRAPPER(type, "void GetMeta(string key, ?&out outValue)", GetMeta<T>);
+
+        REGISTER_METHOD_WRAPPER(type, "bool HasMeta(const string&in key)", (GenericWrapper<T, alt::IBaseObject, &alt::IBaseObject::HasMetaData, bool, std::string&>));
+        REGISTER_METHOD_WRAPPER(type, "void GetMeta(const string&in key, ?&out outValue)", GetMeta<T>);
+        REGISTER_METHOD_WRAPPER(type, "void SetMeta(const string&in key, ?&in value)", SetMeta<T>);
+        REGISTER_METHOD_WRAPPER(type, "void DeleteMeta(const string&in key)", (GenericWrapper<T, alt::IBaseObject, &alt::IBaseObject::DeleteMetaData, void, std::string&>));
     }
 }
