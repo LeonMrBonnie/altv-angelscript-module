@@ -78,8 +78,6 @@ void AngelScriptRuntime::RegisterTypeInfos()
     arrayIntTypeInfo->AddRef();
     arrayUintTypeInfo = engine->GetTypeInfoByDecl("array<uint>");
     arrayUintTypeInfo->AddRef();
-    arrayAnyTypeInfo = engine->GetTypeInfoByDecl("array<any>");
-    arrayAnyTypeInfo->AddRef();
 }
 
 // Creates an array of strings
@@ -100,13 +98,6 @@ CScriptArray* AngelScriptRuntime::CreateIntArray(uint32_t len)
 CScriptArray* AngelScriptRuntime::CreateUIntArray(uint32_t len)
 {
     auto arr = CScriptArray::Create(arrayUintTypeInfo, len);
-    return arr;
-}
-
-// Creates an array of any handles
-CScriptArray* AngelScriptRuntime::CreateAnyArray(uint32_t len)
-{
-    auto arr = CScriptArray::Create(arrayAnyTypeInfo, len);
     return arr;
 }
 
