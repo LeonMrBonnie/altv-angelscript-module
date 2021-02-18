@@ -22,7 +22,8 @@ class AngelScriptResource : public alt::IResource::Impl
     uint32_t nextTimerId = 1;
 
     // first = event type, second = script callback
-    std::vector<std::pair<alt::CEvent::Type, asIScriptFunction*>> eventHandlers;
+    std::unordered_multimap<alt::CEvent::Type, asIScriptFunction*> eventHandlers;
+    // first = custom event name, second = script callback
     std::unordered_multimap<std::string, asIScriptFunction*> customLocalEventHandlers;
     std::unordered_multimap<std::string, asIScriptFunction*> customRemoteEventHandlers;
 
@@ -55,16 +56,14 @@ public:
     // Registers a new script callback for the specified event
     void RegisterEventHandler(alt::CEvent::Type event, asIScriptFunction* handler)
     {
-        eventHandlers.push_back({event, handler});
+        eventHandlers.insert({event, handler});
     }
     // Gets all script event handlers of the specified type
-    std::vector<asIScriptFunction*> GetEventHandlers(alt::CEvent::Type event)
+    std::vector<asIScriptFunction*> GetEventHandlers(const alt::CEvent::Type event)
     {
         std::vector<asIScriptFunction*> events;
-        for(auto handler : eventHandlers)
-        {
-            if(handler.first == event) events.push_back(handler.second);
-        }
+        auto range = eventHandlers.equal_range(event);
+        for (auto it = range.first; it != range.second; it++) events.push_back(it->second);
         return events;
     }
     
