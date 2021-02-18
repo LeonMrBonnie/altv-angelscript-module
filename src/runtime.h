@@ -39,27 +39,27 @@ public:
     }
     int GetBaseObjectTypeId()
     {
-        static int baseObjectType = engine->GetTypeIdByDecl("BaseObject");
+        static int baseObjectType = engine->GetTypeIdByDecl("BaseObject@");
         return baseObjectType;
     }
     int GetWorldObjectTypeId()
     {
-        static int worldObjectType = engine->GetTypeIdByDecl("WorldObject");
+        static int worldObjectType = engine->GetTypeIdByDecl("WorldObject@");
         return worldObjectType;
     }
     int GetEntityTypeId()
     {
-        static int entityType = engine->GetTypeIdByDecl("Entity");
+        static int entityType = engine->GetTypeIdByDecl("Entity@");
         return entityType;
     }
     int GetPlayerTypeId()
     {
-        static int playerType = engine->GetTypeIdByDecl("Player");
+        static int playerType = engine->GetTypeIdByDecl("Player@");
         return playerType;
     }
     int GetVehicleTypeId()
     {
-        static int vehicleType = engine->GetTypeIdByDecl("Vehicle");
+        static int vehicleType = engine->GetTypeIdByDecl("Vehicle@");
         return vehicleType;
     }
     int GetVector3TypeId()

@@ -267,11 +267,17 @@ static void Emit(asIScriptGeneric* gen)
 	int typeId = 0;
 	std::string event = *static_cast<std::string*>(ref);
     alt::MValueArgs args;
-
+    
     for(int i = 1; i < gen->GetArgCount(); i++)
     {
         ref = gen->GetArgAddress(i);
         typeId = gen->GetArgTypeId(i);
+        if(typeId & asTYPEID_OBJHANDLE)
+        {
+            // We're receiving a reference to the handle, so we need to dereference it
+            ref = *(void**)ref;
+            resource->GetRuntime()->GetEngine()->AddRefScriptObject(ref, resource->GetRuntime()->GetEngine()->GetTypeInfoById(typeId));
+        }
         if(typeId == asTYPEID_VOID) continue;
         auto mvalue = Helpers::ValueToMValue(typeId, ref);
         args.Push(mvalue);
