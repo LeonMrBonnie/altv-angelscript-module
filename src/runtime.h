@@ -32,7 +32,7 @@ public:
     // Register the script interfaces (the scripting api)
     void RegisterScriptInterfaces(asIScriptEngine* engine, Helpers::DocsGenerator* docs);
 
-    int GetStringTypeId()
+    const int GetStringTypeId() const
     {
         static int stringType = engine->GetTypeIdByDecl("string");
         return stringType;
