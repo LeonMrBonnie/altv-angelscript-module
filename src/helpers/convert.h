@@ -103,10 +103,6 @@ namespace Helpers
         auto& runtime = AngelScriptRuntime::Instance();
         auto& core = alt::ICore::Instance();
 
-        int stringId = runtime.GetStringTypeId(),
-            vector3Id = runtime.GetVector3TypeId(),
-            vector2Id = runtime.GetVector2TypeId(),
-            rgbaId = runtime.GetRGBATypeId();
         switch(type)
         {
             // Bool
