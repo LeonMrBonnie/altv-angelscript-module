@@ -161,11 +161,19 @@ namespace Helpers
     {
         switch(type)
         {
+            // Bool
             case asTYPEID_BOOL: 
+            // Int
+            case asTYPEID_INT8:
+            case asTYPEID_INT16:
             case asTYPEID_INT32:
             case asTYPEID_INT64:
+            // Uint
+            case asTYPEID_UINT8:
+            case asTYPEID_UINT16:
             case asTYPEID_UINT32:
             case asTYPEID_UINT64:
+            // Float
             case asTYPEID_FLOAT:
             case asTYPEID_DOUBLE:
                 return true;
