@@ -47,6 +47,12 @@ static void SetMeta(T* obj, const std::string& key, void* ref, int typeId)
     obj->SetMetaData(key, mvalue);
 }
 
+template<class T>
+static void Destroy(T* obj)
+{
+    alt::ICore::Instance().DestroyBaseObject(obj);
+}
+
 namespace Helpers
 {
     template<class T>
@@ -61,5 +67,7 @@ namespace Helpers
         REGISTER_METHOD_WRAPPER(type, "void GetMeta(const string&in key, ?&out outValue)", GetMeta<T>);
         REGISTER_METHOD_WRAPPER(type, "void SetMeta(const string&in key, ?&in value)", SetMeta<T>);
         REGISTER_METHOD_WRAPPER(type, "void DeleteMeta(const string&in key)", (GenericWrapper<T, alt::IBaseObject, &alt::IBaseObject::DeleteMetaData, void, std::string&>));
+
+        REGISTER_METHOD_WRAPPER(type, "void Destroy()", Destroy<T>);
     }
 }
