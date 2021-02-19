@@ -53,6 +53,13 @@ static void Destroy(T* obj)
     alt::ICore::Instance().DestroyBaseObject(obj);
 }
 
+template<class T>
+static bool IsValid(T* obj)
+{
+    GET_RESOURCE();
+    return resource->DoesEntityExist(obj);
+}
+
 namespace Helpers
 {
     template<class T>
@@ -62,6 +69,7 @@ namespace Helpers
         engine->RegisterObjectBehaviour(type, asBEHAVE_RELEASE, "void f()", asFUNCTION(RemoveRef<T>), asCALL_CDECL_OBJLAST);
 
         REGISTER_PROPERTY_WRAPPER_GET(type, "uint8", "type", (GenericWrapper<T, alt::IBaseObject, &alt::IBaseObject::GetType, alt::IBaseObject::Type>));
+        REGISTER_PROPERTY_WRAPPER_GET(type, "bool", "valid", IsValid<T>);
 
         REGISTER_METHOD_WRAPPER(type, "bool HasMeta(const string&in key)", (GenericWrapper<T, alt::IBaseObject, &alt::IBaseObject::HasMetaData, bool, std::string&>));
         REGISTER_METHOD_WRAPPER(type, "void GetMeta(const string&in key, ?&out outValue)", GetMeta<T>);

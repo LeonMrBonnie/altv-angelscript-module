@@ -16,6 +16,8 @@ class AngelScriptResource : public alt::IResource::Impl
     asIScriptModule* module = nullptr;
     asIScriptContext* context = nullptr;
 
+    std::vector<alt::IBaseObject*> entities;
+
     // Timers
     std::unordered_map<uint32_t, Helpers::Timer*> timers;
     std::vector<uint32_t> invalidTimers;
@@ -46,6 +48,15 @@ public:
     asIScriptModule* GetModule()
     {
         return module;
+    }
+
+    bool DoesEntityExist(alt::IBaseObject* obj)
+    {
+        for(auto entity : entities)
+        {
+            if(entity == obj) return true;
+        }
+        return false;
     }
 
     // Returns the main function if found, otherwise nullptr
@@ -114,7 +125,13 @@ public:
     bool OnEvent(const alt::CEvent* event);
     void OnTick();
 
-    void OnCreateBaseObject(alt::IBaseObject* object) {}
-    void OnRemoveBaseObject(alt::IBaseObject* object) {}
+    void OnCreateBaseObject(alt::IBaseObject* object) 
+    {
+        entities.push_back(object);
+    }
+    void OnRemoveBaseObject(alt::IBaseObject* object) 
+    {
+        entities.erase(std::find(entities.begin(), entities.end(), object));
+    }
 };
 
