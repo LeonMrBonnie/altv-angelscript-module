@@ -2,6 +2,7 @@
 #include "Log.h"
 #include "../../helpers/module.h"
 #include "../../helpers/convert.h"
+#include "../../helpers/angelscript.h"
 
 using namespace Helpers;
 
@@ -31,25 +32,7 @@ static void GetMeta(T* obj, const std::string& key, void* ref, int typeId)
     auto value = Helpers::MValueToValue(resource->GetRuntime(), mvalue);
 
     auto engine = resource->GetRuntime()->GetEngine();
-    if(typeId & asTYPEID_OBJHANDLE && value.first & asTYPEID_MASK_OBJECT)
-	{
-        // RefCastObject will increment the refCount of the returned pointer if successful
-        engine->RefCastObject(value.second, engine->GetTypeInfoById(value.first), engine->GetTypeInfoById(typeId), reinterpret_cast<void**>(ref));
-	}
-	else if(typeId & asTYPEID_MASK_OBJECT && value.first == typeId)
-	{
-        engine->AssignScriptObject(ref, value.second, engine->GetTypeInfoById(value.first));
-	}
-    else
-    {
-        if(typeId != value.first)
-        {
-            THROW_ERROR("The specified output value for the meta data does not have the correct type");
-            return;
-        }
-        int size = engine->GetSizeOfPrimitiveType(typeId);
-        memcpy(ref, value.second, size);
-    }
+    Helpers::CopyAngelscriptValue(engine, value.second, value.first, ref, typeId);
 }
 
 template<class T>
