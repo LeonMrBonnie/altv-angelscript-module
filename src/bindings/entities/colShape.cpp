@@ -60,7 +60,7 @@ static alt::IColShape* RectFactory(Vector2& pos, Vector2& pos2, float z)
     return shape.Get();
 }
 
-static alt::IColShape* CheckpointFactory(uint8_t type, Vector3& pos, float radius, float height, alt::RGBA& color)
+static alt::ICheckpoint* CheckpointFactory(uint8_t type, Vector3& pos, float radius, float height, alt::RGBA& color)
 {
     auto shape = alt::ICore::Instance().CreateCheckpoint(type, {pos.x, pos.y, pos.z}, radius, height, color);
     if(shape.IsEmpty())
@@ -85,4 +85,7 @@ static ModuleExtension colshapeExtension("alt", [](asIScriptEngine* engine, Docs
     REGISTER_FACTORY("ColShapeCuboid", "Vector3 pos, Vector3 pos2", CuboidFactory);
     REGISTER_FACTORY("ColShapeRect", "Vector2 pos, Vector2 pos2, float z", RectFactory);
     REGISTER_FACTORY("Checkpoint", "uint8 type, Vector3 pos, float radius, float height, RGBA color", CheckpointFactory);
+
+    // Checkpoint
+    // todo: add mising checkpoint methods and properties
 });
