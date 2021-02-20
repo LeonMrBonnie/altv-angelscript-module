@@ -24,7 +24,7 @@ namespace Helpers
 
         REGISTER_METHOD_WRAPPER(type, "string opImplConv() const", ToString);
 
-        REGISTER_PROPERTY_WRAPPER_GET(type, "int8", "type", (GenericWrapper<alt::IColShape, alt::IColShape, &alt::IColShape::GetColshapeType, alt::IColShape::ColShapeType>));
+        REGISTER_PROPERTY_WRAPPER_GET(type, "int8", "shapeType", (GenericWrapper<alt::IColShape, alt::IColShape, &alt::IColShape::GetColshapeType, alt::IColShape::ColShapeType>));
 
         REGISTER_PROPERTY_WRAPPER_GET(type, "bool", "playersOnly", (GenericWrapper<alt::IColShape, alt::IColShape, &alt::IColShape::IsPlayersOnly, bool>));
         REGISTER_PROPERTY_WRAPPER_SET(type, "bool", "playersOnly", (GenericWrapper<alt::IColShape, alt::IColShape, &alt::IColShape::SetPlayersOnly, void, bool>));
