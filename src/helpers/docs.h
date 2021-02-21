@@ -103,7 +103,8 @@ namespace Helpers
 
             // Add generation date to top of file
             std::time_t currentTime = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-            char* timeStr = std::ctime(&currentTime);
+            char* timeStr = new char[40];
+            ctime_s(timeStr, 40, &currentTime);
             stream << "// Generated on " << timeStr << "\n";
 
             // Add namespace
