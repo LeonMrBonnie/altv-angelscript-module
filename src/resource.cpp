@@ -6,8 +6,23 @@
 #include "angelscript/addon/scriptany/scriptany.h"
 #include "helpers/convert.h"
 
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
+#define IS_WINDOWS
+#include "windows.h"
+#include "./helpers/bytecode.h"
+#define FILE_SEPERATOR "\\"
+#else
+#define IS_LINUX
+#define FILE_SEPERATOR "/"
+#endif
+
 bool AngelScriptResource::Start()
 {
+    // Get main filename and extension
+    std::string main = resource->GetMain().ToString();
+    std::string extension = main.substr(main.find_last_of(".") + 1);
+    std::string fileName = main.substr(0, main.find_last_of("."));
+
     // Load file
     auto src = ReadFile(resource->GetMain());
 
@@ -19,15 +34,42 @@ bool AngelScriptResource::Start()
 
     int r = builder.StartNewModule(runtime->GetEngine(), resource->GetName().CStr());
     CHECK_AS_RETURN("Builder start", r, false);
-    
-    r = builder.AddSectionFromMemory(resource->GetMain().CStr(), src.CStr(), src.GetSize());
-    CHECK_AS_RETURN("Adding section", r, false);
 
-    r = builder.BuildModule();
-    CHECK_AS_RETURN("Compilation", r, false);
+    module = builder.GetModule();
+
+    // Check if the file is precompiled binary code
+    if(extension == "asb")
+    {
+        BytecodeStream byteStream(resource->GetPath().ToString() + FILE_SEPERATOR + main, true);
+        r = module->LoadByteCode(&byteStream, false);
+        CHECK_AS_RETURN("Load bytecode", r, false);
+        return true;
+    }
+    else
+    {
+        r = builder.AddSectionFromMemory(main.c_str(), src.CStr(), src.GetSize());
+        CHECK_AS_RETURN("Adding section", r, false);
+
+        r = builder.BuildModule();
+        CHECK_AS_RETURN("Compilation", r, false);
+    }
+
+    // Check if compile only mode
+    #ifdef IS_WINDOWS
+    std::string commandline(GetCommandLineA());
+    if(commandline.find("--save-bytecode") != std::string::npos && extension != "asb")
+    {
+        Helpers::BytecodeStream byteStream(resource->GetPath().ToString() + FILE_SEPERATOR + fileName + ".asb");
+        r = module->SaveByteCode(&byteStream, false);
+        byteStream.Close();
+        CHECK_AS_RETURN("Save bytecode", r, false);
+        Log::Colored << "~g~Successfully saved the compiled bytecode to the file ~w~" << fileName + ".asb" << Log::Endl;
+
+        return true;
+    }
+    #endif
 
     // Start script
-    module = builder.GetModule();
     context = runtime->GetEngine()->CreateContext();
     context->SetUserData(this);
 
