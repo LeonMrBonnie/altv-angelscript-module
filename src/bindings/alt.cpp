@@ -4,6 +4,7 @@
 #include "angelscript/addon/scriptdictionary/scriptdictionary.h"
 #include "angelscript/addon/scriptany/scriptany.h"
 #include "../helpers/convert.h"
+#include "../helpers/angelscript.h"
 
 using namespace Helpers;
 
@@ -298,6 +299,92 @@ static bool IsDebugMode()
     return alt::ICore::Instance().IsDebug();
 }
 
+static bool HasMeta(const std::string& key)
+{
+    return alt::ICore::Instance().HasMetaData(key);
+}
+
+static void GetMeta(const std::string& key, void* ref, int typeId)
+{
+    GET_RESOURCE();
+    if(!HasMeta(key))
+    {
+        THROW_ERROR("The specified meta key does not exist");
+        return;
+    }
+
+    auto mvalue = alt::ICore::Instance().GetMetaData(key);
+    auto value = Helpers::MValueToValue(resource->GetRuntime(), mvalue);
+
+    auto engine = resource->GetRuntime()->GetEngine();
+    Helpers::CopyAngelscriptValue(engine, value.second, value.first, ref, typeId);
+}
+
+static void SetMeta(const std::string& key, void* ref, int typeId)
+{
+    auto mvalue = Helpers::ValueToMValue(typeId, ref);
+    if(mvalue->GetType() == alt::IMValue::Type::NIL)
+    {
+        THROW_ERROR("Invalid value passed to SetMeta");
+        return;
+    }
+    alt::ICore::Instance().SetMetaData(key, mvalue);
+}
+
+static void DeleteMeta(const std::string& key)
+{
+    if(!HasMeta(key))
+    {
+        THROW_ERROR("The specified meta key does not exist");
+        return;
+    }
+
+    alt::ICore::Instance().DeleteMetaData(key);
+}
+
+static bool HasSyncedMeta(const std::string& key)
+{
+    return alt::ICore::Instance().HasSyncedMetaData(key);
+}
+
+static void GetSyncedMeta(const std::string& key, void* ref, int typeId)
+{
+    GET_RESOURCE();
+    if(!HasSyncedMeta(key))
+    {
+        THROW_ERROR("The specified meta key does not exist");
+        return;
+    }
+
+    auto mvalue = alt::ICore::Instance().GetSyncedMetaData(key);
+    auto value = Helpers::MValueToValue(resource->GetRuntime(), mvalue);
+
+    auto engine = resource->GetRuntime()->GetEngine();
+    Helpers::CopyAngelscriptValue(engine, value.second, value.first, ref, typeId);
+}
+
+static void SetSyncedMeta(const std::string& key, void* ref, int typeId)
+{
+    auto mvalue = Helpers::ValueToMValue(typeId, ref);
+    if(mvalue->GetType() == alt::IMValue::Type::NIL)
+    {
+        THROW_ERROR("Invalid value passed to SetMeta");
+        return;
+    }
+    alt::ICore::Instance().SetSyncedMetaData(key, mvalue);
+}
+
+static void DeleteSyncedMeta(const std::string& key)
+{
+    if(!HasSyncedMeta(key))
+    {
+        THROW_ERROR("The specified meta key does not exist");
+        return;
+    }
+    
+    alt::ICore::Instance().DeleteSyncedMetaData(key);
+}
+
 static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs)
 {
     // Generic
@@ -354,4 +441,15 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_GLOBAL_FUNC("void On(const string&in event, const string&in handlerName)", On, "Registers an event handler for a local custom event");
     REGISTER_GLOBAL_FUNC("void OnClient(const string&in event, const string&in handlerName)", OnClient, "Registers an event handler for a remote custom event");
     REGISTER_VARIADIC_FUNC("void", "Emit", "const string&in event", 32, Emit, "Emits a local event (Max 32 args)");
+
+    // Metadata
+    REGISTER_GLOBAL_FUNC("bool HasMeta(const string&in key)", HasMeta, "Returns whether the specified meta key exists");
+    REGISTER_GLOBAL_FUNC("void GetMeta(const string&in key, ?&out outValue)", GetMeta, "Sets the specified meta key to the specified value");
+    REGISTER_GLOBAL_FUNC("void SetMeta(const string&in key, ?&in value)", SetMeta, "Gets the value of the specified meta key");
+    REGISTER_GLOBAL_FUNC("void DeleteMeta(const string&in key)", DeleteMeta, "Deletes the specified meta key");
+
+    REGISTER_GLOBAL_FUNC("bool HasSyncedMeta(const string&in key)", HasSyncedMeta, "Returns whether the specified synced meta key exists");
+    REGISTER_GLOBAL_FUNC("void GetSyncedMeta(const string&in key, ?&out outValue)", GetSyncedMeta, "Sets the specified synced meta key to the specified value");
+    REGISTER_GLOBAL_FUNC("void SetSyncedMeta(const string&in key, ?&in value)", SetSyncedMeta, "Gets the value of the specified synced meta key");
+    REGISTER_GLOBAL_FUNC("void DeleteSyncedMeta(const string&in key)", DeleteSyncedMeta, "Deletes the specified synced meta key");
 });
