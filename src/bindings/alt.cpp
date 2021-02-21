@@ -293,6 +293,11 @@ static T* GetByID(uint16_t id)
     else return dynamic_cast<T*>(ent.Get());
 }
 
+static bool IsDebugMode()
+{
+    return alt::ICore::Instance().IsDebug();
+}
+
 static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs)
 {
     // Generic
@@ -308,6 +313,7 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_GLOBAL_PROPERTY("string", "version", GetVersion);
     REGISTER_GLOBAL_PROPERTY("string", "branch", GetBranch);
     REGISTER_GLOBAL_PROPERTY("uint", "sdkVersion", GetSDKVersion);
+    REGISTER_GLOBAL_PROPERTY("bool", "debugMode", IsDebugMode);
 
     // Filesystem
     REGISTER_GLOBAL_FUNC("string ReadFile(const string&in path)", ReadFile, "Reads the specified file contents");
