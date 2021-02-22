@@ -38,7 +38,9 @@ jobs:
     - name: Build (Linux)
       if: matrix.OS_TYPE == 'Linux'
       shell: bash
-      run: ./build.sh
+      run: |
+        chmod +x ./build.sh
+        ./build.sh
 
     - name: Create Release
       id: create_release
