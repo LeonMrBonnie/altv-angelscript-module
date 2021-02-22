@@ -28,11 +28,13 @@ namespace Helpers
         void Start()
         {
             start = std::chrono::high_resolution_clock::now();
+            ended = false;
         }
         float End()
         {
             if(!ended)
             {
+                ended = true;
                 end = std::chrono::high_resolution_clock::now();
                 auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
                 if(showLog)
