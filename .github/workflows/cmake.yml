@@ -30,19 +30,8 @@ jobs:
         git submodule init
         git submodule update
 
-    - name: Build (Windows)
-      if: matrix.OS_TYPE == 'Windows'
-      shell: bash
-      run: ./build.bat
-
-    - name: Build (Linux)
-      if: matrix.OS_TYPE == 'Linux'
-      shell: bash
-      run: |
-        chmod +x ./build.sh
-        ./build.sh
-
     - name: Create Release
+      if: matrix.OS_TYPE == 'Windows'
       id: create_release
       uses: actions/create-release@v1
       env:
@@ -55,6 +44,18 @@ jobs:
           ${{ github.event.head_commit.message }}
         draft: false
         prerelease: false
+
+    - name: Build (Windows)
+      if: matrix.OS_TYPE == 'Windows'
+      shell: bash
+      run: ./build.bat
+
+    - name: Build (Linux)
+      if: matrix.OS_TYPE == 'Linux'
+      shell: bash
+      run: |
+        chmod +x ./build.sh
+        ./build.sh
 
     - name: Upload Release Assets
       id: upload_release_assets
