@@ -5,6 +5,7 @@
 #include "helpers/events.h"
 #include "angelscript/addon/scriptany/scriptany.h"
 #include "helpers/convert.h"
+#include "./helpers/benchmark.h"
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
 #define IS_WINDOWS
@@ -18,6 +19,10 @@
 
 bool AngelScriptResource::Start()
 {
+    #ifdef DEBUG_MODE
+    Helpers::Benchmark benchmark("ResourceStart_" + resource->GetName().ToString());
+    #endif
+
     // Get main filename and extension
     std::string main = resource->GetMain().ToString();
     std::string extension = main.substr(main.find_last_of(".") + 1);
@@ -172,6 +177,10 @@ bool AngelScriptResource::Stop()
 
 bool AngelScriptResource::OnEvent(const alt::CEvent* ev)
 {
+    #ifdef DEBUG_MODE
+    Helpers::Benchmark benchmark("OnEvent_" + resource->GetName().ToString() + "_" + std::string(std::to_string((uint16_t)ev->GetType())));
+    #endif
+
     if(ev->GetType() == alt::CEvent::Type::SERVER_SCRIPT_EVENT)
     {
         HandleCustomEvent(ev, true);
@@ -216,6 +225,10 @@ bool AngelScriptResource::OnEvent(const alt::CEvent* ev)
 
 void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local)
 {
+    #ifdef DEBUG_MODE
+    Helpers::Benchmark benchmark("HandleCustomEvent_" + resource->GetName().ToString() + "_" + static_cast<const alt::CServerScriptEvent*>(event)->GetName().ToString());
+    #endif
+
     std::string name;
     alt::MValueArgs args;
     if(local)

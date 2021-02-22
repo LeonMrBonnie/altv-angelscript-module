@@ -1,8 +1,13 @@
 #include "main.h"
 #include "Log.h"
+#include "./helpers/benchmark.h"
 
 EXPORT bool altMain(alt::ICore* core)
 {
+    #ifdef DEBUG_MODE
+    Helpers::Benchmark benchmark("Main_Init");
+    #endif
+
     alt::ICore::SetInstance(core);
 
     // Create instance of runtime and register

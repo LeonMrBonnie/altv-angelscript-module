@@ -5,6 +5,7 @@
 #include "angelscript/addon/scriptany/scriptany.h"
 #include "../helpers/convert.h"
 #include "../helpers/angelscript.h"
+#include "../helpers/benchmark.h"
 
 using namespace Helpers;
 
@@ -263,6 +264,10 @@ static void OnClient(const std::string& name, const std::string& handlerName)
 
 static void Emit(asIScriptGeneric* gen)
 {
+    #ifdef DEBUG_MODE
+    Helpers::Benchmark benchmark("Emit");
+    #endif
+
     GET_RESOURCE();
     void* ref = gen->GetArgAddress(0);
     int typeId = 0;
