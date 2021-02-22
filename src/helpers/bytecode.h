@@ -9,10 +9,16 @@ namespace Helpers
     class BytecodeStream : public asIBinaryStream
     {
     public:
-        BytecodeStream(std::string fileName, bool read = false) : readOnly(read), file(fileName,  (readOnly ? std::ios::in : std::ios::out) | std::ios::binary) 
+        BytecodeStream(std::string fileName, bool read = false) : readOnly(read), file(fileName, (read ? std::ios::in : std::ios::out) | std::ios::binary) 
         {
+            // Check if the file was opened
+            if(!file.good()) 
+            {
+                errored = true;
+                Close();
+            }
             // If we write to the file, first clear the file content
-            if(!readOnly)
+            else if(!readOnly)
             {
                 file.clear();
             }
@@ -39,9 +45,15 @@ namespace Helpers
         {
             file.close();
         }
+
+        bool HasErrored()
+        {
+            return errored;
+        }
     
     protected:
         std::fstream file;
         bool readOnly;
+        bool errored = false;
     };
 }

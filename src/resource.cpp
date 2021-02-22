@@ -41,9 +41,14 @@ bool AngelScriptResource::Start()
     if(extension == "asb")
     {
         BytecodeStream byteStream(resource->GetPath().ToString() + FILE_SEPERATOR + main, true);
+        if(byteStream.HasErrored())
+        {
+            Log::Error << "Failed to open bytecode file" << Log::Endl;
+            return false;
+        }
         r = module->LoadByteCode(&byteStream, false);
         CHECK_AS_RETURN("Load bytecode", r, false);
-        return true;
+        byteStream.Close();
     }
     else
     {
@@ -60,6 +65,11 @@ bool AngelScriptResource::Start()
     if(commandline.find("--save-bytecode") != std::string::npos && extension != "asb")
     {
         Helpers::BytecodeStream byteStream(resource->GetPath().ToString() + FILE_SEPERATOR + fileName + ".asb");
+        if(byteStream.HasErrored())
+        {
+            Log::Error << "Failed to open bytecode file" << Log::Endl;
+            return false;
+        }
         r = module->SaveByteCode(&byteStream, false);
         byteStream.Close();
         CHECK_AS_RETURN("Save bytecode", r, false);
