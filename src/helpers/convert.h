@@ -10,7 +10,7 @@
 namespace Helpers
 {
     // first = typeId, second = value
-    static std::pair<int, void*> MValueToValue(AngelScriptRuntime* runtime, alt::MValueConst& val)
+    static std::tuple<int, void*> MValueToValue(AngelScriptRuntime* runtime, alt::MValueConst& val)
     {
         int type;
         void* valuePtr;

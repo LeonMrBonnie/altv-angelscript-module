@@ -226,10 +226,10 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
         std::vector<asIScriptFunction*> handlers = GetCustomEventHandlers(name, true);
         if(handlers.size() == 0) return;
 
-        alt::Array<std::pair<int, void*>> handlerArgs;
+        alt::Array<std::tuple<int, void*>> handlerArgs;
         for(auto arg : args)
         {
-            std::pair<int, void*> converted = Helpers::MValueToValue(runtime, arg);
+            std::tuple<int, void*> converted = Helpers::MValueToValue(runtime, arg);
             handlerArgs.Push(converted);
         }
 
@@ -239,10 +239,10 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
             CHECK_AS_RETURN("Prepare custom event handler", r);
             for(int i = 0; i < handlerArgs.GetSize(); i++)
             {
-                auto arg = handlerArgs[i];
+                auto [typeId, ptr] = handlerArgs[i];
                 int ret;
-                if(Helpers::IsTypePrimitive(arg.first)) ret = context->SetArgAddress(i, arg.second);
-                else ret = context->SetArgObject(i, arg.second);
+                if(Helpers::IsTypePrimitive(typeId)) ret = context->SetArgAddress(i, ptr);
+                else ret = context->SetArgObject(i, ptr);
                 CHECK_AS_RETURN("Set custom event handler arg", ret);
             }
             r = context->Execute();
@@ -250,9 +250,9 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
         }
 
         context->Unprepare();
-        for(auto arg : handlerArgs)
+        for(auto [typeId, ptr] : handlerArgs)
         {
-            if(arg.first != runtime->GetBaseObjectTypeId()) delete arg.second;
+            if(typeId != runtime->GetBaseObjectTypeId()) delete ptr;
         }
     }
     else
@@ -265,10 +265,10 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
         std::vector<asIScriptFunction*> handlers = GetCustomEventHandlers(name, false);
         if(handlers.size() == 0) return;
 
-        alt::Array<std::pair<int, void*>> handlerArgs;
+        alt::Array<std::tuple<int, void*>> handlerArgs;
         for(auto arg : args)
         {
-            std::pair<int, void*> converted = Helpers::MValueToValue(runtime, arg);
+            std::tuple<int, void*> converted = Helpers::MValueToValue(runtime, arg);
             handlerArgs.Push(converted);
         }
 
@@ -279,10 +279,10 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
             context->SetArgObject(0, player.Get());
             for(int i = 0; i < handlerArgs.GetSize(); i++)
             {
-                auto arg = handlerArgs[i];
+                auto [typeId, ptr] = handlerArgs[i];
                 int ret;
-                if(Helpers::IsTypePrimitive(arg.first)) ret = context->SetArgAddress(i + 1, arg.second);
-                else ret = context->SetArgObject(i + 1, arg.second);
+                if(Helpers::IsTypePrimitive(typeId)) ret = context->SetArgAddress(i + 1, ptr);
+                else ret = context->SetArgObject(i + 1, ptr);
                 CHECK_AS_RETURN("Set custom event handler arg", ret);
             }
             r = context->Execute();
@@ -290,9 +290,9 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
         }
 
         context->Unprepare();
-        for(auto arg : handlerArgs)
+        for(auto [typeId, ptr] : handlerArgs)
         {
-            if(arg.first != runtime->GetBaseObjectTypeId()) delete arg.second;
+            if(typeId != runtime->GetBaseObjectTypeId()) delete ptr;
         }
     }
 }
