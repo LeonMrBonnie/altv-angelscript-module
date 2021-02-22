@@ -74,7 +74,10 @@ namespace Helpers
             new(memory) Vector3(x, y, z);
         }
     };
+}
 
+namespace Data
+{
     static void RegisterVector3(asIScriptEngine* engine, DocsGenerator* docs)
     {
         REGISTER_VALUE_CLASS("Vector3", Vector3, asOBJ_VALUE | asOBJ_POD, "Three-dimensional vector");

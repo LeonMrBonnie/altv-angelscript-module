@@ -73,7 +73,10 @@ namespace Helpers
             new(memory) Vector2(x, y);
         }
     };
+}
 
+namespace Data
+{
     static void RegisterVector2(asIScriptEngine* engine, DocsGenerator* docs)
     {
         REGISTER_VALUE_CLASS("Vector2", Vector2, asOBJ_VALUE | asOBJ_POD, "Two-dimensional vector");

@@ -4,7 +4,7 @@
 
 using namespace Helpers;
 
-namespace Helpers
+namespace Data
 {
     static void RegisterClothes(asIScriptEngine* engine, DocsGenerator* docs)
     {

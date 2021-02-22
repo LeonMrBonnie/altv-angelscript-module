@@ -4,7 +4,7 @@
 
 using namespace Helpers;
 
-namespace Helpers
+namespace Data
 {
     static void RegisterProps(asIScriptEngine* engine, DocsGenerator* docs)
     {

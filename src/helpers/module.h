@@ -56,6 +56,12 @@
         docs->PushObjectConstructor(name, decl); \
     }
 
+// Registers a new class destructor
+#define REGISTER_DESTRUCTOR(name, func) \
+    { \
+        engine->RegisterObjectBehaviour(name, asBEHAVE_DESTRUCT, "void f()", asFUNCTION(func), asCALL_CDECL_OBJFIRST); \
+    }
+
 // Registers a new class factory (only used for classes that have a constructor in the scripting api)
 #define REGISTER_FACTORY(name, decl, func) \
     { \
