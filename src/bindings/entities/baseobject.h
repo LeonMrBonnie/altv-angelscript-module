@@ -29,10 +29,10 @@ static void GetMeta(T* obj, const std::string& key, void* ref, int typeId)
     }
     
     auto mvalue = obj->GetMetaData(key);
-    auto value = Helpers::MValueToValue(resource->GetRuntime(), mvalue);
+    auto [type, ptr] = Helpers::MValueToValue(resource->GetRuntime(), mvalue);
 
     auto engine = resource->GetRuntime()->GetEngine();
-    Helpers::CopyAngelscriptValue(engine, value.second, value.first, ref, typeId);
+    Helpers::CopyAngelscriptValue(engine, ptr, type, ref, typeId);
 }
 
 template<class T>

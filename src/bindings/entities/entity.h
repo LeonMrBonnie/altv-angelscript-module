@@ -44,10 +44,10 @@ static void GetSyncedMeta(T* obj, const std::string& key, void* ref, int typeId)
     }
     
     auto mvalue = obj->GetSyncedMetaData(key);
-    auto value = Helpers::MValueToValue(resource->GetRuntime(), mvalue);
+    auto [type, ptr] = Helpers::MValueToValue(resource->GetRuntime(), mvalue);
 
     auto engine = resource->GetRuntime()->GetEngine();
-    Helpers::CopyAngelscriptValue(engine, value.second, value.first, ref, typeId);
+    Helpers::CopyAngelscriptValue(engine, ptr, type, ref, typeId);
 }
 
 template<class T>
@@ -73,10 +73,10 @@ static void GetStreamSyncedMeta(T* obj, const std::string& key, void* ref, int t
     }
     
     auto mvalue = obj->GetStreamSyncedMetaData(key);
-    auto value = Helpers::MValueToValue(resource->GetRuntime(), mvalue);
+    auto [type, ptr] = Helpers::MValueToValue(resource->GetRuntime(), mvalue);
 
     auto engine = resource->GetRuntime()->GetEngine();
-    Helpers::CopyAngelscriptValue(engine, value.second, value.first, ref, typeId);
+    Helpers::CopyAngelscriptValue(engine, ptr, type, ref, typeId);
 }
 
 template<class T>

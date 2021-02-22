@@ -314,10 +314,10 @@ static void GetMeta(const std::string& key, void* ref, int typeId)
     }
 
     auto mvalue = alt::ICore::Instance().GetMetaData(key);
-    auto value = Helpers::MValueToValue(resource->GetRuntime(), mvalue);
+    auto [type, ptr] = Helpers::MValueToValue(resource->GetRuntime(), mvalue);
 
     auto engine = resource->GetRuntime()->GetEngine();
-    Helpers::CopyAngelscriptValue(engine, value.second, value.first, ref, typeId);
+    Helpers::CopyAngelscriptValue(engine, ptr, type, ref, typeId);
 }
 
 static void SetMeta(const std::string& key, void* ref, int typeId)
@@ -357,10 +357,10 @@ static void GetSyncedMeta(const std::string& key, void* ref, int typeId)
     }
 
     auto mvalue = alt::ICore::Instance().GetSyncedMetaData(key);
-    auto value = Helpers::MValueToValue(resource->GetRuntime(), mvalue);
+    auto [type, ptr] = Helpers::MValueToValue(resource->GetRuntime(), mvalue);
 
     auto engine = resource->GetRuntime()->GetEngine();
-    Helpers::CopyAngelscriptValue(engine, value.second, value.first, ref, typeId);
+    Helpers::CopyAngelscriptValue(engine, ptr, type, ref, typeId);
 }
 
 static void SetSyncedMeta(const std::string& key, void* ref, int typeId)
