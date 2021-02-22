@@ -17,9 +17,9 @@ jobs:
           - os: windows-latest
             OS_TYPE: Windows
             EXT: dll
-          - os: ubuntu-latest
-            OS_TYPE: Linux
-            EXT: so
+          #- os: ubuntu-latest
+          #  OS_TYPE: Linux
+          #  EXT: so
 
     steps:
     - uses: actions/checkout@v2
