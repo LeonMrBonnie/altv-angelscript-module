@@ -34,13 +34,12 @@ static void SetNetOwner(T* obj, alt::IPlayer* player, bool disableMigration)
 }
 
 template<class T>
-static void GetSyncedMeta(T* obj, const std::string& key, void* ref, int typeId)
+static bool GetSyncedMeta(T* obj, const std::string& key, void* ref, int typeId)
 {
     GET_RESOURCE();
     if(!obj->HasSyncedMetaData(key))
     {
-        THROW_ERROR("The specified synced meta key does not exist on the object");
-        return;
+        return false;
     }
     
     auto mvalue = obj->GetSyncedMetaData(key);
@@ -48,6 +47,7 @@ static void GetSyncedMeta(T* obj, const std::string& key, void* ref, int typeId)
 
     auto engine = resource->GetRuntime()->GetEngine();
     Helpers::CopyAngelscriptValue(engine, ptr, type, ref, typeId);
+    return true;
 }
 
 template<class T>
@@ -63,13 +63,12 @@ static void SetSyncedMeta(T* obj, const std::string& key, void* ref, int typeId)
 }
 
 template<class T>
-static void GetStreamSyncedMeta(T* obj, const std::string& key, void* ref, int typeId)
+static bool GetStreamSyncedMeta(T* obj, const std::string& key, void* ref, int typeId)
 {
     GET_RESOURCE();
     if(!obj->HasStreamSyncedMetaData(key))
     {
-        THROW_ERROR("The specified stream synced meta key does not exist on the object");
-        return;
+        return false;
     }
     
     auto mvalue = obj->GetStreamSyncedMetaData(key);
@@ -77,6 +76,7 @@ static void GetStreamSyncedMeta(T* obj, const std::string& key, void* ref, int t
 
     auto engine = resource->GetRuntime()->GetEngine();
     Helpers::CopyAngelscriptValue(engine, ptr, type, ref, typeId);
+    return true;
 }
 
 template<class T>
@@ -112,12 +112,12 @@ namespace Helpers
         REGISTER_METHOD_WRAPPER(type, "void SetNetOwner(Player@ player, bool disableMigration = false)", SetNetOwner<T>);
 
         REGISTER_METHOD_WRAPPER(type, "bool HasSyncedMeta(const string&in key)", (GenericWrapper<T, alt::IEntity, &alt::IEntity::HasSyncedMetaData, bool, std::string&>));
-        REGISTER_METHOD_WRAPPER(type, "void GetSyncedMeta(const string&in key, ?&out outValue)", GetSyncedMeta<T>);
+        REGISTER_METHOD_WRAPPER(type, "bool GetSyncedMeta(const string&in key, ?&out outValue)", GetSyncedMeta<T>);
         REGISTER_METHOD_WRAPPER(type, "void SetSyncedMeta(const string&in key, ?&in value)", SetSyncedMeta<T>);
         REGISTER_METHOD_WRAPPER(type, "void DeleteSyncedMeta(const string&in key)", (GenericWrapper<T, alt::IEntity, &alt::IEntity::DeleteSyncedMetaData, void, std::string&>));
 
         REGISTER_METHOD_WRAPPER(type, "bool HasStreamSyncedMeta(const string&in key)", (GenericWrapper<T, alt::IEntity, &alt::IEntity::HasStreamSyncedMetaData, bool, std::string&>));
-        REGISTER_METHOD_WRAPPER(type, "void GetStreamSyncedMeta(const string&in key, ?&out outValue)", GetStreamSyncedMeta<T>);
+        REGISTER_METHOD_WRAPPER(type, "bool GetStreamSyncedMeta(const string&in key, ?&out outValue)", GetStreamSyncedMeta<T>);
         REGISTER_METHOD_WRAPPER(type, "void SetStreamSyncedMeta(const string&in key, ?&in value)", SetStreamSyncedMeta<T>);
         REGISTER_METHOD_WRAPPER(type, "void DeleteStreamSyncedMeta(const string&in key)", (GenericWrapper<T, alt::IEntity, &alt::IEntity::DeleteStreamSyncedMetaData, void, std::string&>));
     }

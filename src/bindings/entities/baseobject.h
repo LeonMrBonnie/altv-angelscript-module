@@ -19,13 +19,12 @@ static void RemoveRef(T* obj)
 }
 
 template<class T>
-static void GetMeta(T* obj, const std::string& key, void* ref, int typeId)
+static bool GetMeta(T* obj, const std::string& key, void* ref, int typeId)
 {
     GET_RESOURCE();
     if(!obj->HasMetaData(key))
     {
-        THROW_ERROR("The specified meta key does not exist on the object");
-        return;
+        return false;
     }
     
     auto mvalue = obj->GetMetaData(key);
@@ -33,6 +32,7 @@ static void GetMeta(T* obj, const std::string& key, void* ref, int typeId)
 
     auto engine = resource->GetRuntime()->GetEngine();
     Helpers::CopyAngelscriptValue(engine, ptr, type, ref, typeId);
+    return true;
 }
 
 template<class T>
@@ -72,7 +72,7 @@ namespace Helpers
         REGISTER_PROPERTY_WRAPPER_GET(type, "bool", "valid", IsValid<T>);
 
         REGISTER_METHOD_WRAPPER(type, "bool HasMeta(const string&in key)", (GenericWrapper<T, alt::IBaseObject, &alt::IBaseObject::HasMetaData, bool, std::string&>));
-        REGISTER_METHOD_WRAPPER(type, "void GetMeta(const string&in key, ?&out outValue)", GetMeta<T>);
+        REGISTER_METHOD_WRAPPER(type, "bool GetMeta(const string&in key, ?&out outValue)", GetMeta<T>);
         REGISTER_METHOD_WRAPPER(type, "void SetMeta(const string&in key, ?&in value)", SetMeta<T>);
         REGISTER_METHOD_WRAPPER(type, "void DeleteMeta(const string&in key)", (GenericWrapper<T, alt::IBaseObject, &alt::IBaseObject::DeleteMetaData, void, std::string&>));
 
