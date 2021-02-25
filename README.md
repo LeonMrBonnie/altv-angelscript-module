@@ -10,14 +10,7 @@ Next simply run the `build.bat` (Windows) or `build.sh` (Linux) and then the bui
 
 ## How to use
 
-Copy the `angelscript-module.dll` to your server `modules` folder and add it to your `server.cfg` modules array.
-
-When you start the server you should see a message similiar to this:
-```
-Loaded AngelScript module. Version vX.X.X
-```
-
-You can now create an AngelScript resource by using the `as` type.
+You can find information about the module in the [Wiki](https://github.com/LeonMrBonnie/altv-angelscript-module/wiki)
 
 ## How to contribute
 
