@@ -84,6 +84,9 @@ bool AngelScriptResource::Start()
     }
     #endif
 
+    r = module->BindAllImportedFunctions();
+    CHECK_AS_RETURN("Bind imported functions", r, false);
+
     // Start script
     context = runtime->GetEngine()->CreateContext();
     context->SetUserData(this);
