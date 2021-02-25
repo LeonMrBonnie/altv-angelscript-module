@@ -390,6 +390,12 @@ static void DeleteSyncedMeta(const std::string& key)
     alt::ICore::Instance().DeleteSyncedMetaData(key);
 }
 
+static void ShowCallstack(uint32_t maxLevels = 0)
+{
+    auto context = asGetActiveContext();
+    Helpers::PrintCallstack(context, maxLevels);
+}
+
 static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs)
 {
     // Generic
@@ -406,6 +412,9 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_GLOBAL_PROPERTY("string", "branch", GetBranch);
     REGISTER_GLOBAL_PROPERTY("uint", "sdkVersion", GetSDKVersion);
     REGISTER_GLOBAL_PROPERTY("bool", "debugMode", IsDebugMode);
+
+    // Debugging
+    REGISTER_GLOBAL_FUNC("void ShowCallstack(uint maxLevels = 0)", ShowCallstack, "Prints the current callstack for debugging");
 
     // Filesystem
     REGISTER_GLOBAL_FUNC("string ReadFile(const string&in path)", ReadFile, "Reads the specified file contents");
