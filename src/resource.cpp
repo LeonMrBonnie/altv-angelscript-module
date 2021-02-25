@@ -92,7 +92,7 @@ bool AngelScriptResource::Start()
     context->SetUserData(this);
 
     // Get metadata (returns start function)
-    asIScriptFunction* func = RegisterMetadata(builder);
+    asIScriptFunction* func = RegisterMetadata(builder, context);
 
     // Get the global start function if no script class start function was found
     if(func == nullptr) func = module->GetFunctionByDecl("void Start()");
@@ -218,9 +218,46 @@ bool AngelScriptResource::OnEvent(const alt::CEvent* ev)
         if(r == asEXECUTION_FINISHED && shouldReturn)
         {
             auto result = context->GetReturnByte();
+            context->Unprepare();
             return result == 1 ? true : false;
         }
         context->Unprepare();
+    }
+
+    // Check if the main script class has been set
+    if(mainScriptClass != nullptr)
+    {
+        // Get the method of the main script class for the event if it exists
+        auto type = mainScriptClass->GetObjectType();
+        asIScriptFunction* eventFunc = nullptr;
+        for(asUINT i = 0; i < type->GetMethodCount(); i++)
+        {
+            auto func = type->GetMethodByIndex(i, false);
+            auto data = func->GetUserData();
+            if(data == nullptr) continue;
+
+            Event* eventData = static_cast<Event*>(data);
+            if(eventData->GetType() != ev->GetType()) continue;
+
+            eventFunc = func;
+            break;
+        }
+        if(eventFunc != nullptr)
+        {
+            int r = context->Prepare(eventFunc);
+            CHECK_AS_RETURN("Prepare main script class event method", r, true);
+            r = context->SetObject(mainScriptClass);
+            CHECK_AS_RETURN("Set main script class event method object", r, true);
+            r = event->Execute(this, ev);
+            CHECK_AS_RETURN("Execute main script class event method", r, true);
+            if(r == asEXECUTION_FINISHED && shouldReturn)
+            {
+                auto result = context->GetReturnByte();
+                context->Unprepare();
+                return result == 1 ? true : false;
+            }
+            context->Unprepare();
+        }
     }
 
     return true;
@@ -330,39 +367,55 @@ void AngelScriptResource::OnTick()
     }
 }
 
-asIScriptFunction* AngelScriptResource::RegisterMetadata(CScriptBuilder& builder)
+asIScriptFunction* AngelScriptResource::RegisterMetadata(CScriptBuilder& builder, asIScriptContext* context)
 {
     asIScriptFunction* mainFunc = nullptr;
-    // todo: add support meta properly
-    /*
+    
     uint32_t count = module->GetObjectTypeCount();
     for(uint32_t i = 0; i < count; i++)
     {
         // Get the type for the class
         auto type = module->GetObjectTypeByIndex(i);
+
         // Get metadata for the class
         std::vector<std::string> metadata = builder.GetMetadataForType(type->GetTypeId());
         for(auto meta : metadata)
         {
             // The metadata equals IServer so its our main server class
-            if(meta == "IServer")
+            if(meta != "IServer") continue;
+
+            // Create an instance
+            auto factory = type->GetFactoryByIndex(0);
+            context->Prepare(factory);
+            context->Execute();
+            asIScriptObject* obj = *(asIScriptObject**)context->GetAddressOfReturnValue();
+            obj->AddRef();
+            // Store our instance on the resource
+            mainScriptClass = obj;
+
+            // Get all methods and check their metadata
+            for(uint32_t n = 0; n < type->GetMethodCount(); n++)
             {
-                // Get all methods and check their metadata
-                auto methods = type->GetMethodCount();
-                for(uint32_t n = 0; i < methods; i++)
+                auto method = type->GetMethodByIndex(n, false);
+                // Get metadata for the method
+                std::vector<std::string> methodMetas = builder.GetMetadataForTypeMethod(type->GetTypeId(), method);
+
+                for(auto methodMeta : methodMetas)
                 {
-                    auto method = type->GetMethodByIndex(n, false);
-                    // Get metadata for the method
-                    std::vector<std::string> methodMetas = builder.GetMetadataForTypeMethod(type->GetTypeId(), method);
-                    for(auto methodMeta : methodMetas)
-                    {
-                        if(methodMeta == "Start") mainFunc = method;
-                    }
+                    Log::Info << methodMeta << Log::Endl;
+                    // Get the event associated with the metadata
+                    Event* event = Event::GetByMetadata(methodMeta);
+                    if(event == nullptr) continue;
+                    // Store the event on the method
+                    method->SetUserData(event);
                 }
             }
+
+            // We are done so we break out of all the loops and return
+            goto done;
         }
     }
-    */
 
+done:
     return mainFunc;
 }

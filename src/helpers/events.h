@@ -13,7 +13,7 @@
         GET_RESOURCE(); \
         resource->RegisterEventHandler(type, callback); \
     } \
-    static Event Event##name##(type, returnType, decl, argsGetter, [](asIScriptEngine* engine, DocsGenerator* docs) { \
+    static Event Event##name##(type, #name, returnType, decl, argsGetter, [](asIScriptEngine* engine, DocsGenerator* docs) { \
         std::stringstream funcDef; \
         funcDef << returnType" " << #name << "Callback(" << decl << ")"; \
         engine->RegisterFuncdef(funcDef.str().c_str()); \
@@ -26,7 +26,6 @@
 namespace Helpers
 {
     using CallbacksGetter = std::vector<asIScriptFunction*>(*)(AngelScriptResource* resource, const alt::CEvent* event, std::string name);
-    // args.pair.first = pointer to object, args.pair.second = boolean whether the value is a primitive
     using ExecuteCallback = int(*)(AngelScriptResource* resource, const alt::CEvent* event, asIScriptContext* context);
     using RegisterCallback = void(*)(asIScriptEngine* engine, DocsGenerator* docs);
 
@@ -34,6 +33,8 @@ namespace Helpers
     {
         static std::unordered_map<alt::CEvent::Type, Event*> all;
 
+        std::string name;
+        alt::CEvent::Type type;
         const char* callbackDecl;
         const char* returnType;
         ExecuteCallback executeCallback;
@@ -42,11 +43,14 @@ namespace Helpers
     public:
         Event(
             alt::CEvent::Type type, 
+            std::string name,
             const char* returnType,
             const char* callbackDecl, 
             ExecuteCallback executeCallback,
             RegisterCallback registerCallback
         ) : 
+            type(type),
+            name(name),
             callbackDecl(callbackDecl),
             returnType(returnType),
             executeCallback(executeCallback),
@@ -65,11 +69,30 @@ namespace Helpers
             return returnType;
         }
 
+        alt::CEvent::Type GetType()
+        {
+            return type;
+        }
+
+        std::string GetName()
+        {
+            return name;
+        }
+
         static Event* GetEvent(alt::CEvent::Type type)
         {
             auto event = all.find(type);
             if(event == all.end()) return nullptr;
             return event->second;
+        }
+
+        static Event* GetByMetadata(std::string metadata)
+        {
+            for(auto [_, event] : all)
+            {
+                if("On" + event->name == metadata) return event;
+            }
+            return nullptr;
         }
 
         static void RegisterAll(asIScriptEngine* engine, DocsGenerator* docs)

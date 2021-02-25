@@ -18,6 +18,8 @@ class AngelScriptResource : public alt::IResource::Impl
 
     std::vector<alt::IBaseObject*> entities;
 
+    asIScriptObject* mainScriptClass = nullptr;
+
     // Timers
     std::unordered_map<uint32_t, Helpers::Timer*> timers;
     std::vector<uint32_t> invalidTimers;
@@ -60,7 +62,7 @@ public:
     }
 
     // Returns the main function if found, otherwise nullptr
-    asIScriptFunction* RegisterMetadata(CScriptBuilder& builder);
+    asIScriptFunction* RegisterMetadata(CScriptBuilder& builder, asIScriptContext* context);
 
     alt::String ReadFile(alt::String path);
 
