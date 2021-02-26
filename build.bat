@@ -13,3 +13,7 @@ IF NOT EXIST dist\ (
 )
 copy build\win64\Release\angelscript-module.dll dist
 copy build\win64\Release\angelscript-module.pdb dist
+
+IF EXIST extra.bat (
+    extra.bat
+)
