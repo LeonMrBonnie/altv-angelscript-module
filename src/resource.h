@@ -129,11 +129,13 @@ public:
 
     void OnCreateBaseObject(alt::IBaseObject* object) 
     {
+        object->AddRef();
         entities.push_back(object);
     }
     void OnRemoveBaseObject(alt::IBaseObject* object) 
     {
         entities.erase(std::find(entities.begin(), entities.end(), object));
+        object->RemoveRef();
     }
 };
 
