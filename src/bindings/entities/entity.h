@@ -37,10 +37,7 @@ template<class T>
 static bool GetSyncedMeta(T* obj, const std::string& key, void* ref, int typeId)
 {
     GET_RESOURCE();
-    if(!obj->HasSyncedMetaData(key))
-    {
-        return false;
-    }
+    if(!obj->HasSyncedMetaData(key)) return false;
     
     auto mvalue = obj->GetSyncedMetaData(key);
     auto [type, ptr] = Helpers::MValueToValue(resource->GetRuntime(), mvalue);
@@ -66,10 +63,7 @@ template<class T>
 static bool GetStreamSyncedMeta(T* obj, const std::string& key, void* ref, int typeId)
 {
     GET_RESOURCE();
-    if(!obj->HasStreamSyncedMetaData(key))
-    {
-        return false;
-    }
+    if(!obj->HasStreamSyncedMetaData(key)) return false;
     
     auto mvalue = obj->GetStreamSyncedMetaData(key);
     auto [type, ptr] = Helpers::MValueToValue(resource->GetRuntime(), mvalue);

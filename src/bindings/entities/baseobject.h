@@ -22,10 +22,7 @@ template<class T>
 static bool GetMeta(T* obj, const std::string& key, void* ref, int typeId)
 {
     GET_RESOURCE();
-    if(!obj->HasMetaData(key))
-    {
-        return false;
-    }
+    if(!obj->HasMetaData(key)) return false;
     
     auto mvalue = obj->GetMetaData(key);
     auto [type, ptr] = Helpers::MValueToValue(resource->GetRuntime(), mvalue);
