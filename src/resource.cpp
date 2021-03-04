@@ -84,8 +84,7 @@ bool AngelScriptResource::Start()
     }
     #endif
 
-    r = module->BindAllImportedFunctions();
-    CHECK_AS_RETURN("Bind imported functions", r, false);
+    RegisterImports();
 
     // Start script
     context = runtime->GetEngine()->CreateContext();
@@ -121,6 +120,47 @@ bool AngelScriptResource::Start()
     context->Unprepare();
 
     return true;
+}
+
+void AngelScriptResource::RegisterImports()
+{
+    for(uint32_t i = 0; i < module->GetImportedFunctionCount(); i++)
+    {
+        auto source = module->GetImportedFunctionSourceModule(i);
+        auto decl = module->GetImportedFunctionDeclaration(i);
+
+        // Get the resource and check if its started
+        auto sourceResource = alt::ICore::Instance().GetResource(source);
+        if(!sourceResource || !sourceResource->IsStarted())
+        {
+            Log::Error << "Could not bind function '" << decl << "' from module '" << source << "'" << Log::Endl;
+            return;
+        }
+
+        // The resource is a angelscript resource
+        if(sourceResource->GetType() == MODULE_TYPE)
+        {
+            auto sourceModule = runtime->GetEngine()->GetModule(sourceResource->GetName().CStr());
+            auto func = sourceModule->GetFunctionByDecl(decl);
+            if(func == nullptr)
+            {
+                Log::Error << "Could not bind function '" << decl << "' from module '" << source << "'" << Log::Endl;
+                return;
+            }
+            module->BindImportedFunction(i, func);
+        }
+        // The resource is not a angelscript resource
+        else
+        {
+            // todo: add import of functions from non angelscript resources
+            /*auto exports = sourceResource->GetExports();
+            for(auto it = exports->Begin(); exports->Next();)
+            {
+                auto name = it->GetKey();
+                auto func = it->GetValue().As<alt::MValueFunctionConst>();
+            }*/
+        }
+    }
 }
 
 alt::String AngelScriptResource::ReadFile(alt::String path)

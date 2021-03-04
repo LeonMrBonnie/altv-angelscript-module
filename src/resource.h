@@ -64,6 +64,9 @@ public:
     // Returns the main function if found, otherwise nullptr
     asIScriptFunction* RegisterMetadata(CScriptBuilder& builder, asIScriptContext* context);
 
+    // Registers all the imported functions
+    void RegisterImports();
+
     alt::String ReadFile(alt::String path);
 
     // Registers a new script callback for the specified event
