@@ -85,6 +85,7 @@ bool AngelScriptResource::Start()
     #endif
 
     RegisterImports();
+    RegisterExports(builder);
 
     // Start script
     context = runtime->GetEngine()->CreateContext();
@@ -416,7 +417,53 @@ asIScriptFunction* AngelScriptResource::RegisterMetadata(CScriptBuilder& builder
     }
 
 done:
-    // Registers the resource exports
+    return mainFunc;
+}
+
+void AngelScriptResource::RegisterImports()
+{
+    for(uint32_t i = 0; i < module->GetImportedFunctionCount(); i++)
+    {
+        auto source = module->GetImportedFunctionSourceModule(i);
+        auto decl = module->GetImportedFunctionDeclaration(i);
+
+        // Get the resource and check if its started
+        auto sourceResource = alt::ICore::Instance().GetResource(source);
+        if(!sourceResource || !sourceResource->IsStarted())
+        {
+            Log::Error << "Could not bind function '" << decl << "' from module '" << source << "'" << Log::Endl;
+            return;
+        }
+
+        auto exports = sourceResource->GetExports();
+        // The resource is a angelscript resource
+        if(sourceResource->GetType() == MODULE_TYPE)
+        {
+            auto sourceModule = runtime->GetEngine()->GetModule(sourceResource->GetName().CStr());
+            auto func = sourceModule->GetFunctionByDecl(decl);
+            if(func == nullptr || exports->Get(func->GetName()).IsEmpty())
+            {
+                Log::Error << "Could not bind function '" << decl << "' from module '" << source << "'" << Log::Endl;
+                return;
+            }
+            module->BindImportedFunction(i, func);
+        }
+        // The resource is not a angelscript resource
+        else
+        {
+            // todo: add import of functions from non angelscript resources
+            /*
+            for(auto it = exports->Begin(); it; it = exports->Next())
+            {
+                auto name = it->GetKey();
+                auto func = it->GetValue().As<alt::MValueFunctionConst>();
+            }*/
+        }
+    }
+}
+
+void AngelScriptResource::RegisterExports(CScriptBuilder& builder)
+{
     alt::MValueDict exports = alt::ICore::Instance().CreateMValueDict();
 
     uint32_t funcs = module->GetFunctionCount();
@@ -452,47 +499,4 @@ done:
     }
 
     resource->SetExports(exports);
-
-    return mainFunc;
-}
-
-void AngelScriptResource::RegisterImports()
-{
-    for(uint32_t i = 0; i < module->GetImportedFunctionCount(); i++)
-    {
-        auto source = module->GetImportedFunctionSourceModule(i);
-        auto decl = module->GetImportedFunctionDeclaration(i);
-
-        // Get the resource and check if its started
-        auto sourceResource = alt::ICore::Instance().GetResource(source);
-        if(!sourceResource || !sourceResource->IsStarted())
-        {
-            Log::Error << "Could not bind function '" << decl << "' from module '" << source << "'" << Log::Endl;
-            return;
-        }
-
-        // The resource is a angelscript resource
-        if(sourceResource->GetType() == MODULE_TYPE)
-        {
-            auto sourceModule = runtime->GetEngine()->GetModule(sourceResource->GetName().CStr());
-            auto func = sourceModule->GetFunctionByDecl(decl);
-            if(func == nullptr)
-            {
-                Log::Error << "Could not bind function '" << decl << "' from module '" << source << "'" << Log::Endl;
-                return;
-            }
-            module->BindImportedFunction(i, func);
-        }
-        // The resource is not a angelscript resource
-        else
-        {
-            // todo: add import of functions from non angelscript resources
-            /*auto exports = sourceResource->GetExports();
-            for(auto it = exports->Begin(); exports->Next();)
-            {
-                auto name = it->GetKey();
-                auto func = it->GetValue().As<alt::MValueFunctionConst>();
-            }*/
-        }
-    }
 }

@@ -66,6 +66,8 @@ public:
 
     // Registers all the imported functions
     void RegisterImports();
+    // Registers the resource exports
+    void RegisterExports(CScriptBuilder& builder);
 
     alt::String ReadFile(alt::String path);
 
