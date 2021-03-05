@@ -20,7 +20,7 @@ REGISTER_EVENT_HANDLER(alt::CEvent::Type::RESOURCE_STOP, ResourceStop, "void", "
     return context->Execute();
 });
 
-REGISTER_EVENT_HANDLER(alt::CEvent::Type::CONSOLE_COMMAND_EVENT, ConsoleCommand, "void", "string command, array<string> args",
+REGISTER_EVENT_HANDLER(alt::CEvent::Type::CONSOLE_COMMAND_EVENT, ConsoleCommand, "void", "const string&in command, array<string> args",
 [](AngelScriptResource* resource, const alt::CEvent* event, asIScriptContext* context) {
     auto ev = static_cast<const alt::CConsoleCommandEvent*>(event);
 
@@ -32,5 +32,16 @@ REGISTER_EVENT_HANDLER(alt::CEvent::Type::CONSOLE_COMMAND_EVENT, ConsoleCommand,
     }
     context->SetArgObject(0, (void*)ev->GetName().CStr());
     context->SetArgObject(1, arr);
+    return context->Execute();
+});
+
+REGISTER_EVENT_HANDLER(alt::CEvent::Type::COLSHAPE_EVENT, ColshapeStateChange, "void", "Colshape@ colshape, Entity@ entity, bool&in state",
+[](AngelScriptResource* resource, const alt::CEvent* event, asIScriptContext* context) {
+    auto ev = static_cast<const alt::CColShapeEvent*>(event);
+
+    context->SetArgObject(0, (void*)ev->GetTarget().Get());
+    context->SetArgObject(1, (void*)ev->GetEntity().Get());
+    auto state = ev->GetState();
+    context->SetArgAddress(2, &state);
     return context->Execute();
 });
