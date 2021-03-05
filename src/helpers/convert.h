@@ -181,4 +181,32 @@ namespace Helpers
                 return false;
         }
     }
+
+    class MValueFunc : public alt::IMValueFunction::Impl
+    {
+        AngelScriptResource* resource;
+        asIScriptFunction* func;
+
+    public:
+        MValueFunc(AngelScriptResource* resource, asIScriptFunction* func) : resource(resource), func(func) {}
+
+        alt::MValue Call(alt::MValueArgs args) const override
+        {
+            auto context = resource->GetContext();
+            context->Prepare(func);
+            for(uint32_t i = 0; i < args.GetSize(); i++)
+            {
+                int ret;
+                auto arg = args[i];
+                auto [type, val] = MValueToValue(resource->GetRuntime(), arg);
+                if(IsTypePrimitive(type)) ret = context->SetArgAddress(i, val);
+                else ret = context->SetArgObject(i, val);
+                CHECK_AS_RETURN("Call MValue function", ret, nullptr);
+            }
+            context->Execute();
+            auto value = ValueToMValue(func->GetReturnTypeId(), context->GetReturnAddress());
+            context->Unprepare();
+            return value;
+        }
+    };
 }

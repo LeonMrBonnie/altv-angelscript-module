@@ -457,5 +457,42 @@ asIScriptFunction* AngelScriptResource::RegisterMetadata(CScriptBuilder& builder
     }
 
 done:
+    // Registers the resource exports
+    alt::MValueDict exports = alt::ICore::Instance().CreateMValueDict();
+
+    uint32_t funcs = module->GetFunctionCount();
+    for(uint32_t i = 0; i < funcs; i++)
+    {
+        // Get the function and its metadata
+        auto func = module->GetFunctionByIndex(i);
+        auto meta = builder.GetMetadataForFunc(func);
+        if(meta.size() == 0) continue;
+
+        // Check if it has the "Export" metadata
+        auto found = false;
+        for(auto& metaString : meta)
+        {
+            if(metaString == "Export")
+            {
+                found = true;
+                break;
+            }
+        }
+        if(!found) continue;
+
+        // Create and set the mvalue function
+        auto mvalueFunc = new MValueFunc(this, func);
+        exports->Set(func->GetName(), alt::ICore::Instance().CreateMValueFunction(mvalueFunc));
+    }
+    uint32_t vars = module->GetGlobalVarCount();
+    for(uint32_t i = 0; i < vars; i++)
+    {
+        auto decl = module->GetGlobalVarDeclaration(i);
+        // todo: add support for export of vars
+        // needs regex for getting the typename and var name
+    }
+
+    resource->SetExports(exports);
+
     return mainFunc;
 }
