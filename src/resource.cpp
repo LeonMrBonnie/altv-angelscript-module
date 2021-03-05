@@ -381,8 +381,8 @@ asIScriptFunction* AngelScriptResource::RegisterMetadata(CScriptBuilder& builder
         std::vector<std::string> metadata = builder.GetMetadataForType(type->GetTypeId());
         for(auto meta : metadata)
         {
-            // The metadata equals IServer so its our main server class
-            if(meta != "IServer") continue;
+            // The metadata equals Main so its our main server class
+            if(meta != "Main") continue;
 
             // Create an instance
             auto factory = type->GetFactoryByIndex(0);
