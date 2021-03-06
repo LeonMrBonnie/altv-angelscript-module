@@ -402,7 +402,6 @@ asIScriptFunction* AngelScriptResource::RegisterMetadata(CScriptBuilder& builder
 
                 for(auto methodMeta : methodMetas)
                 {
-                    Log::Info << methodMeta << Log::Endl;
                     // Get the event associated with the metadata
                     Event* event = Event::GetByMetadata(methodMeta);
                     if(event == nullptr) continue;
