@@ -35,7 +35,7 @@ REGISTER_EVENT_HANDLER(alt::CEvent::Type::CONSOLE_COMMAND_EVENT, ConsoleCommand,
     return context->Execute();
 });
 
-REGISTER_EVENT_HANDLER(alt::CEvent::Type::COLSHAPE_EVENT, ColshapeStateChange, "void", "Colshape@ colshape, Entity@ entity, bool&in state",
+REGISTER_EVENT_HANDLER(alt::CEvent::Type::COLSHAPE_EVENT, ColshapeStateChange, "void", "ColShape@ colshape, Entity@ entity, bool&in state",
 [](AngelScriptResource* resource, const alt::CEvent* event, asIScriptContext* context) {
     auto ev = static_cast<const alt::CColShapeEvent*>(event);
 
