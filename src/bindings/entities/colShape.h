@@ -18,19 +18,20 @@ static bool IsPointIn(alt::IColShape* shape, Vector3 point)
 
 namespace Helpers
 {
+    template<class T>
     static void RegisterAsColshape(asIScriptEngine* engine, DocsGenerator* docs, const char* type)
     {
-        RegisterAsWorldObject<alt::IColShape>(engine, docs, type);
+        RegisterAsWorldObject<T>(engine, docs, type);
 
         REGISTER_METHOD_WRAPPER(type, "string opImplConv() const", ToString);
 
-        REGISTER_PROPERTY_WRAPPER_GET(type, "int8", "shapeType", (GenericWrapper<alt::IColShape, alt::IColShape, &alt::IColShape::GetColshapeType, alt::IColShape::ColShapeType>));
+        REGISTER_PROPERTY_WRAPPER_GET(type, "int8", "shapeType", (GenericWrapper<T, alt::IColShape, &alt::IColShape::GetColshapeType, alt::IColShape::ColShapeType>));
 
-        REGISTER_PROPERTY_WRAPPER_GET(type, "bool", "playersOnly", (GenericWrapper<alt::IColShape, alt::IColShape, &alt::IColShape::IsPlayersOnly, bool>));
-        REGISTER_PROPERTY_WRAPPER_SET(type, "bool", "playersOnly", (GenericWrapper<alt::IColShape, alt::IColShape, &alt::IColShape::SetPlayersOnly, void, bool>));
+        REGISTER_PROPERTY_WRAPPER_GET(type, "bool", "playersOnly", (GenericWrapper<T, alt::IColShape, &alt::IColShape::IsPlayersOnly, bool>));
+        REGISTER_PROPERTY_WRAPPER_SET(type, "bool", "playersOnly", (GenericWrapper<T, alt::IColShape, &alt::IColShape::SetPlayersOnly, void, bool>));
 
         REGISTER_METHOD_WRAPPER(type, "bool IsPointIn(Vector3 point)", IsPointIn);
-        REGISTER_METHOD_WRAPPER(type, "bool IsEntityIn(Entity@ entity)", (GenericWrapper<alt::IColShape, alt::IColShape, &alt::IColShape::IsEntityIn, bool, alt::IEntity*>));
+        REGISTER_METHOD_WRAPPER(type, "bool IsEntityIn(Entity@ entity)", (GenericWrapper<T, alt::IColShape, &alt::IColShape::IsEntityIn, bool, alt::IEntity*>));
     }
 }
 

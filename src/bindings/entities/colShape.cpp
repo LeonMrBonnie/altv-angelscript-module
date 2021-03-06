@@ -72,12 +72,13 @@ static alt::ICheckpoint* CheckpointFactory(uint8_t type, Vector3& pos, float rad
 }
 
 static ModuleExtension colshapeExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs) {
-    RegisterAsColshape(engine, docs, "ColShapeSphere");
-    RegisterAsColshape(engine, docs, "ColShapeCylinder");
-    RegisterAsColshape(engine, docs, "ColShapeCircle");
-    RegisterAsColshape(engine, docs, "ColShapeCuboid");
-    RegisterAsColshape(engine, docs, "ColShapeRect");
-    RegisterAsColshape(engine, docs, "Checkpoint");
+    RegisterAsColshape<alt::IColShape>(engine, docs, "ColShape");
+    RegisterAsColshape<alt::IColShape>(engine, docs, "ColShapeSphere");
+    RegisterAsColshape<alt::IColShape>(engine, docs, "ColShapeCylinder");
+    RegisterAsColshape<alt::IColShape>(engine, docs, "ColShapeCircle");
+    RegisterAsColshape<alt::IColShape>(engine, docs, "ColShapeCuboid");
+    RegisterAsColshape<alt::IColShape>(engine, docs, "ColShapeRect");
+    RegisterAsColshape<alt::ICheckpoint>(engine, docs, "Checkpoint");
 
     REGISTER_FACTORY("ColShapeSphere", "Vector3 pos, float radius", SphereFactory);
     REGISTER_FACTORY("ColShapeCylinder", "Vector3 pos, float radius, float height", CylinderFactory);
