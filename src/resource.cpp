@@ -232,7 +232,7 @@ bool AngelScriptResource::OnEvent(const alt::CEvent* ev)
         asIScriptFunction* eventFunc = nullptr;
         for(asUINT i = 0; i < type->GetMethodCount(); i++)
         {
-            auto func = type->GetMethodByIndex(i, false);
+            auto func = type->GetMethodByIndex(i, true);
             auto data = func->GetUserData();
             if(data == nullptr) continue;
 
@@ -396,7 +396,7 @@ asIScriptFunction* AngelScriptResource::RegisterMetadata(CScriptBuilder& builder
             // Get all methods and check their metadata
             for(uint32_t n = 0; n < type->GetMethodCount(); n++)
             {
-                auto method = type->GetMethodByIndex(n, false);
+                auto method = type->GetMethodByIndex(n, true);
                 // Get metadata for the method
                 std::vector<std::string> methodMetas = builder.GetMetadataForTypeMethod(type->GetTypeId(), method);
 
