@@ -312,6 +312,7 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
             r = context->Execute();
             CHECK_AS_RETURN("Execute custom event handler", r);
         }
+        
         // Check if the main script class has been set
         if(mainScriptClass != nullptr)
         {
@@ -474,6 +475,11 @@ asIScriptFunction* AngelScriptResource::RegisterMetadata(CScriptBuilder& builder
 
             // Create an instance
             auto factory = type->GetFactoryByIndex(0);
+            if(factory == nullptr)
+            {
+                Log::Error << "Main script class has no factory" << Log::Endl;
+                return nullptr;
+            }
             context->Prepare(factory);
             context->Execute();
             asIScriptObject* obj = *(asIScriptObject**)context->GetAddressOfReturnValue();
