@@ -6,6 +6,7 @@
 #include "angelscript/addon/scriptany/scriptany.h"
 #include "helpers/convert.h"
 #include "./helpers/benchmark.h"
+#include <regex>
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
 #define IS_WINDOWS
@@ -175,6 +176,16 @@ bool AngelScriptResource::Stop()
     }
     customRemoteEventHandlers.clear();
 
+    auto type = mainScriptClass->GetObjectType();
+    for(uint32_t n = 0; n < type->GetMethodCount(); n++)
+    {
+        auto method = type->GetMethodByIndex(n);
+        auto localEvent = method->GetUserData(1);
+        if(localEvent != nullptr) delete (std::string*)localEvent;
+        auto remoteEvent = method->GetUserData(2);
+        if(remoteEvent != nullptr) delete (std::string*)remoteEvent;
+    }
+
     return true;
 }
 
@@ -277,7 +288,7 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
         name = ev->GetName().ToString();
         args = ev->GetArgs();
         std::vector<asIScriptFunction*> handlers = GetCustomEventHandlers(name, true);
-        if(handlers.size() == 0) return;
+        if(handlers.size() == 0 && mainScriptClass == nullptr) return;
 
         alt::Array<std::tuple<int, void*>> handlerArgs;
         for(auto arg : args)
@@ -301,8 +312,44 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
             r = context->Execute();
             CHECK_AS_RETURN("Execute custom event handler", r);
         }
+        // Check if the main script class has been set
+        if(mainScriptClass != nullptr)
+        {
+            // Get the method of the main script class for the event if it exists
+            auto type = mainScriptClass->GetObjectType();
+            asIScriptFunction* eventFunc = nullptr;
+            for(asUINT i = 0; i < type->GetMethodCount(); i++)
+            {
+                auto func = type->GetMethodByIndex(i, true);
+                auto data = func->GetUserData(1);
+                if(data == nullptr) continue;
 
+                std::string* name = static_cast<std::string*>(data);
+                if(*name != ev->GetName().ToString()) continue;
+
+                eventFunc = func;
+                break;
+            }
+            if(eventFunc != nullptr)
+            {
+                int r = context->Prepare(eventFunc);
+                CHECK_AS_RETURN("Prepare main script class event method", r);
+                r = context->SetObject(mainScriptClass);
+                CHECK_AS_RETURN("Set main script class event method object", r);
+                for(int i = 0; i < handlerArgs.GetSize(); i++)
+                {
+                    auto [typeId, ptr] = handlerArgs[i];
+                    int ret;
+                    if(Helpers::IsTypePrimitive(typeId)) ret = context->SetArgAddress(i, ptr);
+                    else ret = context->SetArgObject(i, ptr);
+                    CHECK_AS_RETURN("Set custom event handler arg", ret);
+                }
+                r = context->Execute();
+                CHECK_AS_RETURN("Execute main script class event method", r);
+            }
+        }
         context->Unprepare();
+
         for(auto [typeId, ptr] : handlerArgs)
         {
             if(typeId != runtime->GetBaseObjectTypeId()) delete ptr;
@@ -342,7 +389,46 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
             CHECK_AS_RETURN("Execute custom event handler", r);
         }
 
+        // Check if the main script class has been set
+        if(mainScriptClass != nullptr)
+        {
+            // Get the method of the main script class for the event if it exists
+            auto type = mainScriptClass->GetObjectType();
+            asIScriptFunction* eventFunc = nullptr;
+            for(asUINT i = 0; i < type->GetMethodCount(); i++)
+            {
+                auto func = type->GetMethodByIndex(i, true);
+                auto data = func->GetUserData(2);
+                if(data == nullptr) continue;
+
+                std::string* name = static_cast<std::string*>(data);
+                if(*name != ev->GetName().ToString()) continue;
+
+                eventFunc = func;
+                break;
+            }
+            if(eventFunc != nullptr)
+            {
+                int r = context->Prepare(eventFunc);
+                CHECK_AS_RETURN("Prepare main script class event method", r);
+                r = context->SetObject(mainScriptClass);
+                CHECK_AS_RETURN("Set main script class event method object", r);
+                context->SetArgObject(0, player.Get());
+                for(int i = 0; i < handlerArgs.GetSize(); i++)
+                {
+                    auto [typeId, ptr] = handlerArgs[i];
+                    int ret;
+                    if(Helpers::IsTypePrimitive(typeId)) ret = context->SetArgAddress(i + 1, ptr);
+                    else ret = context->SetArgObject(i + 1, ptr);
+                    CHECK_AS_RETURN("Set custom event handler arg", ret);
+                }
+                r = context->Execute();
+                CHECK_AS_RETURN("Execute main script class event method", r);
+            }
+        }
+
         context->Unprepare();
+
         for(auto [typeId, ptr] : handlerArgs)
         {
             if(typeId != runtime->GetBaseObjectTypeId()) delete ptr;
@@ -371,6 +457,8 @@ asIScriptFunction* AngelScriptResource::RegisterMetadata(CScriptBuilder& builder
 {
     asIScriptFunction* mainFunc = nullptr;
     
+    std::regex customEventLocalRegex("LocalEvent\\(\"(.*)\"\\)");
+    std::regex customEventRemoteRegex("RemoteEvent\\(\"(.*)\"\\)");
     uint32_t count = module->GetObjectTypeCount();
     for(uint32_t i = 0; i < count; i++)
     {
@@ -404,9 +492,31 @@ asIScriptFunction* AngelScriptResource::RegisterMetadata(CScriptBuilder& builder
                 {
                     // Get the event associated with the metadata
                     Event* event = Event::GetByMetadata(methodMeta);
-                    if(event == nullptr) continue;
-                    // Store the event on the method
-                    method->SetUserData(event);
+                    if(event != nullptr)
+                    {
+                        // Store the event on the method
+                        method->SetUserData(event);
+                        continue;
+                    }
+                    // Check for local custom events
+                    std::smatch results;
+                    auto result = std::regex_search(methodMeta.cbegin(), methodMeta.cend(), results, customEventLocalRegex);
+                    if(result)
+                    {
+                        auto eventName = results[1].str();
+                        // Store the custom event name on the method
+                        method->SetUserData(new std::string(eventName), 1);
+                        continue;
+                    }
+                    // Check for remote custom events
+                    result = std::regex_search(methodMeta.cbegin(), methodMeta.cend(), results, customEventRemoteRegex);
+                    if(result)
+                    {
+                        auto eventName = results[1].str();
+                        // Store the custom event name on the method
+                        method->SetUserData(new std::string(eventName), 2);
+                        continue;
+                    }
                 }
             }
 
