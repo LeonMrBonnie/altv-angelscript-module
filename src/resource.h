@@ -16,7 +16,7 @@ class AngelScriptResource : public alt::IResource::Impl
     asIScriptModule* module = nullptr;
     asIScriptContext* context = nullptr;
 
-    std::vector<alt::IBaseObject*> entities;
+    std::vector<alt::IBaseObject*> objects;
 
     asIScriptObject* mainScriptClass = nullptr;
 
@@ -54,7 +54,7 @@ public:
 
     bool DoesEntityExist(alt::IBaseObject* obj)
     {
-        for(auto entity : entities)
+        for(auto entity : objects)
         {
             if(entity == obj) return true;
         }
@@ -135,11 +135,11 @@ public:
     void OnCreateBaseObject(alt::IBaseObject* object) 
     {
         object->AddRef();
-        entities.push_back(object);
+        objects.push_back(object);
     }
     void OnRemoveBaseObject(alt::IBaseObject* object) 
     {
-        entities.erase(std::find(entities.begin(), entities.end(), object));
+        objects.erase(std::find(objects.begin(), objects.end(), object));
         object->RemoveRef();
     }
 };
