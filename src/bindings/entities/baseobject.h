@@ -54,7 +54,7 @@ template<class T>
 static bool IsValid(T* obj)
 {
     GET_RESOURCE();
-    return resource->DoesEntityExist(obj);
+    return resource->DoesObjectExist(obj);
 }
 
 namespace Helpers

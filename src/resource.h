@@ -52,7 +52,7 @@ public:
         return module;
     }
 
-    bool DoesEntityExist(alt::IBaseObject* obj)
+    bool DoesObjectExist(alt::IBaseObject* obj)
     {
         auto range = objects.equal_range(obj->GetType());
         for(auto it = range.first; it != range.second; it++)
