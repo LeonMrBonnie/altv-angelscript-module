@@ -50,7 +50,7 @@ namespace Helpers
             RegisterCallback registerCallback
         ) : 
             type(type),
-            name(name),
+            name(std::move(name)),
             callbackDecl(callbackDecl),
             returnType(returnType),
             executeCallback(executeCallback),

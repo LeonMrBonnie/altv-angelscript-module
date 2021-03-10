@@ -16,7 +16,7 @@ namespace Helpers
         bool showLog;
     
     public:
-        Benchmark(std::string name, bool autoStart = true, bool showLog = true) : name(name), showLog(showLog) 
+        Benchmark(std::string name, bool autoStart = true, bool showLog = true) : name(std::move(name)), showLog(showLog) 
         {
             if(autoStart) Start();
         }

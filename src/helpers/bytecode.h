@@ -9,7 +9,7 @@ namespace Helpers
     class BytecodeStream : public asIBinaryStream
     {
     public:
-        BytecodeStream(std::string fileName, bool read = false) : readOnly(read), file(fileName, (read ? std::ios::in : std::ios::out) | std::ios::binary) 
+        BytecodeStream(std::string fileName, bool read = false) : readOnly(read), file(std::move(fileName), (read ? std::ios::in : std::ios::out) | std::ios::binary) 
         {
             // Check if the file was opened
             if(!file.good()) 

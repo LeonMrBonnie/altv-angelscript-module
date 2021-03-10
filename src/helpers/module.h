@@ -179,7 +179,7 @@ namespace Helpers
     public:
         // Creates a new module extension
         // Module extensions are used to register new classes, properties, methods etc.
-        ModuleExtension(std::string name, CreateCallback callback) : name(name), callback(callback)
+        ModuleExtension(std::string name, CreateCallback callback) : name(std::move(name)), callback(callback)
         {
             extensions.push_back(this);
         }
