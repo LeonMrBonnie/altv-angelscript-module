@@ -40,7 +40,10 @@ namespace Helpers
         const char* name = context->GetVarName(varIdx, stackLevel);
         void* val = context->GetAddressOfVar(varIdx, stackLevel);
         int valTypeId = context->GetVarTypeId(varIdx, stackLevel);
+        asITypeInfo* valTypeInfo = runtime.GetEngine()->GetTypeInfoById(valTypeId);
         std::string valString;
+        if(val == nullptr) valTypeId = asTYPEID_VOID;
+
         switch(valTypeId)
         {
             // Bool
@@ -132,7 +135,7 @@ namespace Helpers
                     stream << "RGBA{ r: " << rgba.r << ", g: " << rgba.g << ", b: " << rgba.b << ", a: " << rgba.a << " }";
                     valString = stream.str();
                 }
-                /*else if(valTypeId == runtime.GetBaseObjectTypeId()  || 
+                else if(valTypeId == runtime.GetBaseObjectTypeId()  || 
                         valTypeId == runtime.GetWorldObjectTypeId() || 
                         valTypeId == runtime.GetEntityTypeId()      || 
                         valTypeId == runtime.GetPlayerTypeId()      || 
@@ -142,7 +145,7 @@ namespace Helpers
                     std::stringstream stream;
                     stream << "BaseObject{ type: " << (uint16_t)obj->GetType() << " }";
                     valString = stream.str();
-                }*/
+                }
                 else
                 {
                     valString = "<N/A>";
@@ -150,8 +153,9 @@ namespace Helpers
                 break;
             }
         }
+
         std::stringstream str;
-        str << name << ": " << valString;
+        str << "[~y~" << valTypeInfo->GetName() << "~w~] " << name << ": " << valString;
         return str.str();
     }
     static void PrintCallstack(asIScriptContext* context, uint32_t maxLevels)
@@ -168,10 +172,10 @@ namespace Helpers
             func = context->GetFunction(i);
             line = context->GetLineNumber(i, &column, &scriptSection);
             Log::Colored << "~y~" << scriptSection << " (" << std::to_string(line) << "): " << func->GetDeclaration() << Log::Endl;
-            Log::Colored << "Vars:" << Log::Endl;
+            Log::Colored << "~b~Vars:" << Log::Endl;
             for(int n = 0; n < context->GetVarCount(i); n++)
             {
-                Log::Colored << GetVarData(context, i, n) << Log::Endl;
+                Log::Colored << "~b~-~w~ " << GetVarData(context, i, n) << Log::Endl;
             }
         }
     }
