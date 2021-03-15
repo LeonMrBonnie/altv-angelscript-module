@@ -61,6 +61,11 @@ namespace Helpers
             return Vector3(x * value, y * value, z * value);
         }
 
+        float Distance(Vector3& other)
+        {
+            return (float)sqrt(std::pow(x - other.x, 2) + std::pow(y - other.y, 2) + std::pow(z - other.z, 2));
+        }
+
         std::string ToString()
         {
             std::stringstream str;
@@ -96,6 +101,7 @@ namespace Data
         REGISTER_METHOD("Vector3", "Vector3 Mult(Vector3 vector)", Vector3, MultVector);
         REGISTER_METHOD("Vector3", "Vector3 Mult(float x, float y, float z)", Vector3, MultValues);
         REGISTER_METHOD("Vector3", "Vector3 Mult(float value)", Vector3, MultValue);
+        REGISTER_METHOD("Vector3", "float Distance(Vector3 vector)", Vector3, Distance);
         // Implicit conversion to string
         REGISTER_METHOD("Vector3", "string opImplConv() const", Vector3, ToString);
     }
