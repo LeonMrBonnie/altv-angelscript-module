@@ -26,7 +26,7 @@ namespace Helpers
         {
             if(destType != srcType)
             {
-                THROW_ERROR("The specified output value for the stream synced meta data does not have the correct type");
+                THROW_ERROR("The specified destination value does not have the correct type");
                 return;
             }
             int size = engine->GetSizeOfPrimitiveType(destType);
