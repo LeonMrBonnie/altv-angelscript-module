@@ -92,34 +92,37 @@ bool AngelScriptResource::Start()
     context = runtime->GetEngine()->CreateContext();
     context->SetUserData(this);
 
-    // Get metadata (returns start function)
-    asIScriptFunction* func = RegisterMetadata(builder, context);
+    // Register Metadata
+    RegisterMetadata(builder, context);
 
-    // Get the global start function if no script class start function was found
-    if(func == nullptr) func = module->GetFunctionByDecl("void Start()");
-    // If main function was still not found, return an error
-    if(func == nullptr)
+    // Get the global start function if no main script class was found
+    if(mainScriptClass == nullptr)
     {
-        Log::Error << "The main entrypoint ('void Start()') was not found" << Log::Endl;
-        module->Discard();
-        context->Release();
-        return false;
-    }
-    r = context->Prepare(func);
-    CHECK_AS_RETURN("Context prepare", r, false);
-
-    // Execute script
-    r = context->Execute();
-    switch(r)
-    {
-        case asEXECUTION_EXCEPTION:
+        auto func = module->GetFunctionByDecl("void Start()");
+        // If main function was still not found, return an error
+        if(func == nullptr)
         {
-            Log::Error << "An exception occured while executing the script. Exception: " << Log::Endl;
-            Log::Error << GetExceptionInfo(context, alt::ICore::Instance().IsDebug()) << Log::Endl;
-            break;
+            Log::Error << "The main entrypoint ('void Start()') was not found" << Log::Endl;
+            module->Discard();
+            context->Release();
+            return false;
         }
+        r = context->Prepare(func);
+        CHECK_AS_RETURN("Context prepare", r, false);
+
+        // Execute script
+        r = context->Execute();
+        switch(r)
+        {
+            case asEXECUTION_EXCEPTION:
+            {
+                Log::Error << "An exception occured while executing the script. Exception: " << Log::Endl;
+                Log::Error << GetExceptionInfo(context, alt::ICore::Instance().IsDebug()) << Log::Endl;
+                break;
+            }
+        }
+        context->Unprepare();
     }
-    context->Unprepare();
 
     return true;
 }
@@ -451,10 +454,8 @@ void AngelScriptResource::OnTick()
     }
 }
 
-asIScriptFunction* AngelScriptResource::RegisterMetadata(CScriptBuilder& builder, asIScriptContext* context)
+void AngelScriptResource::RegisterMetadata(CScriptBuilder& builder, asIScriptContext* context)
 {
-    asIScriptFunction* mainFunc = nullptr;
-    
     std::regex customEventLocalRegex("LocalEvent\\(\"(.*)\"\\)");
     std::regex customEventRemoteRegex("RemoteEvent\\(\"(.*)\"\\)");
     uint32_t count = module->GetObjectTypeCount();
@@ -475,7 +476,7 @@ asIScriptFunction* AngelScriptResource::RegisterMetadata(CScriptBuilder& builder
             if(factory == nullptr)
             {
                 Log::Error << "Main script class has no factory" << Log::Endl;
-                return nullptr;
+                return;
             }
             context->Prepare(factory);
             context->Execute();
@@ -523,13 +524,9 @@ asIScriptFunction* AngelScriptResource::RegisterMetadata(CScriptBuilder& builder
                 }
             }
 
-            // We are done so we break out of all the loops and return
-            goto done;
+            return;
         }
     }
-
-done:
-    return mainFunc;
 }
 
 void AngelScriptResource::RegisterImports()

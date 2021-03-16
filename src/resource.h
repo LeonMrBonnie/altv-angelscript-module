@@ -62,8 +62,7 @@ public:
         return false;
     }
 
-    // Returns the main function if found, otherwise nullptr
-    asIScriptFunction* RegisterMetadata(CScriptBuilder& builder, asIScriptContext* context);
+    void RegisterMetadata(CScriptBuilder& builder, asIScriptContext* context);
 
     // Registers all the imported functions
     void RegisterImports();
