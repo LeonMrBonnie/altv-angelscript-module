@@ -447,10 +447,7 @@ void AngelScriptResource::OnTick()
     for(auto& timer : timers)
     {
         int64_t time = GetTime();
-        if(!timer.second->Update(time))
-        {
-            RemoveTimer(timer.first);
-        }
+        if(!timer.second->Update(time)) RemoveTimer(timer.first);
     }
 }
 
@@ -586,6 +583,7 @@ void AngelScriptResource::RegisterExports(CScriptBuilder& builder)
     {
         // Get the function and its metadata
         auto func = module->GetFunctionByIndex(i);
+        if(func == nullptr) continue;
         auto meta = builder.GetMetadataForFunc(func);
         if(meta.size() == 0) continue;
 
