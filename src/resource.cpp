@@ -440,6 +440,35 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
     }
 }
 
+void AngelScriptResource::SetObjectData(alt::IBaseObject* object, const std::string& key, int type, void* value) 
+{
+    auto engine = runtime->GetEngine();
+    if(HasObjectData(object, key))
+    {
+        auto [type, value] = GetObjectData(object, key);
+        engine->ReleaseScriptObject(value, engine->GetTypeInfoById(type));
+    }
+    auto obj = engine->CreateScriptObjectCopy(value, engine->GetTypeInfoById(type));
+    objectData.at(object)[key] = std::make_pair(type, obj);
+}
+
+bool AngelScriptResource::HasObjectData(alt::IBaseObject* object, const std::string& key) 
+{
+    return objectData.at(object).count(key) == 1;
+}
+
+std::pair<int, void*> AngelScriptResource::GetObjectData(alt::IBaseObject* object, const std::string& key) 
+{
+    return objectData.at(object).at(key);
+}
+
+void AngelScriptResource::DeleteObjectData(alt::IBaseObject* object, const std::string& key) 
+{
+    auto [type, value] = objectData.at(object).at(key);
+    runtime->GetEngine()->ReleaseScriptObject(value, runtime->GetEngine()->GetTypeInfoById(type));
+    objectData.at(object).erase(key);
+}
+
 void AngelScriptResource::OnTick()
 {
     // Remove all invalid timers
@@ -452,6 +481,25 @@ void AngelScriptResource::OnTick()
         int64_t time = GetTime();
         if(!timer.second->Update(time)) RemoveTimer(timer.first);
     }
+}
+
+void AngelScriptResource::OnRemoveBaseObject(alt::IBaseObject* object) 
+{
+    auto range = objects.equal_range(object->GetType());
+    for(auto it = range.first; it != range.second; it++)
+    {
+        if(it->second == object)
+        {
+            objects.erase(it);
+            break;
+        }
+    }
+    for(auto& [key, pair] : objectData.at(object))
+    {
+        runtime->GetEngine()->ReleaseScriptObject(pair.second, runtime->GetEngine()->GetTypeInfoById(pair.first));
+    }
+    objectData.erase(object);
+    object->RemoveRef();
 }
 
 void AngelScriptResource::RegisterMetadata(CScriptBuilder& builder, asIScriptContext* context)

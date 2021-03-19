@@ -45,6 +45,42 @@ static void SetMeta(T* obj, const std::string& key, void* ref, int typeId)
 }
 
 template<class T>
+static bool HasData(T* obj, const std::string& key)
+{
+    GET_RESOURCE();
+    return resource->HasObjectData(obj, key);
+}
+
+template<class T>
+static bool GetData(T* obj, const std::string& key, void* ref, int typeId)
+{
+    GET_RESOURCE();
+    if(!resource->HasObjectData(obj, key)) return false;
+    
+    auto [type, value] = resource->GetObjectData(obj, key);
+
+    Helpers::CopyAngelscriptValue(resource->GetRuntime()->GetEngine(), value, type, ref, typeId);
+    return true;
+}
+
+template<class T>
+static void SetData(T* obj, const std::string& key, void* ref, int typeId)
+{
+    GET_RESOURCE();
+
+    resource->SetObjectData(obj, key, typeId, obj);
+}
+
+template<class T>
+static void DeleteData(T* obj, const std::string& key)
+{
+    GET_RESOURCE();
+    if(!resource->HasObjectData(obj, key)) return;
+
+    resource->DeleteObjectData(obj, key);
+}
+
+template<class T>
 static void Destroy(T* obj)
 {
     alt::ICore::Instance().DestroyBaseObject(obj);
@@ -72,6 +108,11 @@ namespace Helpers
         REGISTER_METHOD_WRAPPER(type, "bool GetMeta(const string&in key, ?&out outValue)", GetMeta<T>);
         REGISTER_METHOD_WRAPPER(type, "void SetMeta(const string&in key, ?&in value)", SetMeta<T>);
         REGISTER_METHOD_WRAPPER(type, "void DeleteMeta(const string&in key)", (GenericWrapper<T, alt::IBaseObject, &alt::IBaseObject::DeleteMetaData, void, std::string&>));
+
+        REGISTER_METHOD_WRAPPER(type, "bool HasData(const string&in key)", HasData<T>);
+        REGISTER_METHOD_WRAPPER(type, "bool GetData(const string&in key, ?&out outValue)", GetData<T>);
+        REGISTER_METHOD_WRAPPER(type, "void SetData(const string&in key, ?&in value)", SetData<T>);
+        REGISTER_METHOD_WRAPPER(type, "void DeleteData(const string&in key)", DeleteData<T>);
 
         REGISTER_METHOD_WRAPPER(type, "void Destroy()", Destroy<T>);
     }

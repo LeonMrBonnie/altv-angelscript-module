@@ -11,12 +11,16 @@
 class AngelScriptRuntime;
 class AngelScriptResource : public alt::IResource::Impl
 {  
+    using ObjectsMap = std::unordered_multimap<alt::IBaseObject::Type, alt::IBaseObject*>;
+    using ObjectDataMap = std::unordered_map<alt::IBaseObject*, std::map<std::string, std::pair<int, void*>>>;
+
     AngelScriptRuntime* runtime;
     alt::IResource* resource;
     asIScriptModule* module = nullptr;
     asIScriptContext* context = nullptr;
 
-    std::unordered_multimap<alt::IBaseObject::Type, alt::IBaseObject*> objects;
+    ObjectsMap objects;
+    ObjectDataMap objectData;
 
     asIScriptObject* mainScriptClass = nullptr;
 
@@ -120,6 +124,12 @@ public:
         invalidTimers.emplace_back(id);
     }
 
+    // Object data
+    void SetObjectData(alt::IBaseObject* object, const std::string& key, int type, void* value);
+    bool HasObjectData(alt::IBaseObject* object, const std::string& key);
+    std::pair<int, void*> GetObjectData(alt::IBaseObject* object, const std::string& key);
+    void DeleteObjectData(alt::IBaseObject* object, const std::string& key);
+
     // Yoinked from v8 helpers
     int64_t GetTime()
 	{
@@ -136,19 +146,8 @@ public:
     {
         object->AddRef();
         objects.insert({object->GetType(), object});
+        objectData.insert({object, std::map<std::string, std::pair<int, void*>>()});
     }
-    void OnRemoveBaseObject(alt::IBaseObject* object) 
-    {
-        auto range = objects.equal_range(object->GetType());
-        for(auto it = range.first; it != range.second; it++)
-        {
-            if(it->second == object)
-            {
-                objects.erase(it);
-                break;
-            }
-        }
-        object->RemoveRef();
-    }
+    void OnRemoveBaseObject(alt::IBaseObject* object);
 };
 
