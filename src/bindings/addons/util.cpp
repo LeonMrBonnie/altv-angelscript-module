@@ -3,11 +3,11 @@
 
 using namespace Helpers;
 
-static uint32_t GetTimestamp()
+static uint64_t GetTimestamp()
 {
-    return (uint32_t)std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
+    return (uint64_t)std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 }
 
 static ModuleExtension utilExtension("util", [](asIScriptEngine* engine, DocsGenerator* docs) {
-    REGISTER_GLOBAL_FUNC("uint GetTimestamp()", GetTimestamp, "Gets the current timestamp");
+    REGISTER_GLOBAL_FUNC("uint64 GetTimestamp()", GetTimestamp, "Gets the current timestamp");
 });
