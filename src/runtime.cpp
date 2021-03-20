@@ -72,6 +72,8 @@ void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine, DocsG
 
     // Register extensions
     ModuleExtension::RegisterAll("alt", engine, docs);
+    ModuleExtension::RegisterAll("crypto", engine, docs);
+    ModuleExtension::RegisterAll("util", engine, docs);
 
     // Register events
     Event::RegisterAll(engine, docs);
