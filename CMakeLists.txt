@@ -39,4 +39,5 @@ add_library(
 
 target_link_libraries(${PROJECT_MODULE_NAME} PRIVATE
   ${PROJECT_SOURCE_DIR}/deps/angelscript/lib/angelscript.lib
+  ${PROJECT_SOURCE_DIR}/deps/cryptopp/cryptlib.lib
 )
