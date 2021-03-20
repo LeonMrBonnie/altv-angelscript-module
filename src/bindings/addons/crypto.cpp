@@ -33,15 +33,18 @@ static std::string GetHash(const std::string& input)
     return output;
 }
 
+#define ALGORITHM_CASE(algorithm) case ::Algorithm::algorithm: return GetHash<algorithm>(input)
+
 static std::string GetNamedHash(Algorithm algorithm, const std::string& input)
 {
     using namespace CryptoPP;
+    using namespace CryptoPP::Weak;
     switch(algorithm)
     {
-        case ::Algorithm::SHA256: return GetHash<SHA256>(input);
-        case ::Algorithm::SHA512: return GetHash<SHA512>(input);
-        case ::Algorithm::MD5: return GetHash<Weak::MD5>(input);
-        case ::Algorithm::Whirlpool: return GetHash<Whirlpool>(input);
+        ALGORITHM_CASE(SHA256);
+        ALGORITHM_CASE(SHA512);
+        ALGORITHM_CASE(Whirlpool);
+        ALGORITHM_CASE(MD5);
         default: 
         {
             THROW_ERROR("Invalid algorithm specified");
