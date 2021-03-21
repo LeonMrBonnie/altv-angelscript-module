@@ -2,6 +2,7 @@
 
 // Uncomment to activate debug mode (shows benchmarks)
 //#define DEBUG_MODE
+
 // Uncomment to generate docs files
 //#define AS_GENERATE_DOCUMENTATION
 
