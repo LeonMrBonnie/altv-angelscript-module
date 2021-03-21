@@ -14,9 +14,6 @@ add_definitions(-DMODULE_NAME="${PROJECT_MODULE_NAME}")
 add_definitions(-DALT_SERVER_API)
 add_definitions(-DAS_MIPS)
 
-# Uncomment to generate docs
-add_definitions(-DAS_GENERATE_DOCUMENTATION)
-
 if(UNIX)
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/build/linux64/${CMAKE_BUILD_TYPE})
 else()
