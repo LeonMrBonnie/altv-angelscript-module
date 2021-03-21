@@ -46,7 +46,7 @@
 #define REGISTER_REF_CLASS(name, type, flags, desc) \
     { \
         engine->RegisterObjectType(name, 0, flags); \
-        docs->PushObjectType(name, desc); \
+        docs.PushObjectType(name, desc); \
     }
 
 // Registers a new class constructor

@@ -1,4 +1,4 @@
-// Generated on Sun Mar 21 23:33:47 2021
+// Generated on Sun Mar 21 23:45:28 2021
 
 namespace alt
 {
@@ -64,15 +64,6 @@ namespace alt
         SNOWLIGHT = 12,
         XMAS = 13,
         HALLOWEEN = 14,
-    };
-
-    // An enum with all the available crypto algorithms
-    enum Algorithm
-    {
-        SHA256 = 0,
-        SHA512 = 1,
-        MD5 = 2,
-        Whirlpool = 3,
     };
 
     // ********** Global variables **********
@@ -216,12 +207,6 @@ namespace alt
 
     // Deletes the specified synced meta key
     void DeleteSyncedMeta(const string&in key);
-
-    // Hashes a string using the specified algorithm
-    string Hash(crypto::Algorithm algorithm, const string&in input);
-
-    // Gets the current timestamp
-    uint64 GetTimestamp();
 
     // ********** Events **********
 

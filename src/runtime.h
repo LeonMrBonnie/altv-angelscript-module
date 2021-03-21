@@ -30,7 +30,7 @@ public:
     CScriptArray* CreateUIntArray(uint32_t len);
     void RegisterTypeInfos();
     // Register the script interfaces (the scripting api)
-    void RegisterScriptInterfaces(asIScriptEngine* engine, Helpers::DocsGenerator* docs);
+    void RegisterScriptInterfaces(asIScriptEngine* engine);
 
     const int GetStringTypeId() const
     {

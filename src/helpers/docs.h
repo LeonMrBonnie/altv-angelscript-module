@@ -108,95 +108,113 @@ namespace Helpers
             stream << "// Generated on " << timeStr << "\n";
 
             // Add namespace
-            stream << "namespace alt" << "\n";
+            stream << "namespace " << module << "\n";
             stream << "{" << "\n";
 
             // Add func defs
-            stream << PAD_SPACE << "// ********** Funcdefs **********" << "\n";
-            for(auto def : funcDefs)
+            if(funcDefs.size() > 0) 
             {
-                stream << "\n";
-                stream << PAD_SPACE << "// " << def.second << "\n";
-                stream << PAD_SPACE << "funcdef " << def.first << ";" << "\n";
-            }
+                stream << PAD_SPACE << "// ********** Funcdefs **********" << "\n";
+                for(auto def : funcDefs)
+                {
+                    stream << "\n";
+                    stream << PAD_SPACE << "// " << def.second << "\n";
+                    stream << PAD_SPACE << "funcdef " << def.first << ";" << "\n";
+                }
 
-            stream << "\n";
+                stream << "\n";
+            }
 
             // Add enums
-            stream << PAD_SPACE << "// ********** Enums **********" << "\n";
-            for(auto enumType : enumTypes)
+            if(enumTypes.size() > 0)
             {
-                stream << "\n";
-                stream << PAD_SPACE << "// " << enumType.second << "\n";
-                stream << PAD_SPACE << "enum " << enumType.first << "\n";
-                stream << PAD_SPACE << "{" << "\n";
-                for(auto value : enumValues)
+                stream << PAD_SPACE << "// ********** Enums **********" << "\n";
+                for(auto enumType : enumTypes)
                 {
-                    if(value.first != enumType.first) continue;
-                    stream << PAD_SPACE << PAD_SPACE << value.second.first << " = " << std::to_string(value.second.second) << ",\n";
+                    stream << "\n";
+                    stream << PAD_SPACE << "// " << enumType.second << "\n";
+                    stream << PAD_SPACE << "enum " << enumType.first << "\n";
+                    stream << PAD_SPACE << "{" << "\n";
+                    for(auto value : enumValues)
+                    {
+                        if(value.first != enumType.first) continue;
+                        stream << PAD_SPACE << PAD_SPACE << value.second.first << " = " << std::to_string(value.second.second) << ",\n";
+                    }
+                    stream << PAD_SPACE << "};" << "\n";
                 }
-                stream << PAD_SPACE << "};" << "\n";
-            }
 
-            stream << "\n";
+                stream << "\n";
+            }
 
             // Add variables
-            stream << PAD_SPACE << "// ********** Global variables **********" << "\n";
-            for(auto variable : variables)
+            if(variables.size() > 0)
             {
-                stream << "\n";
-                stream << PAD_SPACE << variable.first << " " << variable.second << ";" << "\n";
-            }
+                stream << PAD_SPACE << "// ********** Global variables **********" << "\n";
+                for(auto variable : variables)
+                {
+                    stream << "\n";
+                    stream << PAD_SPACE << variable.first << " " << variable.second << ";" << "\n";
+                }
 
-            stream << "\n";
+                stream << "\n";
+            }
 
             // Add function declarations
-            stream << PAD_SPACE << "// ********** Functions **********" << "\n";
-            for(auto decl : declarations)
+            if(declarations.size() > 0)
             {
-                stream << "\n";
-                stream << PAD_SPACE << "// " << decl.second << "\n";
-                stream << PAD_SPACE << decl.first << ";" << "\n";
-            }
+                stream << PAD_SPACE << "// ********** Functions **********" << "\n";
+                for(auto decl : declarations)
+                {
+                    stream << "\n";
+                    stream << PAD_SPACE << "// " << decl.second << "\n";
+                    stream << PAD_SPACE << decl.first << ";" << "\n";
+                }
 
-            stream << "\n";
+                stream << "\n";
+            }
 
             // Add event declarations
-            stream << PAD_SPACE << "// ********** Events **********" << "\n";
-            for(auto decl : eventDeclarations)
+            if(eventDeclarations.size() > 0)
             {
+                stream << PAD_SPACE << "// ********** Events **********" << "\n";
+                for(auto decl : eventDeclarations)
+                {
+                    stream << "\n";
+                    stream << PAD_SPACE << decl.first << ";" << "\n";
+                    stream << PAD_SPACE << decl.second << ";" << "\n";
+                }
+
                 stream << "\n";
-                stream << PAD_SPACE << decl.first << ";" << "\n";
-                stream << PAD_SPACE << decl.second << ";" << "\n";
             }
 
-            stream << "\n";
-
             // Add object types
-            stream << PAD_SPACE << "// ********** Objects **********\n";
-            for(auto obj : objectTypes)
+            if(objectTypes.size() > 0)
             {
-                stream << "\n";
-                stream << PAD_SPACE << "// " << obj.second << "\n";
-                stream << PAD_SPACE << "class " << obj.first << "\n";
-                stream << PAD_SPACE << "{\n";
-                for(auto kv : objectDeclarations)
+                stream << PAD_SPACE << "// ********** Objects **********\n";
+                for(auto obj : objectTypes)
                 {
-                    if(kv.first != obj.first) continue;
-                    stream << PAD_SPACE << PAD_SPACE << kv.second << ";\n";
+                    stream << "\n";
+                    stream << PAD_SPACE << "// " << obj.second << "\n";
+                    stream << PAD_SPACE << "class " << obj.first << "\n";
+                    stream << PAD_SPACE << "{\n";
+                    for(auto kv : objectDeclarations)
+                    {
+                        if(kv.first != obj.first) continue;
+                        stream << PAD_SPACE << PAD_SPACE << kv.second << ";\n";
+                    }
+                    stream << "\n";
+                    for(auto kv : objectConstructors)
+                    {
+                        if(kv.first != obj.first) continue;
+                        stream << PAD_SPACE << PAD_SPACE << obj.first << "(" << kv.second << ");\n"; 
+                    }
+                    for(auto kv : objectMethods)
+                    {
+                        if(kv.first != obj.first) continue;
+                        stream << PAD_SPACE << PAD_SPACE << kv.second << ";\n";
+                    }
+                    stream << PAD_SPACE << "};\n";
                 }
-                stream << "\n";
-                for(auto kv : objectConstructors)
-                {
-                    if(kv.first != obj.first) continue;
-                    stream << PAD_SPACE << PAD_SPACE << obj.first << "(" << kv.second << ");\n"; 
-                }
-                for(auto kv : objectMethods)
-                {
-                    if(kv.first != obj.first) continue;
-                    stream << PAD_SPACE << PAD_SPACE << kv.second << ";\n";
-                }
-                stream << PAD_SPACE << "};\n";
             }
 
             // Close namespace

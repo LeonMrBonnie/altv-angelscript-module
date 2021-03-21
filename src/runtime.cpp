@@ -26,18 +26,16 @@ AngelScriptRuntime::AngelScriptRuntime()
 
     // Optimization
     engine->SetEngineProperty(asEP_BUILD_WITHOUT_LINE_CUES, true);
-
-    // Create docs
-    Helpers::DocsGenerator altGen("alt");
     
-    RegisterScriptInterfaces(engine, &altGen);
-
-    // Generate docs
-    altGen.Generate();
+    RegisterScriptInterfaces(engine);
 }
 
-void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine, DocsGenerator* docs)
+void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine)
 {
+    Helpers::DocsGenerator docs("alt");
+    Helpers::DocsGenerator cryptoDocs("crypto");
+    Helpers::DocsGenerator utilDocs("util");
+
     // Register add-ons
     RegisterStdString(engine);
     RegisterScriptArray(engine, true);
@@ -49,12 +47,12 @@ void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine, DocsG
     RegisterExceptionRoutines(engine);
 
     // Register classes
-    Data::RegisterVector3(engine, docs);
-    Data::RegisterVector2(engine, docs);
-    Data::RegisterRGBA(engine, docs);
-    Data::RegisterClothes(engine, docs);
-    Data::RegisterProps(engine, docs);
-    Data::RegisterBenchmark(engine, docs);
+    Data::RegisterVector3(engine, &docs);
+    Data::RegisterVector2(engine, &docs);
+    Data::RegisterRGBA(engine, &docs);
+    Data::RegisterClothes(engine, &docs);
+    Data::RegisterProps(engine, &docs);
+    Data::RegisterBenchmark(engine, &docs);
     REGISTER_REF_CLASS("BaseObject", alt::IBaseObject, asOBJ_REF, "Base object superclass for all alt:V base objects");
     REGISTER_REF_CLASS("WorldObject", alt::IWorldObject, asOBJ_REF, "World object superclass for all alt:V world objects");
     REGISTER_REF_CLASS("Entity", alt::IEntity, asOBJ_REF, "Entity superclass for all alt:V entities");
@@ -71,15 +69,20 @@ void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine, DocsG
     REGISTER_REF_CLASS("Blip", alt::IBlip, asOBJ_REF, "alt:V Blip");
 
     // Register extensions
-    ModuleExtension::RegisterAll("alt", engine, docs);
-    ModuleExtension::RegisterAll("crypto", engine, docs);
-    ModuleExtension::RegisterAll("util", engine, docs);
+    ModuleExtension::RegisterAll("alt", engine, &docs);
+    ModuleExtension::RegisterAll("crypto", engine, &cryptoDocs);
+    ModuleExtension::RegisterAll("util", engine, &utilDocs);
 
     // Register events
-    Event::RegisterAll(engine, docs);
+    Event::RegisterAll(engine, &docs);
 
     // Cache type infos
     RegisterTypeInfos();
+
+    // Generate docs
+    docs.Generate();
+    cryptoDocs.Generate();
+    utilDocs.Generate();
 }
 
 void AngelScriptRuntime::RegisterTypeInfos()
