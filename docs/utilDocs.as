@@ -6,5 +6,4 @@ namespace util
 
     // Gets the current timestamp
     uint64 GetTimestamp();
-
 }

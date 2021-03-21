@@ -17,5 +17,4 @@ namespace crypto
 
     // Hashes a string using the specified algorithm
     string Hash(crypto::Algorithm algorithm, const string&in input);
-
 }
