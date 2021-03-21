@@ -19,8 +19,7 @@ namespace Helpers
 {
     class DocsGenerator
     {
-        #ifdef AS_GENERATE_DOCUMENTATION
-        std::string module;
+        std::string moduleName;
         std::vector<std::pair<std::string, std::string>> declarations;
         std::vector<std::pair<std::string, std::string>> variables;
         std::vector<std::pair<std::string, std::string>> funcDefs;
@@ -31,9 +30,8 @@ namespace Helpers
         std::unordered_multimap<std::string, std::string> objectDeclarations;
         std::unordered_multimap<std::string, std::string> objectConstructors;
         std::unordered_multimap<std::string, std::string> objectMethods;
-        #endif
     public:
-        DocsGenerator(std::string module) : module(module) {};
+        DocsGenerator(std::string moduleName) : moduleName(moduleName) {};
 
         void PushDeclaration(std::string decl, std::string desc)
         {
@@ -108,7 +106,7 @@ namespace Helpers
             stream << "// Generated on " << timeStr << "\n";
 
             // Add namespace
-            stream << "namespace " << module << "\n";
+            stream << "namespace " << moduleName << "\n";
             stream << "{" << "\n";
 
             // Add func defs
@@ -222,7 +220,7 @@ namespace Helpers
 
             // Write the docs to file
             std::ofstream file;
-            file.open(module.append("Docs.as"));
+            file.open(moduleName.append("Docs.as"));
             file << stream.str();
             file.close();
             #endif
