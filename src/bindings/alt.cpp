@@ -393,7 +393,7 @@ static void ShowCallstack(uint32_t maxLevels = 0)
 static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs)
 {
     // Generic
-    REGISTER_GLOBAL_FUNC("uint Hash(const string &in value)", Hash, "Hashes the given string using the joaat algorithm");
+    REGISTER_GLOBAL_FUNC("uint Hash(const string&in value)", Hash, "Hashes the given string using the joaat algorithm");
     REGISTER_GLOBAL_FUNC("array<Player@>@ GetAllPlayers()", GetAllPlayers, "Gets all players on the server");
     REGISTER_GLOBAL_FUNC("array<Vehicle@>@ GetAllVehicles()", GetAllVehicles, "Gets all vehicles on the server");
     REGISTER_GLOBAL_FUNC("array<Entity@>@ GetAllEntities()", GetAllEntities, "Gets all entities on the server");
