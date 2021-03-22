@@ -71,7 +71,8 @@ REGISTER_EVENT_HANDLER(alt::CEvent::Type::WEAPON_DAMAGE_EVENT, WeaponDamage, "vo
     auto value = ev->GetDamageValue();
     context->SetArgAddress(3, &value);
     auto offset = ev->GetShotOffset();
-    context->SetArgObject(4, &Vector3(offset[0], offset[1], offset[2]));
+    Vector3 offsetVector(offset[0], offset[1], offset[2]);
+    context->SetArgObject(4, &offsetVector);
     auto bodypart = ev->GetBodyPart();
     context->SetArgAddress(5, &bodypart);
     return context->Execute();

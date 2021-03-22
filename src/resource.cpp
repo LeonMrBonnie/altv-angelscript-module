@@ -8,10 +8,10 @@
 #include "./helpers/benchmark.h"
 #include <regex>
 
+#include "./helpers/bytecode.h"
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
 #define IS_WINDOWS
 #include "windows.h"
-#include "./helpers/bytecode.h"
 #define FILE_SEPERATOR "\\"
 #else
 #define IS_LINUX
@@ -52,7 +52,7 @@ bool AngelScriptResource::Start()
             Log::Error << "Failed to open bytecode file" << Log::Endl;
             return false;
         }
-        r = module->LoadByteCode(&byteStream, false);
+        r = module->LoadByteCode(&byteStream);
         CHECK_AS_RETURN("Load bytecode", r, false);
         byteStream.Close();
     }
@@ -76,7 +76,7 @@ bool AngelScriptResource::Start()
             Log::Error << "Failed to open bytecode file" << Log::Endl;
             return false;
         }
-        r = module->SaveByteCode(&byteStream, false);
+        r = module->SaveByteCode(&byteStream);
         byteStream.Close();
         CHECK_AS_RETURN("Save bytecode", r, false);
         Log::Colored << "~g~Successfully saved the compiled bytecode to the file ~w~" << fileName + ".asb" << Log::Endl;
@@ -303,17 +303,17 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
         for(auto handler : handlers)
         {
             auto r = context->Prepare(handler);
-            CHECK_AS_RETURN("Prepare custom event handler", r);
+            CHECK_AS_RETURN("Prepare custom event handler", r,);
             for(int i = 0; i < handlerArgs.GetSize(); i++)
             {
                 auto [typeId, ptr] = handlerArgs[i];
                 int ret;
                 if(Helpers::IsTypePrimitive(typeId)) ret = context->SetArgAddress(i, ptr);
                 else ret = context->SetArgObject(i, ptr);
-                CHECK_AS_RETURN("Set custom event handler arg", ret);
+                CHECK_AS_RETURN("Set custom event handler arg", ret,);
             }
             r = context->Execute();
-            CHECK_AS_RETURN("Execute custom event handler", r);
+            CHECK_AS_RETURN("Execute custom event handler", r,);
         }
         
         // Check if the main script class has been set
@@ -337,19 +337,19 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
             if(eventFunc != nullptr)
             {
                 int r = context->Prepare(eventFunc);
-                CHECK_AS_RETURN("Prepare main script class event method", r);
+                CHECK_AS_RETURN("Prepare main script class event method", r,);
                 r = context->SetObject(mainScriptClass);
-                CHECK_AS_RETURN("Set main script class event method object", r);
+                CHECK_AS_RETURN("Set main script class event method object", r,);
                 for(int i = 0; i < handlerArgs.GetSize(); i++)
                 {
                     auto [typeId, ptr] = handlerArgs[i];
                     int ret;
                     if(Helpers::IsTypePrimitive(typeId)) ret = context->SetArgAddress(i, ptr);
                     else ret = context->SetArgObject(i, ptr);
-                    CHECK_AS_RETURN("Set custom event handler arg", ret);
+                    CHECK_AS_RETURN("Set custom event handler arg", ret,);
                 }
                 r = context->Execute();
-                CHECK_AS_RETURN("Execute main script class event method", r);
+                CHECK_AS_RETURN("Execute main script class event method", r,);
             }
         }
         context->Unprepare();
@@ -379,7 +379,7 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
         for(auto handler : handlers)
         {
             auto r = context->Prepare(handler);
-            CHECK_AS_RETURN("Prepare custom event handler", r);
+            CHECK_AS_RETURN("Prepare custom event handler", r,);
             context->SetArgObject(0, player.Get());
             for(int i = 0; i < handlerArgs.GetSize(); i++)
             {
@@ -387,10 +387,10 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
                 int ret;
                 if(Helpers::IsTypePrimitive(typeId)) ret = context->SetArgAddress(i + 1, ptr);
                 else ret = context->SetArgObject(i + 1, ptr);
-                CHECK_AS_RETURN("Set custom event handler arg", ret);
+                CHECK_AS_RETURN("Set custom event handler arg", ret,);
             }
             r = context->Execute();
-            CHECK_AS_RETURN("Execute custom event handler", r);
+            CHECK_AS_RETURN("Execute custom event handler", r,);
         }
 
         // Check if the main script class has been set
@@ -414,9 +414,9 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
             if(eventFunc != nullptr)
             {
                 int r = context->Prepare(eventFunc);
-                CHECK_AS_RETURN("Prepare main script class event method", r);
+                CHECK_AS_RETURN("Prepare main script class event method", r,);
                 r = context->SetObject(mainScriptClass);
-                CHECK_AS_RETURN("Set main script class event method object", r);
+                CHECK_AS_RETURN("Set main script class event method object", r,);
                 context->SetArgObject(0, player.Get());
                 for(int i = 0; i < handlerArgs.GetSize(); i++)
                 {
@@ -424,10 +424,10 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
                     int ret;
                     if(Helpers::IsTypePrimitive(typeId)) ret = context->SetArgAddress(i + 1, ptr);
                     else ret = context->SetArgObject(i + 1, ptr);
-                    CHECK_AS_RETURN("Set custom event handler arg", ret);
+                    CHECK_AS_RETURN("Set custom event handler arg", ret,);
                 }
                 r = context->Execute();
-                CHECK_AS_RETURN("Execute main script class event method", r);
+                CHECK_AS_RETURN("Execute main script class event method", r,);
             }
         }
 

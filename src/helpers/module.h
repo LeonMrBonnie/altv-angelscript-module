@@ -27,7 +27,7 @@
         auto r = engine->RegisterFuncdef(decl); \
         if(r < 0) \
         { \
-            Log::Error << "Failed to register func def '" decl << "'" << Log::Endl; \
+            Log::Error << "Failed to register func def '" << decl << "'" << Log::Endl; \
         } \
         else \
         { \
@@ -52,7 +52,7 @@
 // Registers a new class constructor
 #define REGISTER_CONSTRUCTOR(name, decl, func) \
     { \
-        engine->RegisterObjectBehaviour(name, asBEHAVE_CONSTRUCT, "void f("##decl##")", asFUNCTION(func), asCALL_CDECL_OBJFIRST); \
+        engine->RegisterObjectBehaviour(name, asBEHAVE_CONSTRUCT, "void f(" decl ")", asFUNCTION(func), asCALL_CDECL_OBJFIRST); \
         docs->PushObjectConstructor(name, decl); \
     }
 
@@ -65,7 +65,7 @@
 // Registers a new class factory (only used for classes that have a constructor in the scripting api)
 #define REGISTER_FACTORY(name, decl, func) \
     { \
-        engine->RegisterObjectBehaviour(name, asBEHAVE_FACTORY, ##name##"@ f("##decl##")", asFUNCTION(func), asCALL_CDECL); \
+        engine->RegisterObjectBehaviour(name, asBEHAVE_FACTORY, name"@ f(" decl ")", asFUNCTION(func), asCALL_CDECL); \
         docs->PushObjectConstructor(name, decl); \
     }
 
@@ -93,20 +93,20 @@
 // Registers a new property getter wrapper for the class
 #define REGISTER_PROPERTY_WRAPPER_GET(name, type, prop, getFn) \
     { \
-        engine->RegisterObjectMethod(name, ##type##" get_"##prop##"() const property", asFUNCTION(getFn), asCALL_CDECL_OBJFIRST); \
-        docs->PushObjectProperty(name, ##type##" "##prop##); \
+        engine->RegisterObjectMethod(name, type " get_" prop "() const property", asFUNCTION(getFn), asCALL_CDECL_OBJFIRST); \
+        docs->PushObjectProperty(name, type " " prop); \
     }
 
 // Registers a new property setter wrapper for the class
 #define REGISTER_PROPERTY_WRAPPER_SET(name, type, prop, setFn) \
     { \
-        engine->RegisterObjectMethod(name, "void set_"##prop##"("##type##") property", asFUNCTION(setFn), asCALL_CDECL_OBJFIRST); \
+        engine->RegisterObjectMethod(name, "void set_" prop "(" type ") property", asFUNCTION(setFn), asCALL_CDECL_OBJFIRST); \
     }
 
 // Registers a global property (e.g. 'alt::resourceName')
 #define REGISTER_GLOBAL_PROPERTY(type, prop, wrapperFn) \
     { \
-        engine->RegisterGlobalFunction(##type##" get_"##prop##"() property", asFUNCTION(wrapperFn), asCALL_CDECL); \
+        engine->RegisterGlobalFunction(type" get_" prop "() property", asFUNCTION(wrapperFn), asCALL_CDECL); \
         docs->PushVariable(type, prop); \
     }
 
@@ -127,27 +127,27 @@
 #define REGISTER_VARIADIC_FUNC(type, name, defaultArgs, argCount, func, desc) \
     { \
         std::stringstream stream; \
-        stream << ##type## << " " << ##name## << "(" << ##defaultArgs##; \
+        stream << type << " " << name << "(" << defaultArgs; \
         engine->RegisterGlobalFunction((stream.str() + ")").c_str(), asFUNCTION(func), asCALL_GENERIC); \
         for(int i = 0; i < argCount; i++) \
         { \
             stream << ", ?&in arg" + std::to_string(i); \
             engine->RegisterGlobalFunction((stream.str() + ")").c_str(), asFUNCTION(func), asCALL_GENERIC); \
         } \
-        docs->PushDeclaration(##type##" "##name##"("##defaultArgs##", ...)", desc); \
+        docs->PushDeclaration(type " " name "(" defaultArgs ", ...)", desc); \
     }
 
 #define REGISTER_VARIADIC_METHOD(class, type, name, defaultArgs, argCount, func) \
     { \
         std::stringstream stream; \
-        stream << ##type## << " " << ##name## << "(" << ##defaultArgs##; \
+        stream << type << " " << name << "(" << defaultArgs; \
         engine->RegisterObjectMethod(class, (stream.str() + ")").c_str(), asFUNCTION(func), asCALL_GENERIC); \
         for(int i = 0; i < argCount; i++) \
         { \
             stream << ", ?&in arg" + std::to_string(i); \
             engine->RegisterObjectMethod(class, (stream.str() + ")").c_str(), asFUNCTION(func), asCALL_GENERIC); \
         } \
-        docs->PushObjectMethod(class, ##type##" "##name##"("##defaultArgs##", ...)"); \
+        docs->PushObjectMethod(class, type " " name "(" defaultArgs ", ...)"); \
     }
 
 // Gets the currently active resource

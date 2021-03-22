@@ -24,7 +24,7 @@ static void SpawnPlayer(alt::IPlayer* player, T x, T y, T z, uint32_t delay = 0)
     player->Spawn({x, y, z}, delay);
 }
 
-static void SpawnPlayer(alt::IPlayer* player, Vector3& pos, uint32_t delay = 0)
+static void SpawnPlayerVector(alt::IPlayer* player, Vector3& pos, uint32_t delay = 0)
 {
     player->Spawn({pos.x, pos.y, pos.z}, delay);
 }
@@ -164,7 +164,7 @@ static ModuleExtension playerExtension("alt", [](asIScriptEngine* engine, DocsGe
     
     REGISTER_METHOD_WRAPPER("Player", "void Spawn(float x, float y, float z, uint delay = 0)", SpawnPlayer<float>);
     REGISTER_METHOD_WRAPPER("Player", "void Spawn(int x, int y, int z, uint delay = 0)", SpawnPlayer<int>);
-    REGISTER_METHOD_WRAPPER("Player", "void Spawn(Vector3 pos, uint delay = 0)", SpawnPlayer);
+    REGISTER_METHOD_WRAPPER("Player", "void Spawn(Vector3 pos, uint delay = 0)", SpawnPlayerVector);
     REGISTER_METHOD_WRAPPER("Player", "void Despawn()", (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::Despawn>));
 
     REGISTER_METHOD_WRAPPER("Player", "bool HasWeaponComponent(uint weapon, uint component)", 

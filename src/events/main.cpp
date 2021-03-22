@@ -28,7 +28,8 @@ REGISTER_EVENT_HANDLER(alt::CEvent::Type::CONSOLE_COMMAND_EVENT, ConsoleCommand,
     auto arr = resource->GetRuntime()->CreateStringArray((uint32_t)evArgs.GetSize());
     for(int i = 0; i < evArgs.GetSize(); i++)
     {
-        arr->SetValue(i, &evArgs[i].ToString());
+        auto val = evArgs[i].ToString();
+        arr->SetValue(i, &val);
     }
     context->SetArgObject(0, (void*)ev->GetName().CStr());
     context->SetArgObject(1, arr);
