@@ -165,6 +165,7 @@ bool AngelScriptResource::Stop()
         pair.second->Release();
     }
     eventHandlers.clear();
+    
     for(auto kv : customLocalEventHandlers)
     {
         kv.second->Release();

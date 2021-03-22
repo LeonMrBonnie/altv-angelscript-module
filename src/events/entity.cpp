@@ -18,3 +18,11 @@ REGISTER_EVENT_HANDLER(alt::CEvent::Type::REMOVE_BASE_OBJECT_EVENT, RemoveBaseOb
     context->SetArgObject(0, ev->GetObject().Get());
     return context->Execute();
 });
+
+REGISTER_EVENT_HANDLER(alt::CEvent::Type::CREATE_BASE_OBJECT_EVENT, CreateBaseObject, "void", "BaseObject@ object",
+[](AngelScriptResource* resource, const alt::CEvent* event, asIScriptContext* context) {
+    auto ev = static_cast<const alt::CCreateBaseObjectEvent*>(event);
+
+    context->SetArgObject(0, ev->GetObject().Get());
+    return context->Execute();
+});
