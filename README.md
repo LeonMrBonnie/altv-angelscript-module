@@ -1,6 +1,8 @@
-# alt:V AngelScript Module
-
-An alt:V module providing support for the [AngelScript scripting language](https://www.angelcode.com/angelscript/sdk/docs/manual/index.html).
+<p align="center">
+    <img width="200" src="https://www.angelcode.com/angelscript/sdk/docs/manual/aslogo.png" alt="TfL Logo">
+    <h1 align="center">alt:V AngelScript Module</h1>
+    <p align="center">An alt:V module providing support for the <a href="https://www.angelcode.com/angelscript/sdk/docs/manual/index.html">AngelScript scripting language</a></p>
+</p>
 
 ## How to build
 
