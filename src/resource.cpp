@@ -157,7 +157,6 @@ bool AngelScriptResource::Stop()
         }
         module->Discard();
     }
-
     if(context != nullptr) context->Release();
 
     // Release the event handler script functions to not create a memory leak
@@ -166,7 +165,6 @@ bool AngelScriptResource::Stop()
         pair.second->Release();
     }
     eventHandlers.clear();
-
     for(auto kv : customLocalEventHandlers)
     {
         kv.second->Release();
@@ -179,14 +177,18 @@ bool AngelScriptResource::Stop()
     }
     customRemoteEventHandlers.clear();
 
-    auto type = mainScriptClass->GetObjectType();
-    for(uint32_t n = 0; n < type->GetMethodCount(); n++)
+    if(mainScriptClass != nullptr)
     {
-        auto method = type->GetMethodByIndex(n);
-        auto localEvent = method->GetUserData(1);
-        if(localEvent != nullptr) delete (std::string*)localEvent;
-        auto remoteEvent = method->GetUserData(2);
-        if(remoteEvent != nullptr) delete (std::string*)remoteEvent;
+        auto type = mainScriptClass->GetObjectType();
+        for(uint32_t n = 0; n < type->GetMethodCount(); n++)
+        {
+            auto method = type->GetMethodByIndex(n);
+            auto localEvent = method->GetUserData(1);
+            if(localEvent != nullptr) delete (std::string*)localEvent;
+            auto remoteEvent = method->GetUserData(2);
+            if(remoteEvent != nullptr) delete (std::string*)remoteEvent;
+        }
+        mainScriptClass->Release();
     }
 
     return true;
