@@ -218,7 +218,7 @@ namespace Helpers
     {
         // todo: add support for relative paths
         auto resource = static_cast<AngelScriptResource*>(data);
-        auto src = resource->ReadFile(alt::String(include));
+        auto src = resource->ReadFile(include);
         int r = builder->AddSectionFromMemory(include, src.CStr(), (asUINT)src.GetSize());
         CHECK_AS_RETURN("Include", r, -1);
         return 0;

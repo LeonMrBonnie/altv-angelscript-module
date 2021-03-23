@@ -50,14 +50,17 @@ void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine)
     Data::RegisterVector3(engine, &docs);
     Data::RegisterVector2(engine, &docs);
     Data::RegisterRGBA(engine, &docs);
+    #ifdef SERVER_MODULE
     Data::RegisterClothes(engine, &docs);
     Data::RegisterProps(engine, &docs);
+    #endif
     Data::RegisterBenchmark(engine, &docs);
     REGISTER_REF_CLASS("BaseObject", alt::IBaseObject, asOBJ_REF, "Base object superclass for all alt:V base objects");
     REGISTER_REF_CLASS("WorldObject", alt::IWorldObject, asOBJ_REF, "World object superclass for all alt:V world objects");
     REGISTER_REF_CLASS("Entity", alt::IEntity, asOBJ_REF, "Entity superclass for all alt:V entities");
     REGISTER_REF_CLASS("Player", alt::IPlayer, asOBJ_REF, "alt:V Player Entity");
     REGISTER_REF_CLASS("Vehicle", alt::IVehicle, asOBJ_REF, "alt:V Vehicle Entity");
+    #ifdef SERVER_MODULE
     REGISTER_REF_CLASS("VoiceChannel", alt::IVoiceChannel, asOBJ_REF, "alt:V Voice Channel");
     REGISTER_REF_CLASS("ColShape", alt::IColShape, asOBJ_REF, "alt:V Generic ColShape");
     REGISTER_REF_CLASS("ColShapeSphere", alt::IColShape, asOBJ_REF, "alt:V ColShape sphere");
@@ -65,6 +68,7 @@ void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine)
     REGISTER_REF_CLASS("ColShapeCircle", alt::IColShape, asOBJ_REF, "alt:V ColShape circle");
     REGISTER_REF_CLASS("ColShapeCuboid", alt::IColShape, asOBJ_REF, "alt:V ColShape cuboid");
     REGISTER_REF_CLASS("ColShapeRect", alt::IColShape, asOBJ_REF, "alt:V ColShape rectangle");
+    #endif
     REGISTER_REF_CLASS("Checkpoint", alt::IColShape, asOBJ_REF, "alt:V ColShape checkpoint");
     REGISTER_REF_CLASS("Blip", alt::IBlip, asOBJ_REF, "alt:V Blip");
 
@@ -126,8 +130,5 @@ alt::IResource::Impl* AngelScriptRuntime::CreateImpl(alt::IResource* impl)
 void AngelScriptRuntime::DestroyImpl(alt::IResource::Impl* impl)
 {
     AngelScriptRuntime* resource = dynamic_cast<AngelScriptRuntime*>(impl);
-    if(resource != nullptr) 
-    {
-        delete resource;
-    }
+    if(resource != nullptr) delete resource;
 }

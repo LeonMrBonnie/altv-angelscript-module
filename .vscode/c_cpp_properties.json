@@ -10,7 +10,9 @@
                 "UNICODE",
                 "_UNICODE",
                 "ALT_SERVER_API",
+                "ALT_CLIENT_API",
                 "SERVER_MODULE",
+                "CLIENT_MODULE",
                 "AS_GENERATE_DOCUMENTATION"
             ],
             "windowsSdkVersion": "10.0.18362.0",

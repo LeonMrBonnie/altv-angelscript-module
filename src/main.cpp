@@ -6,20 +6,20 @@
 void CommandHandler(alt::Array<alt::StringView> args, void* userData)
 {
     Log::Colored << "~g~[[[ ~w~AngelScript Module ~g~]]]" << Log::Endl;
-    if(args.GetSize() == 0 || args[0] == "--help")
+    if(args.GetSize() == 0 || args[0] == "help")
     {
         Log::Colored << "Available commands:" << Log::Endl;
         Log::Colored << "~y~--help ~w~| Shows the command help" << Log::Endl;
         Log::Colored << "~y~--info ~w~| Shows some debug info" << Log::Endl;
         Log::Colored << "~y~--credits ~w~| Shows the module credits" << Log::Endl;
     }
-    else if(args[0] == "--info")
+    else if(args[0] == "info")
     {
         Log::Colored << "Module version: ~y~v" MODULE_VERSION << Log::Endl;
         Log::Colored << "SDK version: ~y~v" << alt::ICore::SDK_VERSION << Log::Endl;
         Log::Colored << "AngelScript version: ~y~v" << asGetLibraryVersion() << Log::Endl;
     }
-    else if(args[0] == "--credits")
+    else if(args[0] == "credits")
     {
         Log::Colored << "~y~LeonMrBonnie ~w~| Creator of the module" << Log::Endl;
         Log::Colored << "~y~Andreas Jönsson ~w~| Creator of AngelScript" << Log::Endl;
@@ -27,6 +27,7 @@ void CommandHandler(alt::Array<alt::StringView> args, void* userData)
     }
 }
 
+#ifdef SERVER_MODULE
 EXPORT bool altMain(alt::ICore* core)
 {
     #ifdef DEBUG_MODE
@@ -46,6 +47,30 @@ EXPORT bool altMain(alt::ICore* core)
 
     return true;
 }
+#endif
+#ifdef CLIENT_MODULE
+EXPORT void CreateScriptRuntime(alt::ICore* core)
+{
+    #ifdef DEBUG_MODE
+    Helpers::Benchmark benchmark("Main_Init");
+    #endif
+
+    alt::ICore::SetInstance(core);
+
+    // Create instance of runtime and register
+    auto& runtime = AngelScriptRuntime::Instance();
+    core->RegisterScriptRuntime(MODULE_TYPE, &runtime);
+
+    // Register command
+    core->SubscribeCommand("angelscript-module", CommandHandler);
+    core->SubscribeCommand("as-module", CommandHandler);
+}
+
+EXPORT const char* GetType()
+{
+    return MODULE_TYPE;
+}
+#endif
 
 EXPORT uint32_t GetSDKVersion()
 {

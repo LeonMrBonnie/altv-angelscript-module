@@ -66,7 +66,7 @@ bool AngelScriptResource::Start()
     }
 
     // Check if compile only mode
-    #ifdef IS_WINDOWS
+    #if defined(IS_WINDOWS) && defined(SERVER_MODULE)
     std::string commandline(GetCommandLineA());
     if(commandline.find("--save-bytecode") != std::string::npos && extension != "asb")
     {
@@ -157,7 +157,6 @@ bool AngelScriptResource::Stop()
         }
         module->Discard();
     }
-    if(context != nullptr) context->Release();
 
     // Release the event handler script functions to not create a memory leak
     for(auto pair : eventHandlers)
@@ -192,6 +191,8 @@ bool AngelScriptResource::Stop()
         mainScriptClass->Release();
     }
 
+    if(context != nullptr) context->Release();
+
     return true;
 }
 
@@ -203,12 +204,20 @@ bool AngelScriptResource::OnEvent(const alt::CEvent* ev)
 
     if(ev->GetType() == alt::CEvent::Type::SERVER_SCRIPT_EVENT)
     {
+        #ifdef SERVER_MODULE
         HandleCustomEvent(ev, true);
+        #else
+        HandleCustomEvent(ev, false);
+        #endif
         return true;
     }
     else if(ev->GetType() == alt::CEvent::Type::CLIENT_SCRIPT_EVENT)
     {
+        #ifdef SERVER_MODULE
         HandleCustomEvent(ev, false);
+        #else
+        HandleCustomEvent(ev, true);
+        #endif
         return true;
     }
     // Get the handler for the specified event
@@ -288,7 +297,11 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
 
     std::string name;
     alt::MValueArgs args;
+    #ifdef SERVER_MODULE
     if(local)
+    #else
+    if(!local)
+    #endif
     {
         auto ev = static_cast<const alt::CServerScriptEvent*>(event);
         name = ev->GetName().ToString();
@@ -364,11 +377,12 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
     }
     else
     {
-        alt::Ref<alt::IPlayer> player;
         auto ev = static_cast<const alt::CClientScriptEvent*>(event);
         name = ev->GetName().ToString();
         args = ev->GetArgs();
-        player = ev->GetTarget();
+        #ifdef SERVER_MODULE
+        alt::Ref<alt::IPlayer> player = ev->GetTarget();
+        #endif
         std::vector<asIScriptFunction*> handlers = GetCustomEventHandlers(name, false);
         if(handlers.size() == 0) return;
 
@@ -383,13 +397,19 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
         {
             auto r = context->Prepare(handler);
             CHECK_AS_RETURN("Prepare custom event handler", r,);
+            #ifdef SERVER_MODULE
             context->SetArgObject(0, player.Get());
+            #endif
             for(int i = 0; i < handlerArgs.GetSize(); i++)
             {
+                int argOffset = i;
+                #ifdef SERVER_MODULE
+                argOffset += 1;
+                #endif
                 auto [typeId, ptr] = handlerArgs[i];
                 int ret;
-                if(Helpers::IsTypePrimitive(typeId)) ret = context->SetArgAddress(i + 1, ptr);
-                else ret = context->SetArgObject(i + 1, ptr);
+                if(Helpers::IsTypePrimitive(typeId)) ret = context->SetArgAddress(argOffset, ptr);
+                else ret = context->SetArgObject(argOffset, ptr);
                 CHECK_AS_RETURN("Set custom event handler arg", ret,);
             }
             r = context->Execute();
@@ -420,13 +440,19 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
                 CHECK_AS_RETURN("Prepare main script class event method", r,);
                 r = context->SetObject(mainScriptClass);
                 CHECK_AS_RETURN("Set main script class event method object", r,);
+                #ifdef SERVER_MODULE
                 context->SetArgObject(0, player.Get());
+                #endif
                 for(int i = 0; i < handlerArgs.GetSize(); i++)
                 {
+                    int argOffset = i;
+                    #ifdef SERVER_MODULE
+                    argOffset += 1;
+                    #endif
                     auto [typeId, ptr] = handlerArgs[i];
                     int ret;
-                    if(Helpers::IsTypePrimitive(typeId)) ret = context->SetArgAddress(i + 1, ptr);
-                    else ret = context->SetArgObject(i + 1, ptr);
+                    if(Helpers::IsTypePrimitive(typeId)) ret = context->SetArgAddress(argOffset, ptr);
+                    else ret = context->SetArgObject(argOffset, ptr);
                     CHECK_AS_RETURN("Set custom event handler arg", ret,);
                 }
                 r = context->Execute();

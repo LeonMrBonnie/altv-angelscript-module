@@ -1,5 +1,5 @@
 #include "../../helpers/module.h"
-#include "../helpers/angelscript.h"
+#include "../../helpers/angelscript.h"
 #include <chrono>
 
 using namespace Helpers;
