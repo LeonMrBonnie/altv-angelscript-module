@@ -407,9 +407,6 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_GLOBAL_PROPERTY("uint", "sdkVersion", GetSDKVersion);
     REGISTER_GLOBAL_PROPERTY("bool", "debugMode", IsDebugMode);
 
-    // Debugging
-    REGISTER_GLOBAL_FUNC("void ShowCallstack(uint maxLevels = 0)", ShowCallstack, "Prints the current callstack for debugging");
-
     // Filesystem
     REGISTER_GLOBAL_FUNC("string ReadFile(const string&in path)", ReadFile, "Reads the specified file contents");
     REGISTER_GLOBAL_FUNC("bool FileExists(const string&in path)", FileExists, "Checks if the given file exists");

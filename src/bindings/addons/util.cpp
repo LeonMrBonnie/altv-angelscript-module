@@ -1,4 +1,5 @@
 #include "../../helpers/module.h"
+#include "../helpers/angelscript.h"
 #include <chrono>
 
 using namespace Helpers;
@@ -8,6 +9,12 @@ static uint64_t GetTimestamp()
     return (uint64_t)std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 }
 
+static void ShowCallstack(uint32_t maxLevels = 0)
+{
+    Helpers::PrintCallstack(asGetActiveContext(), maxLevels);
+}
+
 static ModuleExtension utilExtension("util", [](asIScriptEngine* engine, DocsGenerator* docs) {
     REGISTER_GLOBAL_FUNC("uint64 GetTimestamp()", GetTimestamp, "Gets the current timestamp");
+    REGISTER_GLOBAL_FUNC("void ShowCallstack(uint maxLevels = 0)", ShowCallstack, "Prints the current callstack for debugging");
 });
