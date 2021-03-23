@@ -6,6 +6,7 @@
 #include "../bindings/data/vector3.h"
 #include "../bindings/data/vector2.h"
 #include "../runtime.h"
+#include "angelscript/addon/scriptdictionary/scriptdictionary.h"
 
 namespace Helpers
 {
@@ -54,18 +55,22 @@ namespace Helpers
             case alt::IMValue::Type::LIST:
             {
                 // todo: add handle for array in custom events
-                /*typeInfo = engine->GetTypeInfoByName("array");
-                auto value = val.As<alt::IMValueList>()->Get();
-                valuePtr = &value;*/
-                break;
+                /*auto value = val.As<alt::IMValueList>();
+                valuePtr = &value;
+                break;*/
             }
             case alt::IMValue::Type::DICT:
             {
-                // todo: add handle for dict in custom events
-                /*typeInfo = engine->GetTypeInfoByName("dict");
-                auto value = val.As<alt::IMValueUInt>()->Value();
-                valuePtr = &value;
-                break;*/
+                auto dict = CScriptDictionary::Create(runtime->GetEngine());
+                auto value = val.As<alt::IMValueDict>();
+                for(auto it = value->Begin(); it; it = value->Next())
+                {
+                    auto [type, val] = MValueToValue(runtime, it->GetValue());
+                    dict->Set(it->GetKey().ToString(), val, type);
+                }
+                type = runtime->GetDictTypeId();
+                valuePtr = dict;
+                break;
             }
             case alt::IMValue::Type::BASE_OBJECT:
             {
@@ -148,6 +153,16 @@ namespace Helpers
                         type == runtime.GetPlayerTypeId()      || 
                         type == runtime.GetVehicleTypeId())
                     return core.CreateMValueBaseObject(static_cast<alt::IBaseObject*>(value));
+                else if(type == runtime.GetDictTypeId())
+                {
+                    auto dict = static_cast<CScriptDictionary*>(value);
+                    auto list = core.CreateMValueDict();
+                    for(auto& it = dict->begin(); it != dict->end(); it++)
+                    {
+                        list->Set(it.GetKey(), ValueToMValue(it.GetTypeId(), const_cast<void*>(it.GetAddressOfValue())));
+                    }
+                    return list;
+                }
 
                 break;
             }

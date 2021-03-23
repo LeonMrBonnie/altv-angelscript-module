@@ -77,6 +77,11 @@ public:
         static int rgbaType = engine->GetTypeIdByDecl("RGBA");
         return rgbaType;
     }
+    int GetDictTypeId()
+    {
+        static int dictType = engine->GetTypeIdByDecl("dictionary");
+        return dictType;
+    }
 
     // Gets the current runtime instance or creates one if not exists
     static AngelScriptRuntime& Instance()
