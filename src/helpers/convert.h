@@ -17,6 +17,13 @@ namespace Helpers
         void* valuePtr;
         switch(val->GetType())
         {
+            case alt::IMValue::Type::NONE:
+            case alt::IMValue::Type::NIL:
+            {
+                type = asTYPEID_VOID;
+                valuePtr = nullptr;
+                break;
+            }
             case alt::IMValue::Type::BOOL: 
             {
                 type = asTYPEID_BOOL;
@@ -110,6 +117,7 @@ namespace Helpers
 
         switch(type)
         {
+            case asTYPEID_VOID: return core.CreateMValueNone();
             // Bool
             case asTYPEID_BOOL: return core.CreateMValueBool(*static_cast<bool*>(value));
             // Int
