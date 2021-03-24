@@ -98,6 +98,8 @@ void AngelScriptRuntime::RegisterTypeInfos()
     arrayIntTypeInfo->AddRef();
     arrayUintTypeInfo = engine->GetTypeInfoByDecl("array<uint>");
     arrayUintTypeInfo->AddRef();
+    arrayByteTypeInfo = engine->GetTypeInfoByDecl("array<uint8>");
+    arrayByteTypeInfo->AddRef();
 }
 
 // Creates an array of strings
@@ -118,6 +120,12 @@ CScriptArray* AngelScriptRuntime::CreateIntArray(uint32_t len)
 CScriptArray* AngelScriptRuntime::CreateUIntArray(uint32_t len)
 {
     auto arr = CScriptArray::Create(arrayUintTypeInfo, len);
+    return arr;
+}
+
+CScriptArray* AngelScriptRuntime::CreateByteArray(uint8_t* data) 
+{
+    auto arr = CScriptArray::Create(arrayByteTypeInfo, data);
     return arr;
 }
 

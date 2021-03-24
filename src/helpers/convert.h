@@ -107,6 +107,13 @@ namespace Helpers
                 valuePtr = new alt::RGBA(value.r, value.g, value.b, value.a);
                 break;
             }
+            case alt::IMValue::Type::BYTE_ARRAY:
+            {
+                type = runtime->GetByteArrayTypeId();
+                auto value = val.As<alt::IMValueByteArray>()->GetData();
+                valuePtr = runtime->CreateByteArray(const_cast<uint8_t*>(value));
+                break;
+            }
         }
         return {type, valuePtr};
     }
@@ -155,12 +162,6 @@ namespace Helpers
                     auto rgba = *static_cast<alt::RGBA*>(value);
                     return core.CreateMValueRGBA(rgba);
                 }
-                else if(type == runtime.GetBaseObjectTypeId()  || 
-                        type == runtime.GetWorldObjectTypeId() || 
-                        type == runtime.GetEntityTypeId()      || 
-                        type == runtime.GetPlayerTypeId()      || 
-                        type == runtime.GetVehicleTypeId())
-                    return core.CreateMValueBaseObject(static_cast<alt::IBaseObject*>(value));
                 else if(type == runtime.GetDictTypeId())
                 {
                     auto dict = static_cast<CScriptDictionary*>(value);
@@ -171,6 +172,22 @@ namespace Helpers
                     }
                     return list;
                 }
+                else if(type == runtime.GetByteArrayTypeId())
+                {
+                    std::vector<uint8_t> arr;
+                    auto byteArray = static_cast<CScriptArray*>(value);
+                    for(asUINT i = 0; i < byteArray->GetSize(); i++)
+                    {
+                        arr.push_back(*(uint8_t*)byteArray->At(i));
+                    }
+                    return core.CreateMValueByteArray(arr.data(), byteArray->GetSize());
+                }
+                else if(type == runtime.GetBaseObjectTypeId()  || 
+                        type == runtime.GetWorldObjectTypeId() || 
+                        type == runtime.GetEntityTypeId()      || 
+                        type == runtime.GetPlayerTypeId()      || 
+                        type == runtime.GetVehicleTypeId())
+                    return core.CreateMValueBaseObject(static_cast<alt::IBaseObject*>(value));
 
                 break;
             }
