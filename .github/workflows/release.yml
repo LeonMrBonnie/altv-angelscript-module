@@ -45,10 +45,15 @@ jobs:
         draft: false
         prerelease: false
 
-    - name: Build (Windows)
+    - name: Build server (Windows)
       if: matrix.OS_TYPE == 'Windows'
       shell: bash
-      run: ./build.bat
+      run: ./build-server.bat
+
+    - name: Build client (Windows)
+      if: matrix.OS_TYPE == 'Windows'
+      shell: bash
+      run: ./build-client.bat
 
     - name: Build (Linux)
       if: matrix.OS_TYPE == 'Linux'
@@ -57,13 +62,25 @@ jobs:
         chmod +x ./build.sh
         ./build.sh
 
-    - name: Upload Release Assets
+    - name: Upload Release Server Assets
       id: upload_release_assets
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./dist/angelscript-module.${{ matrix.EXT }}
+        asset_path: ./dist/server/angelscript-module.${{ matrix.EXT }}
         asset_name: angelscript-module.${{ matrix.EXT }}
+        asset_content_type: application/octet-stream
+
+    - name: Upload Release Client Assets
+      if: matrix.OS_TYPE == 'Windows'
+      id: upload_release_assets
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dist/client/angelscript-client-module.${{ matrix.EXT }}
+        asset_name: angelscript-client-module.${{ matrix.EXT }}
         asset_content_type: application/octet-stream

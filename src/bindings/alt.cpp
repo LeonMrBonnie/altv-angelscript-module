@@ -162,6 +162,7 @@ static CScriptArray* GetResourceExports(const std::string& name)
 }
 */
 
+#ifdef SERVER_MODULE
 static void StartResource(const std::string& name)
 {
     alt::ICore::Instance().StartResource(name);
@@ -182,7 +183,6 @@ static uint32_t GetNetTime()
     return alt::ICore::Instance().GetNetTime();
 }
 
-#ifdef SERVER_MODULE
 static void SetPassword(const std::string& password)
 {
     alt::ICore::Instance().SetPassword(password);
@@ -436,8 +436,8 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_GLOBAL_PROPERTY("string", "resourceName", GetResourceName);
 
     // Server
-    REGISTER_GLOBAL_FUNC("uint GetNetTime()", GetNetTime, "Gets the total time the server has been running for");
     #ifdef SERVER_MODULE
+    REGISTER_GLOBAL_FUNC("uint GetNetTime()", GetNetTime, "Gets the total time the server has been running for");
     REGISTER_GLOBAL_FUNC("void SetPassword(const string&in password)", SetPassword, "Sets the current server password");
     #endif
 

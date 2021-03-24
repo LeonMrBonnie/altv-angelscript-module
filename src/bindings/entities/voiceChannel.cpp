@@ -2,6 +2,7 @@
 #include "../../helpers/module.h"
 #include "baseObject.h"
 
+#ifdef SERVER_MODULE
 using namespace Helpers;
 
 static std::string ToString(alt::IVoiceChannel* channel)
@@ -47,3 +48,4 @@ static ModuleExtension voiceChannelExtension("alt", [](asIScriptEngine* engine, 
     REGISTER_METHOD_WRAPPER("VoiceChannel", "void UnmutePlayer(Player@ player)", 
         (GenericWrapper<alt::IVoiceChannel, alt::IVoiceChannel, &alt::IVoiceChannel::UnmutePlayer, void, alt::IPlayer*>));
 });
+#endif

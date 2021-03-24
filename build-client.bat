@@ -13,8 +13,8 @@ IF NOT EXIST dist\ (
     mkdir dist\client
     mkdir dist\server
 )
-copy build\win64\client\Release\angelscript-module.dll dist\client
-copy build\win64\client\Release\angelscript-module.pdb dist\client
+copy build\win64\client\Release\angelscript-client-module.dll dist\client
+copy build\win64\client\Release\angelscript-client-module.pdb dist\client
 
 IF EXIST extra.bat (
     extra.bat

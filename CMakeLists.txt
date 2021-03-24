@@ -5,8 +5,6 @@ cmake_minimum_required (VERSION 3.8)
 
 project ("altv-angelscript-module")
 
-set(PROJECT_MODULE_NAME "angelscript-module")
-
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -14,10 +12,12 @@ add_definitions(-DMODULE_NAME="${PROJECT_MODULE_NAME}")
 add_definitions(-DAS_MIPS)
 
 if(SERVER_MODULE)
+	set(PROJECT_MODULE_NAME "angelscript-module")
 	set(COMPILE_FOLDER "server")
 	add_definitions(-DALT_SERVER_API)
 	add_definitions(-DSERVER_MODULE)
 elseif(CLIENT_MODULE)
+	set(PROJECT_MODULE_NAME "angelscript-client-module")
 	set(COMPILE_FOLDER "client")
 	add_definitions(-DALT_CLIENT_API)
 	add_definitions(-DCLIENT_MODULE)

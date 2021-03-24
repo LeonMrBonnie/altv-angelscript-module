@@ -4,6 +4,7 @@
 
 using namespace Helpers;
 
+#ifdef SERVER_MODULE
 static alt::IBlip* BlipFactory(alt::IPlayer* target, alt::IBlip::BlipType type, Vector3& pos)
 {
     GET_RESOURCE();
@@ -29,6 +30,7 @@ static alt::IBlip* BlipFactoryAttach(alt::IPlayer* target, alt::IBlip::BlipType 
     blip->AddRef();
     return blip.Get();
 }
+#endif
 
 static alt::IPlayer* GetTarget(alt::IBlip* blip)
 {
@@ -43,8 +45,10 @@ static alt::IEntity* GetAttachedTo(alt::IBlip* blip)
 static ModuleExtension blipExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs) {
     RegisterAsWorldObject<alt::IBlip>(engine, docs, "Blip");
 
+    #ifdef SERVER_MODULE
     REGISTER_FACTORY("Blip", "Player@ target, uint16 type, Vector3 pos", BlipFactory);
     REGISTER_FACTORY("Blip", "Player@ target, uint16 type, Entity@ attachTo", BlipFactoryAttach);
+    #endif
 
     REGISTER_PROPERTY_WRAPPER_GET("Blip", "uint16", "blipType", (GenericWrapper<alt::IBlip, alt::IBlip, &alt::IBlip::GetBlipType, alt::IBlip::BlipType>));
 

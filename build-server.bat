@@ -4,7 +4,7 @@ IF NOT EXIST build\ (
     mkdir build
 )
 pushd build
-cmake -DSERVER_MODULE=1 ..
+cmake -DSERVER_MODULE=1 -DCMAKE_BUILD_TYPE=Release ..
 cmake --build . --config Release
 popd
 

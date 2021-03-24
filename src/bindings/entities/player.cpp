@@ -18,6 +18,7 @@ static std::string GetName(alt::IPlayer* player)
     return player->GetName().ToString();
 }
 
+#ifdef SERVER_MODULE
 template<class T>
 static void SpawnPlayer(alt::IPlayer* player, T x, T y, T z, uint32_t delay = 0)
 {
@@ -28,6 +29,7 @@ static void SpawnPlayerVector(alt::IPlayer* player, Vector3& pos, uint32_t delay
 {
     player->Spawn({pos.x, pos.y, pos.z}, delay);
 }
+#endif
 
 static CScriptArray* GetWeaponComponents(alt::IPlayer* player)
 {
@@ -73,6 +75,7 @@ static Vector3 GetEntityAimOffset(alt::IPlayer* player)
     return Vector3(vector[0], vector[1], vector[2]);
 }
 
+#ifdef SERVER_MODULE
 static std::string GetIP(alt::IPlayer* player)
 {
     return player->GetIP().ToString();
@@ -108,6 +111,7 @@ static void Emit(asIScriptGeneric* gen)
     }
     alt::ICore::Instance().TriggerClientEvent(player, event, args);
 }
+#endif
 
 static ModuleExtension playerExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs) {
     RegisterAsEntity<alt::IPlayer>(engine, docs, "Player");
@@ -117,20 +121,32 @@ static ModuleExtension playerExtension("alt", [](asIScriptEngine* engine, DocsGe
 
     REGISTER_PROPERTY_WRAPPER_GET("Player", "string", "name", GetName);
 
+    #ifdef SERVER_MODULE
     REGISTER_PROPERTY_WRAPPER_SET("Player", "uint", "model", (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::SetModel, void, uint32_t>));
+    #endif
 
     REGISTER_PROPERTY_WRAPPER_GET("Player", "uint", "health", (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::GetHealth, uint32_t>));
+    #ifdef SERVER_MODULE
     REGISTER_PROPERTY_WRAPPER_SET("Player", "uint", "health", (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::SetHealth, void, uint32_t>));
+    #endif
     REGISTER_PROPERTY_WRAPPER_GET("Player", "uint", "maxHealth", (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::GetMaxHealth, uint32_t>));
+    #ifdef SERVER_MODULE
     REGISTER_PROPERTY_WRAPPER_SET("Player", "uint", "maxHealth", (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::SetMaxHealth, void, uint32_t>));
+    #endif
 
     REGISTER_PROPERTY_WRAPPER_GET("Player", "uint", "armour", (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::GetArmour, uint32_t>));
+    #ifdef SERVER_MODULE
     REGISTER_PROPERTY_WRAPPER_SET("Player", "uint", "armour", (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::SetArmour, void, uint32_t>));
+    #endif
     REGISTER_PROPERTY_WRAPPER_GET("Player", "uint", "maxArmour", (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::GetMaxArmour, uint32_t>));
+    #ifdef SERVER_MODULE
     REGISTER_PROPERTY_WRAPPER_SET("Player", "uint", "maxArmour", (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::SetMaxArmour, void, uint32_t>));
+    #endif
 
     REGISTER_PROPERTY_WRAPPER_GET("Player", "uint", "weapon", (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::GetCurrentWeapon, uint32_t>));
+    #ifdef SERVER_MODULE
     REGISTER_PROPERTY_WRAPPER_SET("Player", "uint", "weapon", (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::SetCurrentWeapon, void, uint32_t>));
+    #endif
     REGISTER_PROPERTY_WRAPPER_GET("Player", "array<uint>@", "weaponComponents", GetWeaponComponents);
     REGISTER_PROPERTY_WRAPPER_GET("Player", "uint8", "weaponTint", (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::GetCurrentWeaponTintIndex, uint8_t>));
 
@@ -140,7 +156,9 @@ static ModuleExtension playerExtension("alt", [](asIScriptEngine* engine, DocsGe
     REGISTER_PROPERTY_WRAPPER_GET("Player", "bool", "aiming", (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::IsAiming, bool>));
     REGISTER_PROPERTY_WRAPPER_GET("Player", "bool", "shooting", (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::IsShooting, bool>));
     REGISTER_PROPERTY_WRAPPER_GET("Player", "bool", "reloading", (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::IsReloading, bool>));
+    #ifdef SERVER_MODULE
     REGISTER_PROPERTY_WRAPPER_GET("Player", "bool", "connected", (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::IsConnected, bool>));
+    #endif
 
     REGISTER_PROPERTY_WRAPPER_GET("Player", "float", "moveSpeed", (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::GetMoveSpeed, float>));
     REGISTER_PROPERTY_WRAPPER_GET("Player", "Vector3", "aimPos", GetAimPos);
@@ -155,6 +173,7 @@ static ModuleExtension playerExtension("alt", [](asIScriptEngine* engine, DocsGe
 
     REGISTER_PROPERTY_WRAPPER_GET("Player", "bool", "flashlightActive", (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::IsFlashlightActive, bool>));
 
+    #ifdef SERVER_MODULE
     REGISTER_PROPERTY_WRAPPER_GET("Player", "uint", "ping", (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::GetPing, uint32_t>));
     REGISTER_PROPERTY_WRAPPER_GET("Player", "string", "ip", GetIP);
     REGISTER_PROPERTY_WRAPPER_GET("Player", "uint64", "socialId", (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::GetSocialID, uint64_t>));
@@ -166,11 +185,13 @@ static ModuleExtension playerExtension("alt", [](asIScriptEngine* engine, DocsGe
     REGISTER_METHOD_WRAPPER("Player", "void Spawn(int x, int y, int z, uint delay = 0)", SpawnPlayer<int>);
     REGISTER_METHOD_WRAPPER("Player", "void Spawn(Vector3 pos, uint delay = 0)", SpawnPlayerVector);
     REGISTER_METHOD_WRAPPER("Player", "void Despawn()", (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::Despawn>));
+    #endif
 
     REGISTER_METHOD_WRAPPER("Player", "bool HasWeaponComponent(uint weapon, uint component)", 
         (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::HasWeaponComponent, bool, uint32_t, uint32_t>));
     REGISTER_METHOD_WRAPPER("Player", "uint GetWeaponTint(uint weapon)", 
         (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::GetWeaponTintIndex, uint32_t, uint32_t>));
+    #ifdef SERVER_MODULE
     REGISTER_METHOD_WRAPPER("Player", "void SetWeaponTint(uint weapon, uint8 tint)", 
         (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::SetWeaponTintIndex, void, uint32_t, uint8_t>));
     REGISTER_METHOD_WRAPPER("Player", "void AddWeaponComponent(uint weapon, uint component)",
@@ -182,7 +203,9 @@ static ModuleExtension playerExtension("alt", [](asIScriptEngine* engine, DocsGe
     REGISTER_METHOD_WRAPPER("Player", "bool RemoveWeapon(uint weapon)",
         (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::RemoveWeapon, bool, uint32_t>));
     REGISTER_METHOD_WRAPPER("Player", "void RemoveAllWeapons()", (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::RemoveAllWeapons>));
+    #endif
 
+    #ifdef SERVER_MODULE
     REGISTER_METHOD_WRAPPER("Player", "void ClearBloodDamage()", (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::ClearBloodDamage>));
     REGISTER_METHOD_WRAPPER("Player", "void SetDateTime(uint8 day, uint8 month, uint8 year, uint8 hour, uint8 minute, uint8 second)",
         (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::SetDateTime, void, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t>));
@@ -190,7 +213,9 @@ static ModuleExtension playerExtension("alt", [](asIScriptEngine* engine, DocsGe
     REGISTER_METHOD_WRAPPER("Player", "void Kick(const string&in reason = \"Kicked\")", (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::Kick, void, const std::string&>));
     REGISTER_METHOD_WRAPPER("Player", "bool IsEntityInStreamRange(Entity@ entity)", 
         (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::IsEntityInStreamingRange, bool, alt::IEntity*>));
+    #endif
 
+    #ifdef SERVER_MODULE
     REGISTER_VARIADIC_METHOD("Player", "void", "Emit", "const string&in event", 32, Emit);
 
     REGISTER_METHOD_WRAPPER("Player", "Cloth GetClothes(uint8 component)", 
@@ -210,4 +235,5 @@ static ModuleExtension playerExtension("alt", [](asIScriptEngine* engine, DocsGe
         (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::SetProps, void, uint8_t, uint16_t, uint8_t>));
     REGISTER_METHOD_WRAPPER("Player", "void SetDlcProps(uint8 component, uint16 drawable, uint8 texture, uint8 palette, uint dlc)", 
         (Helpers::GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::SetDlcProps, void, uint8_t, uint16_t, uint8_t, uint32_t>));
+    #endif
 });

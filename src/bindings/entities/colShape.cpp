@@ -1,5 +1,6 @@
 #include "Log.h"
 #include "../../helpers/module.h"
+#ifdef SERVER_MODULE
 #include "colShape.h"
 
 using namespace Helpers;
@@ -89,3 +90,4 @@ static ModuleExtension colshapeExtension("alt", [](asIScriptEngine* engine, Docs
     // Checkpoint
     // todo: add mising checkpoint methods and properties
 });
+#endif
