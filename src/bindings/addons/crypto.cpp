@@ -130,7 +130,7 @@ static bool VerifyEncryptedString(EncryptAlgorithm algorithm, const std::string&
     uint32_t rounds = std::stoul(parts[2]);
 
     auto result = GetNamedEncryption(algorithm, input, salt, rounds);
-    return result == hash;
+    return result == encrypted;
 }
 
 static std::string GenerateRandomString(uint32_t size)
