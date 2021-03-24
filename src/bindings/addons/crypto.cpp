@@ -8,6 +8,9 @@
 #include "cryptopp/include/sha.h"
 #include "cryptopp/include/whrlpool.h"
 #include "cryptopp/include/pwdbased.h"
+#include "cryptopp/include/hkdf.h"
+#include "cryptopp/include/scrypt.h"
+#include "cryptopp/include/aes.h"
 
 using namespace Helpers;
 
@@ -21,7 +24,9 @@ enum class HashAlgorithm : uint8_t
 
 enum class EncryptAlgorithm : uint8_t
 {
-    PBKDF2
+    PBKDF2,
+    HKDF,
+    SCRYPT
 };
 
 template<class T>
@@ -45,7 +50,17 @@ static std::string GetEncrypted(const std::string& input, const std::string& sal
 {
     CryptoPP::byte digest[CryptoPP::SHA256::DIGESTSIZE];
     Encryption encryption;
-    encryption.DeriveKey(digest, sizeof(digest), 0, (CryptoPP::byte*)input.c_str(), input.length(), (CryptoPP::byte*)salt.c_str(), salt.length(), rounds, 0.0f);
+
+    // todo: maybe not use this ugly hack here
+    if constexpr(std::is_same_v<Encryption, CryptoPP::PKCS5_PBKDF2_HMAC<CryptoPP::SHA256>>) 
+        encryption.DeriveKey(digest, sizeof(digest), 0, (CryptoPP::byte*)input.c_str(), input.length(), (CryptoPP::byte*)salt.c_str(), salt.length(), rounds, 0.0f);
+    else if constexpr(std::is_same_v<Encryption, CryptoPP::HKDF<CryptoPP::SHA256>>)
+    {
+        std::string info = std::to_string(rounds);
+        encryption.DeriveKey(digest, sizeof(digest), (CryptoPP::byte*)input.c_str(), input.length(), (CryptoPP::byte*)salt.c_str(), salt.length(), (CryptoPP::byte*)info.c_str(), info.length());
+    }
+    else if constexpr(std::is_same_v<Encryption, CryptoPP::Scrypt>)
+        encryption.DeriveKey(digest, sizeof(digest), (CryptoPP::byte*)input.c_str(), input.length(), (CryptoPP::byte*)salt.c_str(), salt.length(), rounds);
 
     CryptoPP::HexEncoder encoder;
     std::string output;
@@ -75,13 +90,15 @@ static std::string GetNamedHash(HashAlgorithm algorithm, const std::string& inpu
     }
 }
 
-#define ENCRYPTION_ALGORITHM_CASE(enumVal, algorithm) case ::EncryptAlgorithm::enumVal: return GetEncrypted<algorithm<SHA256>>(input, salt, rounds)
+#define ENCRYPTION_ALGORITHM_CASE(enumVal, algorithm) case ::EncryptAlgorithm::enumVal: return GetEncrypted<algorithm>(input, salt, rounds)
 static std::string GetNamedEncryption(EncryptAlgorithm algorithm, const std::string& input, const std::string& salt, uint32_t rounds = 1024)
 {
     using namespace CryptoPP;
     switch(algorithm)
     {
-        ENCRYPTION_ALGORITHM_CASE(PBKDF2, PKCS5_PBKDF2_HMAC);
+        ENCRYPTION_ALGORITHM_CASE(PBKDF2, PKCS5_PBKDF2_HMAC<SHA256>);
+        ENCRYPTION_ALGORITHM_CASE(HKDF, HKDF<SHA256>);
+        ENCRYPTION_ALGORITHM_CASE(SCRYPT, Scrypt);
         default: 
         {
             THROW_ERROR("Invalid algorithm specified");
@@ -142,6 +159,8 @@ static ModuleExtension cryptoExtension("crypto", [](asIScriptEngine* engine, Doc
 
     REGISTER_ENUM("EncryptAlgorithm", "An enum with all the available encryption algorithms");
     REGISTER_ENUM_VALUE("EncryptAlgorithm", "PBKDF2", EncryptAlgorithm::PBKDF2);
+    REGISTER_ENUM_VALUE("EncryptAlgorithm", "HKDF", EncryptAlgorithm::HKDF);
+    REGISTER_ENUM_VALUE("EncryptAlgorithm", "SCRYPT", EncryptAlgorithm::SCRYPT);
 
     REGISTER_GLOBAL_FUNC(
         "string Encrypt(crypto::EncryptAlgorithm encryptAlgorithm, const string&in input, const string&in salt, uint rounds = 1024", 
