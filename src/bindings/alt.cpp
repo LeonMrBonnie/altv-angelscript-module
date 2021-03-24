@@ -392,12 +392,6 @@ static void DeleteSyncedMeta(const std::string& key)
 }
 #endif
 
-static void ShowCallstack(uint32_t maxLevels = 0)
-{
-    auto context = asGetActiveContext();
-    Helpers::PrintCallstack(context, maxLevels);
-}
-
 static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs)
 {
     // Generic
