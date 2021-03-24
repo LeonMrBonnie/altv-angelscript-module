@@ -66,6 +66,7 @@
         "cstdarg": "cpp",
         "fstream": "cpp",
         "iomanip": "cpp",
-        "set": "cpp"
+        "set": "cpp",
+        "random": "cpp"
     }
 }
