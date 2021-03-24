@@ -24,6 +24,7 @@ enum class HashAlgorithm : uint8_t
 
 enum class EncryptAlgorithm : uint8_t
 {
+    PBKDF1,
     PBKDF2,
     HKDF,
     SCRYPT
@@ -52,7 +53,7 @@ static std::string GetEncrypted(const std::string& input, const std::string& sal
     Encryption encryption;
 
     // todo: maybe not use this ugly hack here
-    if constexpr(std::is_same_v<Encryption, CryptoPP::PKCS5_PBKDF2_HMAC<CryptoPP::SHA256>>) 
+    if constexpr(std::is_same_v<Encryption, CryptoPP::PKCS5_PBKDF2_HMAC<CryptoPP::SHA256>> || std::is_same_v<Encryption, CryptoPP::PKCS5_PBKDF1<CryptoPP::SHA256>>) 
         encryption.DeriveKey(digest, sizeof(digest), 0, (CryptoPP::byte*)input.c_str(), input.length(), (CryptoPP::byte*)salt.c_str(), salt.length(), rounds, 0.0f);
     else if constexpr(std::is_same_v<Encryption, CryptoPP::HKDF<CryptoPP::SHA256>>)
     {
@@ -96,6 +97,7 @@ static std::string GetNamedEncryption(EncryptAlgorithm algorithm, const std::str
     using namespace CryptoPP;
     switch(algorithm)
     {
+        ENCRYPTION_ALGORITHM_CASE(PBKDF1, PKCS5_PBKDF1<SHA256>);
         ENCRYPTION_ALGORITHM_CASE(PBKDF2, PKCS5_PBKDF2_HMAC<SHA256>);
         ENCRYPTION_ALGORITHM_CASE(HKDF, HKDF<SHA256>);
         ENCRYPTION_ALGORITHM_CASE(SCRYPT, Scrypt);
@@ -158,12 +160,13 @@ static ModuleExtension cryptoExtension("crypto", [](asIScriptEngine* engine, Doc
     REGISTER_GLOBAL_FUNC("string Hash(crypto::HashAlgorithm algorithm, const string&in input)", GetNamedHash, "Hashes a string using the specified hash algorithm");
 
     REGISTER_ENUM("EncryptAlgorithm", "An enum with all the available encryption algorithms");
+    REGISTER_ENUM_VALUE("EncryptAlgorithm", "PBKDF1", EncryptAlgorithm::PBKDF1);
     REGISTER_ENUM_VALUE("EncryptAlgorithm", "PBKDF2", EncryptAlgorithm::PBKDF2);
     REGISTER_ENUM_VALUE("EncryptAlgorithm", "HKDF", EncryptAlgorithm::HKDF);
     REGISTER_ENUM_VALUE("EncryptAlgorithm", "SCRYPT", EncryptAlgorithm::SCRYPT);
 
     REGISTER_GLOBAL_FUNC(
-        "string Encrypt(crypto::EncryptAlgorithm encryptAlgorithm, const string&in input, const string&in salt, uint rounds = 1024", 
+        "string Encrypt(crypto::EncryptAlgorithm encryptAlgorithm, const string&in input, const string&in salt, uint rounds = 1024)", 
         GetNamedEncryption, "Encrypts a string using the specified encryption algorithm");
     REGISTER_GLOBAL_FUNC("bool Verify(crypto::EncryptAlgorithm encryptAlgorithm, const string&in encryptedInput, const string&in input)", 
         VerifyEncryptedString, "Verifies if the given input and the given encrypted input are the same");
