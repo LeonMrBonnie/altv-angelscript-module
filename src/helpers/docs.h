@@ -1,5 +1,6 @@
 #pragma once
 
+#include "main.h"
 #include "cpp-sdk/SDK.h"
 #include "Log.h"
 #include "angelscript/include/angelscript.h"

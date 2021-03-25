@@ -35,6 +35,7 @@ void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine)
     Helpers::DocsGenerator docs("alt");
     Helpers::DocsGenerator cryptoDocs("crypto");
     Helpers::DocsGenerator utilDocs("util");
+    Helpers::DocsGenerator httpDocs("http");
 
     // Register add-ons
     RegisterStdString(engine);
@@ -76,6 +77,7 @@ void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine)
     ModuleExtension::RegisterAll("alt", engine, &docs);
     ModuleExtension::RegisterAll("crypto", engine, &cryptoDocs);
     ModuleExtension::RegisterAll("util", engine, &utilDocs);
+    ModuleExtension::RegisterAll("http", engine, &httpDocs);
 
     // Register events
     Event::RegisterAll(engine, &docs);
@@ -87,6 +89,7 @@ void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine)
     docs.Generate();
     cryptoDocs.Generate();
     utilDocs.Generate();
+    httpDocs.Generate();
 }
 
 void AngelScriptRuntime::RegisterTypeInfos()
