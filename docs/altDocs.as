@@ -1,4 +1,4 @@
-// Generated on Sun Mar 21 23:45:28 2021
+// Generated on Thu Mar 25 15:14:10 2021
 
 namespace alt
 {
@@ -109,20 +109,17 @@ namespace alt
     // Gets the entity with the specified ID
     Entity@ GetEntityByID(uint16 id);
 
-    // Prints the current callstack for debugging
-    void ShowCallstack(uint maxLevels = 0);
-
     // Reads the specified file contents
     string ReadFile(const string&in path);
 
     // Checks if the given file exists
     bool FileExists(const string&in path);
 
-    // Gets the path to the specified resource
-    string GetResourcePath(const string&in name);
-
     // Returns whether the specified resource exists and is started
     bool HasResource(const string&in name);
+
+    // Gets the path to the specified resource
+    string GetResourcePath(const string&in name);
 
     // Starts the specified resource
     void StartResource(const string&in name);
@@ -132,6 +129,9 @@ namespace alt
 
     // Restarts the specified resource
     void RestartResource(const string&in name);
+
+    // Gets the exports of the specified resource
+    dictionary@ GetResourceExports(const string&in name);
 
     // Gets the total time the server has been running for
     uint GetNetTime();
@@ -216,14 +216,14 @@ namespace alt
     funcdef void RemoveBaseObjectCallback(BaseObject@ object);
     void OnRemoveBaseObject(RemoveBaseObjectCallback@ callback);
 
+    funcdef void CreateBaseObjectCallback(BaseObject@ object);
+    void OnCreateBaseObject(CreateBaseObjectCallback@ callback);
+
     funcdef void ResourceStartCallback(const string &in resource);
     void OnResourceStart(ResourceStartCallback@ callback);
 
     funcdef void ResourceStopCallback(const string &in resource);
     void OnResourceStop(ResourceStopCallback@ callback);
-
-    funcdef void PlayerDisconnectCallback(Player@ player, string reason);
-    void OnPlayerDisconnect(PlayerDisconnectCallback@ callback);
 
     funcdef void ConsoleCommandCallback(const string&in command, array<string> args);
     void OnConsoleCommand(ConsoleCommandCallback@ callback);
@@ -233,6 +233,9 @@ namespace alt
 
     funcdef void PlayerConnectCallback(Player@ player);
     void OnPlayerConnect(PlayerConnectCallback@ callback);
+
+    funcdef void PlayerDisconnectCallback(Player@ player, string reason);
+    void OnPlayerDisconnect(PlayerDisconnectCallback@ callback);
 
     funcdef void PlayerDamageCallback(Player@ player, Entity@ attacker, uint&in damage, uint&in weapon);
     void OnPlayerDamage(PlayerDamageCallback@ callback);

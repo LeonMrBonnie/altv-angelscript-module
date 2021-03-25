@@ -1,4 +1,4 @@
-// Generated on Sun Mar 21 23:45:28 2021
+// Generated on Thu Mar 25 15:14:10 2021
 
 namespace util
 {
@@ -6,4 +6,8 @@ namespace util
 
     // Gets the current timestamp
     uint64 GetTimestamp();
+
+    // Prints the current callstack for debugging
+    void ShowCallstack(uint maxLevels = 0);
+
 }
