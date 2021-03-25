@@ -11,7 +11,6 @@
 #include "cryptopp/include/pwdbased.h"
 #include "cryptopp/include/hkdf.h"
 #include "cryptopp/include/scrypt.h"
-#include "cryptopp/include/aes.h"
 
 using namespace Helpers;
 
