@@ -60,11 +60,19 @@ namespace Helpers
                 break;
             }
             case alt::IMValue::Type::LIST:
-            {
-                // todo: add handle for array in custom events
-                /*auto value = val.As<alt::IMValueList>();
-                valuePtr = &value;
-                break;*/
+            {   
+                // We pass the list MValue as a dict, because AngelScript doesn't support arrays with dynamic value types
+                auto dict = CScriptDictionary::Create(runtime->GetEngine());
+                auto list = val.As<alt::IMValueList>();
+                for(uint64_t i = 0; i < list->GetSize(); i++)
+                {
+                    auto value = list->Get(i);
+                    auto [type, val] = MValueToValue(runtime, value);
+                    dict->Set(std::to_string(i), val, type);
+                }
+                type = runtime->GetDictTypeId();
+                valuePtr = dict;
+                break;
             }
             case alt::IMValue::Type::DICT:
             {
