@@ -142,9 +142,7 @@ static bool HasResource(const std::string& name)
     return resource != nullptr && resource->IsStarted();
 }
 
-// todo: add get resource exports
-/*
-static CScriptArray* GetResourceExports(const std::string& name)
+static CScriptDictionary* GetResourceExports(const std::string& name)
 {
     GET_RESOURCE();
     auto res = alt::ICore::Instance().GetResource(name);
@@ -155,12 +153,15 @@ static CScriptArray* GetResourceExports(const std::string& name)
     }
     auto exports = res->GetExports();
     auto dict = CScriptDictionary::Create(resource->GetRuntime()->GetEngine());
-    for (auto it = exports->Begin(); it; it = exports->Next())
+    for(auto it = exports->Begin(); it; it = exports->Next())
     {
-        
+        auto value = it->GetValue();
+        if(value->GetType() == alt::IMValue::Type::FUNCTION) continue;
+        auto [type, val] = Helpers::MValueToValue(resource->GetRuntime(), value);
+        dict->Set(it->GetKey().ToString(), val, type);
     }
+    return dict;
 }
-*/
 
 #ifdef SERVER_MODULE
 static void StartResource(const std::string& name)
@@ -426,6 +427,7 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_GLOBAL_FUNC("void StopResource(const string&in name)", StopResource, "Stops the specified resource");
     REGISTER_GLOBAL_FUNC("void RestartResource(const string&in name)", RestartResource, "Restarts the specified resource");
     #endif
+    REGISTER_GLOBAL_FUNC("dictionary@ GetResourceExports(const string&in name)", GetResourceExports, "Gets the exports of the specified resource");
     REGISTER_GLOBAL_PROPERTY("string", "resourceMain", GetResourceMain);
     REGISTER_GLOBAL_PROPERTY("string", "resourceName", GetResourceName);
 
