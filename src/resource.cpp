@@ -681,8 +681,32 @@ void AngelScriptResource::RegisterExports(CScriptBuilder& builder)
     for(uint32_t i = 0; i < vars; i++)
     {
         auto decl = module->GetGlobalVarDeclaration(i);
-        // todo: add support for export of vars
-        // needs regex for getting the typename and var name
+        auto meta = builder.GetMetadataForVar(i);
+        if(meta.size() == 0) continue;
+
+        // Check if it has the "Export" metadata
+        auto found = false;
+        for(auto& metaString : meta)
+        {
+            if(metaString == "Export")
+            {
+                found = true;
+                break;
+            }
+        }
+        if(!found) continue;
+        
+        auto parts = Helpers::SplitString(decl, " ");
+        auto type = module->GetEngine()->GetTypeIdByDecl(parts[0].c_str());
+        auto name = parts[1];
+        if(type < 0)
+        {
+            Log::Warning << "Invalid type for exported variable " << name << ": " << type << Log::Endl;
+            continue;
+        }
+        
+        auto mvalue = Helpers::ValueToMValue(type, module->GetAddressOfGlobalVar(i));
+        exports->Set(name, mvalue);
     }
 
     resource->SetExports(exports);

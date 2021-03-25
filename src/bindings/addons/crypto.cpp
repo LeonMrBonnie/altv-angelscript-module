@@ -1,5 +1,6 @@
 #include <random>
-#include "../../helpers/module.h"
+#include "helpers/module.h"
+#include "helpers/convert.h"
 
 #define CRYPTOPP_ENABLE_NAMESPACE_WEAK 1
 #include "cryptopp/include/cryptlib.h"
@@ -107,19 +108,6 @@ static std::string GetNamedEncryption(EncryptAlgorithm algorithm, const std::str
             return "";
         }
     }
-}
-
-static std::vector<std::string> SplitString(const std::string& input, const std::string& delimiter)
-{
-    std::vector<std::string> parts;
-    size_t last = 0, next = 0;
-    while((next = input.find(delimiter, last)) != std::string::npos) 
-    {
-        parts.push_back(input.substr(last, next-last));
-        last = next + 1; 
-    } 
-    parts.push_back(input.substr(last));
-    return parts;
 }
 
 static bool VerifyEncryptedString(EncryptAlgorithm algorithm, const std::string& encrypted, const std::string& input)

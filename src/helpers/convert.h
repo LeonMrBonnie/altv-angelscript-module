@@ -249,4 +249,17 @@ namespace Helpers
             return value;
         }
     };
+
+    static std::vector<std::string> SplitString(const std::string& input, const std::string& delimiter)
+    {
+        std::vector<std::string> parts;
+        size_t last = 0, next = 0;
+        while((next = input.find(delimiter, last)) != std::string::npos) 
+        {
+            parts.push_back(input.substr(last, next-last));
+            last = next + 1; 
+        } 
+        parts.push_back(input.substr(last));
+        return parts;
+    }
 }
