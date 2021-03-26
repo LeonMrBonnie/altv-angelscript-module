@@ -88,6 +88,18 @@ public:
     {
         return arrayByteTypeInfo->GetTypeId();
     }
+    int GetUintArrayTypeId()
+    {
+        return arrayUintTypeInfo->GetTypeId();
+    }
+    int GetIntArrayTypeId()
+    {
+        return arrayIntTypeInfo->GetTypeId();
+    }
+    int GetStringArrayTypeId()
+    {
+        return arrayStringTypeInfo->GetTypeId();
+    }
 
     // Gets the current runtime instance or creates one if not exists
     static AngelScriptRuntime& Instance()

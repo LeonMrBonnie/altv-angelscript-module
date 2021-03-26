@@ -190,6 +190,18 @@ namespace Helpers
                     }
                     return core.CreateMValueByteArray(arr.data(), byteArray->GetSize());
                 }
+                else if(type == runtime.GetIntArrayTypeId()  ||
+                        type == runtime.GetUintArrayTypeId() ||
+                        type == runtime.GetStringArrayTypeId())
+                {
+                    auto mvalue = core.CreateMValueList();
+                    auto arr = static_cast<CScriptArray*>(value);
+                    for(asUINT i = 0; i < arr->GetSize(); i++)
+                    {
+                        mvalue->Push(ValueToMValue(arr->GetElementTypeId(), arr->At(i)));
+                    }
+                    return mvalue;
+                }
                 else if(type == runtime.GetBaseObjectTypeId()  || 
                         type == runtime.GetWorldObjectTypeId() || 
                         type == runtime.GetEntityTypeId()      || 
