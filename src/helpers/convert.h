@@ -241,6 +241,32 @@ namespace Helpers
                 return false;
         }
     }
+    static bool IsTypeUInt(int type)
+    {
+        switch(type)
+        {
+            case asTYPEID_UINT8:
+            case asTYPEID_UINT16:
+            case asTYPEID_UINT32:
+            case asTYPEID_UINT64:
+                return true;
+            default: 
+                return false;
+        }
+    }
+    static bool IsTypeInt(int type)
+    {
+        switch(type)
+        {
+            case asTYPEID_INT8:
+            case asTYPEID_INT16:
+            case asTYPEID_INT32:
+            case asTYPEID_INT64:
+                return true;
+            default: 
+                return false;
+        }
+    }
 
     class MValueFunc : public alt::IMValueFunction::Impl
     {

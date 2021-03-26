@@ -2,6 +2,7 @@
 #include "resource.h"
 #include "helpers/module.h"
 #include "helpers/events.h"
+#include "helpers/angelscript.h"
 #include "bindings/data/vector3.h"
 #include "bindings/data/vector2.h"
 #include "bindings/data/rgba.h"
@@ -36,6 +37,7 @@ void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine)
     Helpers::DocsGenerator cryptoDocs("crypto");
     Helpers::DocsGenerator utilDocs("util");
     Helpers::DocsGenerator httpDocs("http");
+    Helpers::DocsGenerator jsonDocs("json");
 
     // Register add-ons
     RegisterStdString(engine);
@@ -78,6 +80,7 @@ void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine)
     ModuleExtension::RegisterAll("crypto", engine, &cryptoDocs);
     ModuleExtension::RegisterAll("util", engine, &utilDocs);
     ModuleExtension::RegisterAll("http", engine, &httpDocs);
+    ModuleExtension::RegisterAll("json", engine, &jsonDocs);
 
     // Register events
     Event::RegisterAll(engine, &docs);
@@ -90,6 +93,7 @@ void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine)
     cryptoDocs.Generate();
     utilDocs.Generate();
     httpDocs.Generate();
+    jsonDocs.Generate();
 }
 
 void AngelScriptRuntime::RegisterTypeInfos()
