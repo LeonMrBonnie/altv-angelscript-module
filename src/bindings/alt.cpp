@@ -158,6 +158,8 @@ static CScriptDictionary* GetResourceExports(const std::string& name)
         auto value = it->GetValue();
         if(value->GetType() == alt::IMValue::Type::FUNCTION) continue;
         auto [type, val] = Helpers::MValueToValue(resource->GetRuntime(), value);
+        // Set the type to int64 if its an uint, because the dict doesn't support uint
+        if(type == asTYPEID_UINT64) type = asTYPEID_INT64;
         dict->Set(it->GetKey().ToString(), val, type);
     }
     return dict;

@@ -68,6 +68,8 @@ namespace Helpers
                 {
                     auto value = list->Get(i);
                     auto [type, val] = MValueToValue(runtime, value);
+                    // Set the type to int64 if its an uint, because the dict doesn't support uint
+                    if(type == asTYPEID_UINT64) type = asTYPEID_INT64;
                     dict->Set(std::to_string(i), val, type);
                 }
                 type = runtime->GetDictTypeId();
@@ -81,6 +83,8 @@ namespace Helpers
                 for(auto it = value->Begin(); it; it = value->Next())
                 {
                     auto [type, val] = MValueToValue(runtime, it->GetValue());
+                    // Set the type to int64 if its an uint, because the dict doesn't support uint
+                    if(type == asTYPEID_UINT64) type = asTYPEID_INT64;
                     dict->Set(it->GetKey().ToString(), val, type);
                 }
                 type = runtime->GetDictTypeId();
