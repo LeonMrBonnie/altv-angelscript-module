@@ -49,6 +49,9 @@ void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine)
     RegisterScriptDateTime(engine);
     RegisterExceptionRoutines(engine);
 
+    // Performance
+    Helpers::RegisterArrayTemplateSpecializations(engine);
+
     // Register classes
     Data::RegisterVector3(engine, &docs);
     Data::RegisterVector2(engine, &docs);

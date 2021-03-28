@@ -179,4 +179,25 @@ namespace Helpers
             }
         }
     }
+
+    static void RegisterArrayTemplateSpecializations(asIScriptEngine* engine)
+    {
+        // Int
+        engine->RegisterObjectType("array<int8>", 0, asOBJ_REF);
+        engine->RegisterObjectType("array<int16>", 0, asOBJ_REF);
+        engine->RegisterObjectType("array<int>", 0, asOBJ_REF);
+        engine->RegisterObjectType("array<int64>", 0, asOBJ_REF);
+        // UInt
+        engine->RegisterObjectType("array<uint8>", 0, asOBJ_REF);
+        engine->RegisterObjectType("array<uint16>", 0, asOBJ_REF);
+        engine->RegisterObjectType("array<uint>", 0, asOBJ_REF);
+        engine->RegisterObjectType("array<uint64>", 0, asOBJ_REF);
+        // String
+        //engine->RegisterObjectType("array<string>", 0, asOBJ_REF);
+        // Bool
+        engine->RegisterObjectType("array<bool>", 0, asOBJ_REF);
+        // Floating point
+        engine->RegisterObjectType("array<float>", 0, asOBJ_REF);
+        engine->RegisterObjectType("array<double>", 0, asOBJ_REF);
+    }
 }
