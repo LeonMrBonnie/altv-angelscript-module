@@ -1,0 +1,1 @@
+for /f %F in ('dir /b /a-d ^| findstr /vile ".h .hpp"') do del "%F"

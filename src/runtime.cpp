@@ -16,6 +16,7 @@
 #include "angelscript/addon/scriptmath/scriptmath.h"
 #include "angelscript/addon/scriptany/scriptany.h"
 #include "angelscript/addon/datetime/datetime.h"
+#include "angelscript-jit-compiler/as_jit.h"
 
 AngelScriptRuntime::AngelScriptRuntime()
 {
@@ -24,6 +25,12 @@ AngelScriptRuntime::AngelScriptRuntime()
     // Create a new AngelScript engine
     engine = asCreateScriptEngine();
     engine->SetMessageCallback(asFUNCTION(Helpers::MessageHandler), 0, asCALL_CDECL);
+
+    // JIT compiler
+    engine->SetEngineProperty(asEP_INCLUDE_JIT_INSTRUCTIONS, true);
+
+    asCJITCompiler* jitCompiler = new asCJITCompiler(JIT_SYSCALL_FPU_NORESET | JIT_ALLOC_SIMPLE | JIT_NO_SUSPEND | JIT_FAST_REFCOUNT);
+    engine->SetJITCompiler(jitCompiler);
 
     // Optimization
     engine->SetEngineProperty(asEP_BUILD_WITHOUT_LINE_CUES, true);
