@@ -24,6 +24,7 @@ void CommandHandler(alt::Array<alt::StringView> args, void* userData)
         Log::Colored << "~y~LeonMrBonnie ~w~| Creator of the module" << Log::Endl;
         Log::Colored << "~y~Andreas Jönsson ~w~| Creator of AngelScript" << Log::Endl;
         Log::Colored << "~y~Vektor aka. voidlord ~w~| General help with the module" << Log::Endl;
+        Log::Colored << "~y~bluecataudio ~w~& ~y~BlindMindStudios ~w~| Creators of the AngelScript JIT Compiler" << Log::Endl;
     }
 }
 

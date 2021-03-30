@@ -25,10 +25,12 @@ endif()
 
 if(UNIX)
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/build/linux64/${COMPILE_FOLDER})
+	set(JIT_COMPILER_FILE ${PROJECT_SOURCE_DIR}/deps/angelscript-jit-compiler/virtual_asm_linux.cpp)
 else()
 	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/build/win64/${COMPILE_FOLDER})
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MD /Zi")
 	set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /DEBUG /OPT:REF /OPT:ICF")
+	set(JIT_COMPILER_FILE ${PROJECT_SOURCE_DIR}/deps/angelscript-jit-compiler/virtual_asm_windows.cpp)
 endif()
 
 file(GLOB_RECURSE PROJECT_SOURCE_FILES "./src/*.h" "./src/*.hpp" "./src/*.cpp")
@@ -38,9 +40,12 @@ include_directories(
 	"${PROJECT_SOURCE_DIR}/deps"
 )
 
-add_library(
-	${PROJECT_MODULE_NAME} SHARED
+add_library(${PROJECT_MODULE_NAME} SHARED
 	${PROJECT_SOURCE_FILES}
+	# AngelScript JIT Compiler
+	${PROJECT_SOURCE_DIR}/deps/angelscript-jit-compiler/as_jit.cpp
+	${PROJECT_SOURCE_DIR}/deps/angelscript-jit-compiler/virtual_asm_x64.cpp
+	${JIT_COMPILER_FILE}
 )
 
 target_link_libraries(${PROJECT_MODULE_NAME} PRIVATE
