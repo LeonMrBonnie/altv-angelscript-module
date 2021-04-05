@@ -63,7 +63,7 @@ jobs:
         ./build.sh
 
     - name: Upload Release Server Assets
-      id: upload_release_assets
+      id: upload_release_assets_server
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -73,14 +73,14 @@ jobs:
         asset_name: angelscript-module.${{ matrix.EXT }}
         asset_content_type: application/octet-stream
 
-    - name: Upload Release Client Assets
-      if: matrix.OS_TYPE == 'Windows'
-      id: upload_release_assets
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./dist/client/angelscript-client-module.${{ matrix.EXT }}
-        asset_name: angelscript-client-module.${{ matrix.EXT }}
-        asset_content_type: application/octet-stream
+    #- name: Upload Release Client Assets
+    #  if: matrix.OS_TYPE == 'Windows'
+    #  id: upload_release_assets_client
+    #  uses: actions/upload-release-asset@v1
+    #  env:
+    #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #  with:
+    ##    upload_url: ${{ steps.create_release.outputs.upload_url }}
+    #    asset_path: ./dist/client/angelscript-client-module.${{ matrix.EXT }}
+    #    asset_name: angelscript-client-module.${{ matrix.EXT }}
+    #    asset_content_type: application/octet-stream
