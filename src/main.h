@@ -8,7 +8,7 @@
 //#define AS_GENERATE_DOCUMENTATION
 #endif
 
-#define MODULE_VERSION "1.0.0"
+#define MODULE_VERSION "1.1.0"
 #define MODULE_TYPE "as"
 
 // SDK
