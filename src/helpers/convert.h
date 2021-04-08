@@ -1,4 +1,5 @@
 #pragma once
+#include <random>
 
 #include "cpp-sdk/SDK.h"
 #include "Log.h"
@@ -311,5 +312,22 @@ namespace Helpers
         } 
         parts.push_back(input.substr(last));
         return parts;
+    }
+
+    static std::string GenerateRandomString(uint32_t size)
+    {
+        std::string availableChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+        std::random_device random_device;
+        std::mt19937 generator(random_device());
+        std::uniform_int_distribution<size_t> distribution(0, availableChars.size() - 1);
+
+        std::string random_string;
+        for (std::size_t i = 0; i < size; ++i)
+        {
+            random_string += availableChars[distribution(generator)];
+        }
+
+        return random_string;
     }
 }
