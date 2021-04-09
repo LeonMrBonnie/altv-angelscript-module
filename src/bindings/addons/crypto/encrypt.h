@@ -2,6 +2,8 @@
 #include "helpers/angelscript.h"
 #include "helpers/convert.h"
 
+#include "cryptopp/include/hex.h"
+#include "cryptopp/include/filters.h"
 #include "cryptopp/include/sha.h"
 #include "cryptopp/include/pwdbased.h"
 #include "cryptopp/include/hkdf.h"
