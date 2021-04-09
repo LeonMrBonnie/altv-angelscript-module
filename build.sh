@@ -10,5 +10,5 @@ if [ ! -d "./dist" ]; then
     mkdir dist
 fi
 
-cp ./build/linux64/server/Release/libangelscript-module.so dist
+cp ./build/linux64/server/libangelscript-module.so dist
 #cp build\linux64\Release\angelscript-module.pdb dist
