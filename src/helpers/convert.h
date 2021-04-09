@@ -83,7 +83,8 @@ namespace Helpers
                 auto value = val.As<alt::IMValueDict>();
                 for(auto it = value->Begin(); it; it = value->Next())
                 {
-                    auto [type, val] = MValueToValue(runtime, it->GetValue());
+                    auto itValue = it->GetValue();
+                    auto [type, val] = MValueToValue(runtime, itValue);
                     // Set the type to int64 if its an uint, because the dict doesn't support uint
                     if(type == asTYPEID_UINT64) type = asTYPEID_INT64;
                     dict->Set(it->GetKey().ToString(), val, type);
@@ -179,7 +180,7 @@ namespace Helpers
                 {
                     auto dict = static_cast<CScriptDictionary*>(value);
                     auto list = core.CreateMValueDict();
-                    for(auto& it = dict->begin(); it != dict->end(); it++)
+                    for(auto it = dict->begin(); it != dict->end(); it++)
                     {
                         list->Set(it.GetKey(), ValueToMValue(it.GetTypeId(), const_cast<void*>(it.GetAddressOfValue())));
                     }
