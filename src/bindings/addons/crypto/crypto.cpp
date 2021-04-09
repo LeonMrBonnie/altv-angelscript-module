@@ -5,6 +5,9 @@
 using namespace Helpers;
 
 static ModuleExtension cryptoExtension("crypto", [](asIScriptEngine* engine, DocsGenerator* docs) {
+    // CryptoPP doesn't work on Linux so no Crypto on Linux
+    // todo: fix this lol
+    #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
     using namespace Crypto;
 
     REGISTER_ENUM("HashAlgorithm", "An enum with all the available hash algorithms");
@@ -28,4 +31,5 @@ static ModuleExtension cryptoExtension("crypto", [](asIScriptEngine* engine, Doc
         VerifyEncryptedString, "Verifies if the given input and the given encrypted input are the same");
 
     REGISTER_GLOBAL_FUNC("string GenerateRandomString(uint length)", GenerateRandomString, "Generates a random character sequence");
+    #endif
 });

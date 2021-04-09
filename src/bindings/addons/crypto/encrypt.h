@@ -2,6 +2,12 @@
 #include "helpers/angelscript.h"
 #include "helpers/convert.h"
 
+// CryptoPP doesn't work on Linux so no Crypto on Linux
+// todo: fix this lol
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
+
+#include "cryptopp/include/hex.h"
+#include "cryptopp/include/filters.h"
 #include "cryptopp/include/sha.h"
 #include "cryptopp/include/pwdbased.h"
 #include "cryptopp/include/hkdf.h"
@@ -72,3 +78,4 @@ namespace Crypto
         return result == encrypted;
     }
 }
+#endif

@@ -1,6 +1,10 @@
 #pragma once
 #include "helpers/angelscript.h"
 
+// CryptoPP doesn't work on Linux so no Crypto on Linux
+// todo: fix this lol
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
+
 #define CRYPTOPP_ENABLE_NAMESPACE_WEAK 1
 #include "cryptopp/include/cryptlib.h"
 #include "cryptopp/include/hex.h"
@@ -53,3 +57,4 @@ namespace Crypto
         }
     }
 }
+#endif
