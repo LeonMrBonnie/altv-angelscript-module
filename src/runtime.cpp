@@ -56,9 +56,6 @@ void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine)
     RegisterScriptDateTime(engine);
     RegisterExceptionRoutines(engine);
 
-    // Performance
-    Helpers::RegisterArrayTemplateSpecializations(engine);
-
     // Register classes
     Data::RegisterVector3(engine, &docs);
     Data::RegisterVector2(engine, &docs);
@@ -84,6 +81,9 @@ void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine)
     #endif
     REGISTER_REF_CLASS("Checkpoint", alt::IColShape, asOBJ_REF, "alt:V ColShape checkpoint");
     REGISTER_REF_CLASS("Blip", alt::IBlip, asOBJ_REF, "alt:V Blip");
+
+    // Performance
+    Helpers::RegisterArrayTemplateSpecializations(engine);
 
     // Register extensions
     ModuleExtension::RegisterAll("alt", engine, &docs);

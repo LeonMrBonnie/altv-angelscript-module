@@ -199,5 +199,13 @@ namespace Helpers
         // Floating point
         engine->RegisterObjectType("array<float>", 0, asOBJ_REF);
         engine->RegisterObjectType("array<double>", 0, asOBJ_REF);
+        // alt:V Entities
+        engine->RegisterObjectType("array<Player@>", 0, asOBJ_REF);
+        engine->RegisterObjectType("array<Vehicle@>", 0, asOBJ_REF);
+        engine->RegisterObjectType("array<Entity@>", 0, asOBJ_REF);
+        engine->RegisterObjectType("array<VoiceChannel@>", 0, asOBJ_REF);
+        engine->RegisterObjectType("array<ColShape@>", 0, asOBJ_REF);
+        engine->RegisterObjectType("array<Checkpoint@>", 0, asOBJ_REF);
+        engine->RegisterObjectType("array<Blip@>", 0, asOBJ_REF);
     }
 }
