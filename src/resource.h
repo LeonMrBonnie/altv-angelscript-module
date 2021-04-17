@@ -39,7 +39,7 @@ public:
     AngelScriptResource(AngelScriptRuntime* runtime, alt::IResource* resource) : runtime(runtime), resource(resource) {};
     ~AngelScriptResource() = default;
 
-    alt::IResource* GetResource()
+    alt::IResource* GetIResource()
     {
         return resource;
     }

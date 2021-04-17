@@ -116,13 +116,13 @@ static CScriptArray* GetAllEntities()
 static std::string GetResourceName()
 {
     GET_RESOURCE();
-    return resource->GetResource()->GetName().ToString();
+    return resource->GetIResource()->GetName().ToString();
 }
 
 static std::string GetResourceMain()
 {
     GET_RESOURCE();
-    return resource->GetResource()->GetMain().ToString();
+    return resource->GetIResource()->GetMain().ToString();
 }
 
 static std::string GetResourcePath(const std::string& name)
