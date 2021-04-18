@@ -512,7 +512,13 @@ void AngelScriptResource::OnTick()
     }
 }
 
-void AngelScriptResource::OnRemoveBaseObject(alt::IBaseObject* object) 
+void AngelScriptResource::OnCreateBaseObject(alt::Ref<alt::IBaseObject> object)
+{
+    objects.insert({ object->GetType(), object });
+    objectData.insert({ object, std::map<std::string, std::pair<int, void*>>() });
+}
+
+void AngelScriptResource::OnRemoveBaseObject(alt::Ref<alt::IBaseObject> object) 
 {
     auto range = objects.equal_range(object->GetType());
     for(auto it = range.first; it != range.second; it++)
@@ -528,7 +534,6 @@ void AngelScriptResource::OnRemoveBaseObject(alt::IBaseObject* object)
         runtime->GetEngine()->ReleaseScriptObject(pair.second, runtime->GetEngine()->GetTypeInfoById(pair.first));
     }
     objectData.erase(object);
-    object->RemoveRef();
 }
 
 void AngelScriptResource::RegisterMetadata(CScriptBuilder& builder, asIScriptContext* context)

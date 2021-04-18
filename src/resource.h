@@ -11,8 +11,8 @@
 class AngelScriptRuntime;
 class AngelScriptResource : public alt::IResource::Impl
 {  
-    using ObjectsMap = std::unordered_multimap<alt::IBaseObject::Type, alt::IBaseObject*>;
-    using ObjectDataMap = std::unordered_map<alt::IBaseObject*, std::map<std::string, std::pair<int, void*>>>;
+    using ObjectsMap = std::unordered_multimap<alt::IBaseObject::Type, alt::Ref<alt::IBaseObject>>;
+    using ObjectDataMap = std::unordered_map<alt::Ref<alt::IBaseObject>, std::map<std::string, std::pair<int, void*>>>;
 
     AngelScriptRuntime* runtime;
     alt::IResource* resource;
@@ -142,12 +142,7 @@ public:
     bool OnEvent(const alt::CEvent* event);
     void OnTick();
 
-    void OnCreateBaseObject(alt::IBaseObject* object) 
-    {
-        object->AddRef();
-        objects.insert({object->GetType(), object});
-        objectData.insert({object, std::map<std::string, std::pair<int, void*>>()});
-    }
-    void OnRemoveBaseObject(alt::IBaseObject* object);
+    void OnCreateBaseObject(alt::Ref<alt::IBaseObject> object) override;
+    void OnRemoveBaseObject(alt::Ref<alt::IBaseObject> object) override;
 };
 
