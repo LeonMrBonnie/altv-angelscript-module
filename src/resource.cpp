@@ -531,7 +531,8 @@ void AngelScriptResource::OnRemoveBaseObject(alt::Ref<alt::IBaseObject> object)
     }
     for(auto& [key, pair] : objectData.at(object))
     {
-        runtime->GetEngine()->ReleaseScriptObject(pair.second, runtime->GetEngine()->GetTypeInfoById(pair.first));
+        if(pair.first & asTYPEID_SCRIPTOBJECT) runtime->GetEngine()->ReleaseScriptObject(pair.second, runtime->GetEngine()->GetTypeInfoById(pair.first));
+        else delete pair.second;
     }
     objectData.erase(object);
 }
