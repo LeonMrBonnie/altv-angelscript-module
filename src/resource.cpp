@@ -659,6 +659,7 @@ void AngelScriptResource::RegisterImports()
         // The resource is not a angelscript resource
         else
         {
+            Log::Warning << "Importing a function from a non-AngelScript resource is currently not possible" << Log::Endl;
             // todo: add import of functions from non angelscript resources
             /*
             for(auto it = exports->Begin(); it; it = exports->Next())
