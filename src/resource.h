@@ -67,7 +67,7 @@ public:
     }
 
     void RegisterMetadata(CScriptBuilder& builder, asIScriptContext* context);
-
+    void RegisterDefines(CScriptBuilder& builder);
     // Registers all the imported functions
     void RegisterImports();
     // Registers the resource exports

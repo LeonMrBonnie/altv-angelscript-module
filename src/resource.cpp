@@ -38,6 +38,8 @@ bool AngelScriptResource::Start()
     builder.SetIncludeCallback(Helpers::IncludeHandler, this);
     builder.SetPragmaCallback(Helpers::PragmaHandler, this);
 
+    RegisterDefines(builder);
+
     int r = builder.StartNewModule(runtime->GetEngine(), resource->GetName().CStr());
     CHECK_AS_RETURN("Builder start", r, false);
 
@@ -610,6 +612,20 @@ void AngelScriptResource::RegisterMetadata(CScriptBuilder& builder, asIScriptCon
             return;
         }
     }
+}
+
+void AngelScriptResource::RegisterDefines(CScriptBuilder& builder) 
+{
+    // Debug
+    if(alt::ICore::Instance().IsDebug()) builder.DefineWord("DEBUG");
+
+    // Client / Server
+    #ifdef SERVER_MODULE
+    builder.DefineWord("SERVER");
+    #endif
+    #ifdef CLIENT_MODULE
+    builder.DefineWord("CLIENT");
+    #endif
 }
 
 void AngelScriptResource::RegisterImports()
