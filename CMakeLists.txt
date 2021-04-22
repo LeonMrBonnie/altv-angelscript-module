@@ -36,7 +36,7 @@ else()
 	set(CRYPTOPP_LIB ${PROJECT_SOURCE_DIR}/deps/cryptopp/cryptlib.lib)
 endif()
 
-file(GLOB_RECURSE PROJECT_SOURCE_FILES "./src/*.h" "./src/*.hpp" "./src/*.cpp")
+file(GLOB_RECURSE PROJECT_SOURCE_FILES "./src/*.h" "./src/*.cpp")
 
 include_directories(
 	"${PROJECT_SOURCE_DIR}/src"
