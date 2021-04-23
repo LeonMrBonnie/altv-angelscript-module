@@ -500,6 +500,25 @@ void AngelScriptResource::DeleteObjectData(alt::IBaseObject* object, const std::
     objectData.at(object).erase(key);
 }
 
+void AngelScriptResource::ShowDebugInfo() 
+{
+    Log::Colored << "*************** ~y~" << resource->GetName() << " ~w~***************" << Log::Endl;
+    Log::Colored << "Has main script class: ~g~" << (mainScriptClass != nullptr ? "true" : "false") << Log::Endl;
+    Log::Colored << "Timers: ~g~" << timers.size() << Log::Endl;
+    Log::Colored << "Current timer id: ~g~" << nextTimerId << Log::Endl;
+    Log::Colored << "Stored objects: ~g~" << objectData.size() << Log::Endl;
+    Log::Colored << "Built-in event handlers: ~g~" << eventHandlers.size() << Log::Endl;
+    Log::Colored << "Local event handlers: ~g~" << customLocalEventHandlers.size() << Log::Endl;
+    Log::Colored << "Remote event handlers: ~g~" << customRemoteEventHandlers.size() << Log::Endl;
+    Log::Colored << "Exports: ~g~" << resource->GetExports()->GetSize() << Log::Endl;
+    Log::Colored << "Imports: ~g~" << module->GetImportedFunctionCount() << Log::Endl;
+    Log::Colored << "Global vars: ~g~" << module->GetGlobalVarCount() << Log::Endl;
+    Log::Colored << "Global enums: ~g~" << module->GetEnumCount() << Log::Endl;
+    Log::Colored << "Global functions: ~g~" << module->GetFunctionCount() << Log::Endl;
+    Log::Colored << "Global classes: ~g~" << module->GetObjectTypeCount() << Log::Endl;
+    Log::Colored << "Global typedefs: ~g~" << module->GetTypedefCount() << Log::Endl;
+}
+
 void AngelScriptResource::OnTick()
 {
     // Remove all invalid timers

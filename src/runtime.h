@@ -10,6 +10,8 @@ class AngelScriptRuntime : public alt::IScriptRuntime
 {
     asIScriptEngine* engine;
 
+    std::unordered_map<alt::IResource*, AngelScriptResource*> resources;
+
     // Types
     asITypeInfo* arrayStringTypeInfo = nullptr;
     asITypeInfo* arrayIntTypeInfo = nullptr;
@@ -99,6 +101,12 @@ public:
     int GetStringArrayTypeId()
     {
         return arrayStringTypeInfo->GetTypeId();
+    }
+
+    AngelScriptResource* GetResource(alt::IResource* resource)
+    {
+        if(!resources.count(resource)) return nullptr;
+        return resources.at(resource);
     }
 
     // Gets the current runtime instance or creates one if not exists

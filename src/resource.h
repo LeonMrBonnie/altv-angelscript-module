@@ -136,6 +136,10 @@ public:
 		return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
 	}
 
+    // Shows some debug info about the resource
+    // Only used by the debug console command
+    void ShowDebugInfo();
+
     bool Start();
     bool Stop();
 

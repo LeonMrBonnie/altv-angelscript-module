@@ -149,11 +149,16 @@ CScriptArray* AngelScriptRuntime::CreateByteArray(uint8_t* data)
 alt::IResource::Impl* AngelScriptRuntime::CreateImpl(alt::IResource* impl)
 {
     auto resource = new AngelScriptResource(this, impl);
+    resources.insert({ impl, resource });
     return resource;
 }
 
 void AngelScriptRuntime::DestroyImpl(alt::IResource::Impl* impl)
 {
-    AngelScriptRuntime* resource = dynamic_cast<AngelScriptRuntime*>(impl);
-    if(resource != nullptr) delete resource;
+    AngelScriptResource* resource = dynamic_cast<AngelScriptResource*>(impl);
+    if(resource != nullptr) 
+    {
+        resources.erase(resource->GetIResource());
+        delete resource;
+    }
 }
