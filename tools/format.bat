@@ -1,5 +1,7 @@
 @echo off
 
+pushd ..
+
 IF NOT EXIST build\ (
     mkdir build
 )

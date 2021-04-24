@@ -6,9 +6,9 @@
       {
         "label": "Build server",
         "type": "shell",
-        "command": "./build.sh",
+        "command": "cd tools && ./build.sh",
         "windows": {
-          "command": "build-server.bat"
+          "command": "cd tools && build-server.bat"
         },
         "problemMatcher": ["$msCompile"],
         "group": {
@@ -19,7 +19,7 @@
       {
         "label": "Build client",
         "type": "shell",
-        "command": "build-client.bat",
+        "command": "cd tools && build-client.bat",
         "problemMatcher": ["$msCompile"],
         "group": {
           "kind": "build",
@@ -29,9 +29,9 @@
       {
         "label": "Format",
         "type": "shell",
-        "command": "./format.sh",
+        "command": "cd tools && ./format.sh",
         "windows": {
-          "command": "format.bat"
+          "command": "cd tools && format.bat"
         },
         "problemMatcher": ["$msCompile"],
         "group": "build"

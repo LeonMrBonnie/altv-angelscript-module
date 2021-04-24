@@ -1,5 +1,7 @@
 @echo off
 
+pushd ..
+
 IF NOT EXIST build\ (
     mkdir build
 )
@@ -16,6 +18,6 @@ IF NOT EXIST dist\ (
 copy build\win64\client\Release\angelscript-client-module.dll dist\client
 copy build\win64\client\Release\angelscript-client-module.pdb dist\client
 
-IF EXIST extra.bat (
-    extra.bat
+IF EXIST tools\extra.bat (
+    tools\extra.bat
 )
