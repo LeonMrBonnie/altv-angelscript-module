@@ -55,3 +55,7 @@ target_link_libraries(${PROJECT_MODULE_NAME} PRIVATE
   ${ANGELSCRIPT_LIB}
   ${CRYPTOPP_LIB}
 )
+
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+include(ClangFormat)
+target_clangformat_setup(${PROJECT_MODULE_NAME})

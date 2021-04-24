@@ -70,6 +70,13 @@
         "random": "cpp",
         "array": "cpp",
         "condition_variable": "cpp",
-        "csignal": "cpp"
+        "csignal": "cpp",
+        "bit": "cpp",
+        "clocale": "cpp",
+        "forward_list": "cpp",
+        "numeric": "cpp",
+        "stack": "cpp",
+        "stop_token": "cpp",
+        "valarray": "cpp"
     }
 }
