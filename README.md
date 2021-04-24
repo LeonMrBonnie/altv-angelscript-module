@@ -33,4 +33,10 @@ If you want to contribute to this in any way, then first of all Thank You!
 
 Just clone the repository, create a new branch to store your changes and create a pull request containing your created branch and changes.
 
+Before commiting a pull request, please make sure to format your code using the projects `clang-format` configuration.
+This can be done by either manually using `clang-format` to format the files, using the VSCode task or by running the `tools/format.(bat / sh)` file.
+
 If you are unsure with something and want to know how something works etc. you can contact me on Discord (**LeonMrBonnie#9840**).
+
+> It is suggested to use Visual Studio Code when working on this project,
+> as there are already VSCode tasks set-up to simplify the workflow.
