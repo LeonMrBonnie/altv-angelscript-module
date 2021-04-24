@@ -35,6 +35,16 @@
         },
         "problemMatcher": ["$msCompile"],
         "group": "build"
+      },
+      {
+        "label": "Update C++ SDK",
+        "type": "shell",
+        "command": "cd tools && ./update-sdk.sh",
+        "windows": {
+          "command": "cd tools && update-sdk.bat"
+        },
+        "problemMatcher": ["$msCompile"],
+        "group": "build"
       }
     ]
   }
