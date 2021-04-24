@@ -79,5 +79,7 @@
         "stop_token": "cpp",
         "valarray": "cpp"
     },
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "files.insertFinalNewline": true,
+    "files.trimFinalNewlines": true
 }
