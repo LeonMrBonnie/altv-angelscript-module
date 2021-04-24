@@ -6,7 +6,10 @@
       {
         "label": "Build server",
         "type": "shell",
-        "command": "build-server.bat",
+        "command": "./build.sh",
+        "windows": {
+          "command": "build-server.bat"
+        },
         "problemMatcher": ["$msCompile"],
         "group": {
           "kind": "build",
@@ -26,7 +29,10 @@
       {
         "label": "Format",
         "type": "shell",
-        "command": "format.bat",
+        "command": "./format.sh",
+        "windows": {
+          "command": "format.bat"
+        },
         "problemMatcher": ["$msCompile"],
         "group": "build"
       }
