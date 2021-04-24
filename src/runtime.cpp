@@ -47,8 +47,8 @@ void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine)
     Helpers::DocsGenerator jsonDocs("json");
 
     // Register add-ons
-    RegisterStdString(engine);
     RegisterScriptArray(engine, true);
+    RegisterStdString(engine);
     RegisterStdStringUtils(engine);
     RegisterScriptDictionary(engine);
     RegisterScriptMath(engine);
@@ -83,7 +83,8 @@ void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine)
     REGISTER_REF_CLASS("Blip", alt::IBlip, asOBJ_REF, "alt:V Blip");
 
     // Performance
-    Helpers::RegisterArrayTemplateSpecializations(engine);
+    // todo: make template specializations work
+    //Helpers::RegisterArrayTemplateSpecializations(engine);
 
     // Register extensions
     ModuleExtension::RegisterAll("alt", engine, &docs);
