@@ -56,8 +56,9 @@ Cpp11BracedListStyle: false
 #EmptyLineAfterAccessModifier: Never
 #EmptyLineBeforeAccessModifier: LogicalBlock
 FixNamespaceComments: true
-IncludeBlocks: Regroup
+#IncludeBlocks: Regroup
 #IndentAccessModifiers: false
+AccessModifierOffset: -4
 IndentCaseBlocks: false
 IndentCaseLabels: true
 IndentExternBlock: true
@@ -70,7 +71,7 @@ MaxEmptyLinesToKeep: 1
 NamespaceIndentation: All
 PointerAlignment: Left
 #ShortNamespaceLines: 0
-SortIncludes: true
+SortIncludes: false
 SortUsingDeclarations: true
 SpaceAfterCStyleCast: false
 SpaceAfterLogicalNot: false
