@@ -78,5 +78,6 @@
         "stack": "cpp",
         "stop_token": "cpp",
         "valarray": "cpp"
-    }
+    },
+    "editor.formatOnSave": true
 }
