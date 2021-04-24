@@ -8,6 +8,8 @@
 #include "bindings/data/vector3.h"
 #include "bindings/data/vector2.h"
 #include "bindings/data/rgba.h"
+#include "angelscript/addon/scriptdictionary/scriptdictionary.h"
+#include "angelscript/addon/scriptarray/scriptarray.h"
 
 namespace Helpers
 {
@@ -34,18 +36,46 @@ namespace Helpers
         }
     }
 
+    static std::string GetTypeName(int typeId)
+    {
+        auto& runtime = AngelScriptRuntime::Instance();
+        asITypeInfo* typeInfo = runtime.GetEngine()->GetTypeInfoById(typeId);
+        if(typeInfo != nullptr) return typeInfo->GetName();
+        else switch(typeId)
+        {
+            case asTYPEID_VOID: return "void";
+            case asTYPEID_BOOL: return "bool";
+            case asTYPEID_INT8: return "int8";
+            case asTYPEID_INT16: return "int16";
+            case asTYPEID_INT32: return "int32";
+            case asTYPEID_INT64: return "int64";
+            case asTYPEID_UINT8: return "uint8";
+            case asTYPEID_UINT16: return "uint16";
+            case asTYPEID_UINT32: return "uint32";
+            case asTYPEID_UINT64: return "uint64";
+            case asTYPEID_FLOAT: return "float";
+            case asTYPEID_DOUBLE: return "double";
+        }
+        return "unknown";
+    }
     static std::string GetVarData(asIScriptContext* context, int stackLevel, int varIdx)
     {
         auto& runtime = AngelScriptRuntime::Instance();
         const char* name = context->GetVarName(varIdx, stackLevel);
         void* val = context->GetAddressOfVar(varIdx, stackLevel);
         int valTypeId = context->GetVarTypeId(varIdx, stackLevel);
-        asITypeInfo* valTypeInfo = runtime.GetEngine()->GetTypeInfoById(valTypeId);
+        std::string valTypeName = GetTypeName(valTypeId);
         std::string valString;
         if(val == nullptr) valTypeId = asTYPEID_VOID;
 
         switch(valTypeId)
         {
+            // Unknown / Void
+            case asTYPEID_VOID:
+            {
+                valString = "<void>";
+                break;
+            }
             // Bool
             case asTYPEID_BOOL:
             {
@@ -146,6 +176,20 @@ namespace Helpers
                     stream << "BaseObject{ type: " << (uint16_t)obj->GetType() << " }";
                     valString = stream.str();
                 }
+                else if(valTypeId == runtime.GetDictTypeId())
+                {
+                    auto dict = static_cast<CScriptDictionary*>(val);
+                    std::stringstream stream;
+                    stream << "Dictionary{ size: " << dict->GetSize() << " }";
+                    valString = stream.str();
+                }
+                else if(valTypeName == "array")
+                {
+                    auto array = static_cast<CScriptArray*>(val);
+                    std::stringstream stream;
+                    stream << "Array{ size: " << array->GetSize() << ", type: " << GetTypeName(array->GetElementTypeId()) << " }";
+                    valString = stream.str();
+                }
                 else
                 {
                     valString = "<N/A>";
@@ -155,7 +199,7 @@ namespace Helpers
         }
 
         std::stringstream str;
-        str << "[~y~" << valTypeInfo->GetName() << "~w~] " << name << ": " << valString;
+        str << "[~y~" << valTypeName << "~w~] " << name << ": ~b~" << valString;
         return str.str();
     }
     static void PrintCallstack(asIScriptContext* context, uint32_t maxLevels)
@@ -171,7 +215,7 @@ namespace Helpers
             int line, column;
             func = context->GetFunction(i);
             line = context->GetLineNumber(i, &column, &scriptSection);
-            Log::Colored << "~y~" << scriptSection << " (" << std::to_string(line) << "): " << func->GetDeclaration() << Log::Endl;
+            Log::Colored << "~y~" << scriptSection << " (" << std::to_string(line) << ") : " << func->GetDeclaration() << Log::Endl;
             Log::Colored << "~b~Vars:" << Log::Endl;
             for(int n = 0; n < context->GetVarCount(i); n++)
             {
