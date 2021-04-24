@@ -18,4 +18,4 @@ namespace JSON
         }
         new(memory) json(vector);
     }
-}
+}  // namespace JSON

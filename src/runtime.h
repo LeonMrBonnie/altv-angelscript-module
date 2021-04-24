@@ -14,14 +14,14 @@ class AngelScriptRuntime : public alt::IScriptRuntime
 
     // Types
     asITypeInfo* arrayStringTypeInfo = nullptr;
-    asITypeInfo* arrayIntTypeInfo = nullptr;
-    asITypeInfo* arrayUintTypeInfo = nullptr;
-    asITypeInfo* arrayByteTypeInfo = nullptr;
+    asITypeInfo* arrayIntTypeInfo    = nullptr;
+    asITypeInfo* arrayUintTypeInfo   = nullptr;
+    asITypeInfo* arrayByteTypeInfo   = nullptr;
 
 public:
     AngelScriptRuntime();
     alt::IResource::Impl* CreateImpl(alt::IResource* resource) override;
-    void DestroyImpl(alt::IResource::Impl* impl) override;
+    void                  DestroyImpl(alt::IResource::Impl* impl) override;
 
     asIScriptEngine* GetEngine()
     {
@@ -32,7 +32,7 @@ public:
     CScriptArray* CreateIntArray(uint32_t len);
     CScriptArray* CreateUIntArray(uint32_t len);
     CScriptArray* CreateByteArray(uint8_t* data);
-    void RegisterTypeInfos();
+    void          RegisterTypeInfos();
     // Register the script interfaces (the scripting api)
     void RegisterScriptInterfaces(asIScriptEngine* engine);
 
@@ -111,8 +111,8 @@ public:
 
     // Gets the current runtime instance or creates one if not exists
     static AngelScriptRuntime& Instance()
-	{
-		static AngelScriptRuntime _instance;
-		return _instance;
-	}
+    {
+        static AngelScriptRuntime _instance;
+        return _instance;
+    }
 };

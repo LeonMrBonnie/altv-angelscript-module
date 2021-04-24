@@ -17,4 +17,4 @@ namespace Data
         REGISTER_PROPERTY("DlcProp", "uint8 texture", alt::DlcProp, textureId);
         REGISTER_PROPERTY("DlcProp", "uint dlc", alt::DlcProp, dlc);
     }
-}
+}  // namespace Data

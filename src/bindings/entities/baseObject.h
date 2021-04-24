@@ -23,8 +23,8 @@ static bool GetMeta(T* obj, const std::string& key, void* ref, int typeId)
 {
     GET_RESOURCE();
     if(!obj->HasMetaData(key)) return false;
-    
-    auto mvalue = obj->GetMetaData(key);
+
+    auto mvalue      = obj->GetMetaData(key);
     auto [type, ptr] = Helpers::MValueToValue(resource->GetRuntime(), mvalue);
 
     auto engine = resource->GetRuntime()->GetEngine();
@@ -56,7 +56,7 @@ static bool GetData(T* obj, const std::string& key, void* ref, int typeId)
 {
     GET_RESOURCE();
     if(!resource->HasObjectData(obj, key)) return false;
-    
+
     auto [type, value] = resource->GetObjectData(obj, key);
 
     Helpers::CopyAngelscriptValue(resource->GetRuntime()->GetEngine(), value, type, ref, typeId);
@@ -101,13 +101,16 @@ namespace Helpers
         engine->RegisterObjectBehaviour(type, asBEHAVE_ADDREF, "void f()", asFUNCTION(AddRef<T>), asCALL_CDECL_OBJLAST);
         engine->RegisterObjectBehaviour(type, asBEHAVE_RELEASE, "void f()", asFUNCTION(RemoveRef<T>), asCALL_CDECL_OBJLAST);
 
-        REGISTER_PROPERTY_WRAPPER_GET(type, "uint8", "type", (GenericWrapper<T, alt::IBaseObject, &alt::IBaseObject::GetType, alt::IBaseObject::Type>));
+        REGISTER_PROPERTY_WRAPPER_GET(
+          type, "uint8", "type", (GenericWrapper<T, alt::IBaseObject, &alt::IBaseObject::GetType, alt::IBaseObject::Type>));
         REGISTER_PROPERTY_WRAPPER_GET(type, "bool", "valid", IsValid<T>);
 
-        REGISTER_METHOD_WRAPPER(type, "bool HasMeta(const string&in key)", (GenericWrapper<T, alt::IBaseObject, &alt::IBaseObject::HasMetaData, bool, std::string&>));
+        REGISTER_METHOD_WRAPPER(
+          type, "bool HasMeta(const string&in key)", (GenericWrapper<T, alt::IBaseObject, &alt::IBaseObject::HasMetaData, bool, std::string&>));
         REGISTER_METHOD_WRAPPER(type, "bool GetMeta(const string&in key, ?&out outValue)", GetMeta<T>);
         REGISTER_METHOD_WRAPPER(type, "void SetMeta(const string&in key, ?&in value)", SetMeta<T>);
-        REGISTER_METHOD_WRAPPER(type, "void DeleteMeta(const string&in key)", (GenericWrapper<T, alt::IBaseObject, &alt::IBaseObject::DeleteMetaData, void, std::string&>));
+        REGISTER_METHOD_WRAPPER(
+          type, "void DeleteMeta(const string&in key)", (GenericWrapper<T, alt::IBaseObject, &alt::IBaseObject::DeleteMetaData, void, std::string&>));
 
         REGISTER_METHOD_WRAPPER(type, "bool HasData(const string&in key)", HasData<T>);
         REGISTER_METHOD_WRAPPER(type, "bool GetData(const string&in key, ?&out outValue)", GetData<T>);
@@ -116,4 +119,4 @@ namespace Helpers
 
         REGISTER_METHOD_WRAPPER(type, "void Destroy()", Destroy<T>);
     }
-}
+}  // namespace Helpers

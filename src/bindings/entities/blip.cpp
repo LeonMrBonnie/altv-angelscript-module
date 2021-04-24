@@ -8,7 +8,7 @@ using namespace Helpers;
 static alt::IBlip* BlipFactory(alt::IPlayer* target, alt::IBlip::BlipType type, Vector3& pos)
 {
     GET_RESOURCE();
-    auto blip = alt::ICore::Instance().CreateBlip(target, type, {pos.x, pos.y, pos.z});
+    auto blip = alt::ICore::Instance().CreateBlip(target, type, { pos.x, pos.y, pos.z });
     if(blip.IsEmpty())
     {
         THROW_ERROR("Failed to create blip");
@@ -45,12 +45,13 @@ static alt::IEntity* GetAttachedTo(alt::IBlip* blip)
 static ModuleExtension blipExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs) {
     RegisterAsWorldObject<alt::IBlip>(engine, docs, "Blip");
 
-    #ifdef SERVER_MODULE
+#ifdef SERVER_MODULE
     REGISTER_FACTORY("Blip", "Player@ target, uint16 type, Vector3 pos", BlipFactory);
     REGISTER_FACTORY("Blip", "Player@ target, uint16 type, Entity@ attachTo", BlipFactoryAttach);
-    #endif
+#endif
 
-    REGISTER_PROPERTY_WRAPPER_GET("Blip", "uint16", "blipType", (GenericWrapper<alt::IBlip, alt::IBlip, &alt::IBlip::GetBlipType, alt::IBlip::BlipType>));
+    REGISTER_PROPERTY_WRAPPER_GET(
+      "Blip", "uint16", "blipType", (GenericWrapper<alt::IBlip, alt::IBlip, &alt::IBlip::GetBlipType, alt::IBlip::BlipType>));
 
     REGISTER_PROPERTY_WRAPPER_GET("Blip", "bool", "global", (GenericWrapper<alt::IBlip, alt::IBlip, &alt::IBlip::IsGlobal, bool>));
     REGISTER_PROPERTY_WRAPPER_GET("Blip", "Player@+", "target", GetTarget);

@@ -1,5 +1,5 @@
 #pragma once
-#pragma warning(disable : 4244) // Disable warnings about loss of data in type conversion
+#pragma warning(disable : 4244)  // Disable warnings about loss of data in type conversion
 #include "Log.h"
 #include "../../helpers/module.h"
 
@@ -15,7 +15,7 @@ namespace Helpers
         float z;
 
         Vector3(float x, float y, float z) : x(x), y(y), z(z) {}
-        Vector3(int x, int y, int z) : x(x), y(y), z(z) {};
+        Vector3(int x, int y, int z) : x(x), y(y), z(z){};
 
         float Length()
         {
@@ -79,7 +79,7 @@ namespace Helpers
             new(memory) Vector3(x, y, z);
         }
     };
-}
+}  // namespace Helpers
 
 namespace Data
 {
@@ -105,4 +105,4 @@ namespace Data
         // Implicit conversion to string
         REGISTER_METHOD("Vector3", "string opImplConv() const", Vector3, ToString);
     }
-}
+}  // namespace Data

@@ -31,7 +31,7 @@ void CommandHandler(alt::Array<alt::StringView> args, void* userData)
     }
     else if(args[0] == "--debug")
     {
-        if(!alt::ICore::Instance().IsDebug()) 
+        if(!alt::ICore::Instance().IsDebug())
         {
             Log::Error << "Debug info is only available in debug mode" << Log::Endl;
             return;
@@ -55,8 +55,8 @@ void CommandHandler(alt::Array<alt::StringView> args, void* userData)
                 return;
             }
             // Show resource specific debug info
-            auto iresource = alt::ICore::Instance().GetResource(args[2]);
-            AngelScriptResource* resource = nullptr;
+            auto                 iresource = alt::ICore::Instance().GetResource(args[2]);
+            AngelScriptResource* resource  = nullptr;
             if(iresource != nullptr) resource = AngelScriptRuntime::Instance().GetResource(iresource);
             if(resource == nullptr)
             {

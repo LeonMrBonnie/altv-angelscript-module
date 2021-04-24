@@ -1,5 +1,5 @@
 #pragma once
-#pragma warning(disable : 4244) // Disable warnings about loss of data in type conversion
+#pragma warning(disable : 4244)  // Disable warnings about loss of data in type conversion
 #include "Log.h"
 #include "../../helpers/module.h"
 
@@ -78,7 +78,7 @@ namespace Helpers
             new(memory) Vector2(x, y);
         }
     };
-}
+}  // namespace Helpers
 
 namespace Data
 {
@@ -103,4 +103,4 @@ namespace Data
         // Implicit conversion to string
         REGISTER_METHOD("Vector2", "string opImplConv() const", Vector2, ToString);
     }
-}
+}  // namespace Data

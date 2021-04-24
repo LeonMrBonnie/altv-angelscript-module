@@ -63,12 +63,13 @@ static CScriptArray* GetAllPlayers()
 {
     GET_RESOURCE();
     static asITypeInfo* playerArrayTypeInfo = nullptr;
-    if(playerArrayTypeInfo == nullptr) {
+    if(playerArrayTypeInfo == nullptr)
+    {
         playerArrayTypeInfo = resource->GetRuntime()->GetEngine()->GetTypeInfoByDecl("array<alt::Player@>");
         playerArrayTypeInfo->AddRef();
     }
     auto players = alt::ICore::Instance().GetPlayers();
-    auto arr = CScriptArray::Create(playerArrayTypeInfo, players.GetSize());
+    auto arr     = CScriptArray::Create(playerArrayTypeInfo, players.GetSize());
     for(int i = 0; i < players.GetSize(); i++)
     {
         void* player = players[i].Get();
@@ -81,12 +82,13 @@ static CScriptArray* GetAllVehicles()
 {
     GET_RESOURCE();
     static asITypeInfo* vehicleArrayTypeInfo = nullptr;
-    if(vehicleArrayTypeInfo == nullptr) {
+    if(vehicleArrayTypeInfo == nullptr)
+    {
         vehicleArrayTypeInfo = resource->GetRuntime()->GetEngine()->GetTypeInfoByDecl("array<alt::Vehicle@>");
         vehicleArrayTypeInfo->AddRef();
     }
     auto vehicles = alt::ICore::Instance().GetVehicles();
-    auto arr = CScriptArray::Create(vehicleArrayTypeInfo, vehicles.GetSize());
+    auto arr      = CScriptArray::Create(vehicleArrayTypeInfo, vehicles.GetSize());
     for(int i = 0; i < vehicles.GetSize(); i++)
     {
         void* vehicle = vehicles[i].Get();
@@ -99,12 +101,13 @@ static CScriptArray* GetAllEntities()
 {
     GET_RESOURCE();
     static asITypeInfo* entityArrayTypeInfo = nullptr;
-    if(entityArrayTypeInfo == nullptr) {
+    if(entityArrayTypeInfo == nullptr)
+    {
         entityArrayTypeInfo = resource->GetRuntime()->GetEngine()->GetTypeInfoByDecl("array<alt::Entity@>");
         entityArrayTypeInfo->AddRef();
     }
     auto entities = alt::ICore::Instance().GetEntities();
-    auto arr = CScriptArray::Create(entityArrayTypeInfo, entities.GetSize());
+    auto arr      = CScriptArray::Create(entityArrayTypeInfo, entities.GetSize());
     for(int i = 0; i < entities.GetSize(); i++)
     {
         void* entity = entities[i].Get();
@@ -152,7 +155,7 @@ static CScriptDictionary* GetResourceExports(const std::string& name)
         return nullptr;
     }
     auto exports = res->GetExports();
-    auto dict = CScriptDictionary::Create(resource->GetRuntime()->GetEngine());
+    auto dict    = CScriptDictionary::Create(resource->GetRuntime()->GetEngine());
     for(auto it = exports->Begin(); it; it = exports->Next())
     {
         auto value = it->GetValue();
@@ -271,19 +274,19 @@ static void OnClient(const std::string& name, const std::string& handlerName)
 
 static void Emit(asIScriptGeneric* gen)
 {
-    #ifdef DEBUG_MODE
+#ifdef DEBUG_MODE
     Helpers::Benchmark benchmark("Emit");
-    #endif
+#endif
 
     GET_RESOURCE();
-    void* ref = gen->GetArgAddress(0);
-    int typeId = 0;
-    std::string event = *static_cast<std::string*>(ref);
+    void*           ref    = gen->GetArgAddress(0);
+    int             typeId = 0;
+    std::string     event  = *static_cast<std::string*>(ref);
     alt::MValueArgs args;
-    
+
     for(int i = 1; i < gen->GetArgCount(); i++)
     {
-        ref = gen->GetArgAddress(i);
+        ref    = gen->GetArgAddress(i);
         typeId = gen->GetArgTypeId(i);
         if(typeId & asTYPEID_OBJHANDLE)
         {
@@ -303,7 +306,8 @@ static T* GetByID(uint16_t id)
 {
     auto ent = alt::ICore::Instance().GetEntityByID(id);
     if(ent.IsEmpty()) return nullptr;
-    else return dynamic_cast<T*>(ent.Get());
+    else
+        return dynamic_cast<T*>(ent.Get());
 }
 
 static bool IsDebugMode()
@@ -321,7 +325,7 @@ static bool GetMeta(const std::string& key, void* ref, int typeId)
     GET_RESOURCE();
     if(!HasMeta(key)) return false;
 
-    auto mvalue = alt::ICore::Instance().GetMetaData(key);
+    auto mvalue      = alt::ICore::Instance().GetMetaData(key);
     auto [type, ptr] = Helpers::MValueToValue(resource->GetRuntime(), mvalue);
 
     auto engine = resource->GetRuntime()->GetEngine();
@@ -363,7 +367,7 @@ static bool GetSyncedMeta(const std::string& key, void* ref, int typeId)
     GET_RESOURCE();
     if(!HasSyncedMeta(key)) return false;
 
-    auto mvalue = alt::ICore::Instance().GetSyncedMetaData(key);
+    auto mvalue      = alt::ICore::Instance().GetSyncedMetaData(key);
     auto [type, ptr] = Helpers::MValueToValue(resource->GetRuntime(), mvalue);
 
     auto engine = resource->GetRuntime()->GetEngine();
@@ -390,13 +394,12 @@ static void DeleteSyncedMeta(const std::string& key)
         THROW_ERROR("The specified meta key does not exist");
         return;
     }
-    
+
     alt::ICore::Instance().DeleteSyncedMetaData(key);
 }
 #endif
 
-static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs)
-{
+static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs) {
     // Generic
     REGISTER_GLOBAL_FUNC("uint Hash(const string&in value)", Hash, "Hashes the given string using the joaat algorithm");
     REGISTER_GLOBAL_FUNC("array<Player@>@ GetAllPlayers()", GetAllPlayers, "Gets all players on the server");
@@ -405,10 +408,10 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_GLOBAL_FUNC("Player@ GetPlayerByID(uint16 id)", (GetByID<alt::IPlayer>), "Gets the player with the specified ID");
     REGISTER_GLOBAL_FUNC("Vehicle@ GetVehicleByID(uint16 id)", (GetByID<alt::IVehicle>), "Gets the vehicle with the specified ID");
     REGISTER_GLOBAL_FUNC("Entity@ GetEntityByID(uint16 id)", (GetByID<alt::IEntity>), "Gets the entity with the specified ID");
-    #ifdef SERVER_MODULE
+#ifdef SERVER_MODULE
     REGISTER_GLOBAL_PROPERTY("int", "defaultDimension", GetDefaultDimension);
     REGISTER_GLOBAL_PROPERTY("int", "globalDimension", GetGlobalDimension);
-    #endif
+#endif
     REGISTER_GLOBAL_PROPERTY("string", "version", GetVersion);
     REGISTER_GLOBAL_PROPERTY("string", "branch", GetBranch);
     REGISTER_GLOBAL_PROPERTY("uint", "sdkVersion", GetSDKVersion);
@@ -417,27 +420,27 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     // Filesystem
     REGISTER_GLOBAL_FUNC("string ReadFile(const string&in path)", ReadFile, "Reads the specified file contents");
     REGISTER_GLOBAL_FUNC("bool FileExists(const string&in path)", FileExists, "Checks if the given file exists");
-    #ifdef SERVER_MODULE
+#ifdef SERVER_MODULE
     REGISTER_GLOBAL_PROPERTY("string", "rootDir", GetRootDir);
-    #endif
+#endif
 
     // Resource
     REGISTER_GLOBAL_FUNC("bool HasResource(const string&in name)", HasResource, "Returns whether the specified resource exists and is started");
-    #ifdef SERVER_MODULE
+#ifdef SERVER_MODULE
     REGISTER_GLOBAL_FUNC("string GetResourcePath(const string&in name)", GetResourcePath, "Gets the path to the specified resource");
     REGISTER_GLOBAL_FUNC("void StartResource(const string&in name)", StartResource, "Starts the specified resource");
     REGISTER_GLOBAL_FUNC("void StopResource(const string&in name)", StopResource, "Stops the specified resource");
     REGISTER_GLOBAL_FUNC("void RestartResource(const string&in name)", RestartResource, "Restarts the specified resource");
-    #endif
+#endif
     REGISTER_GLOBAL_FUNC("dictionary@ GetResourceExports(const string&in name)", GetResourceExports, "Gets the exports of the specified resource");
     REGISTER_GLOBAL_PROPERTY("string", "resourceMain", GetResourceMain);
     REGISTER_GLOBAL_PROPERTY("string", "resourceName", GetResourceName);
 
-    // Server
-    #ifdef SERVER_MODULE
+// Server
+#ifdef SERVER_MODULE
     REGISTER_GLOBAL_FUNC("uint GetNetTime()", GetNetTime, "Gets the total time the server has been running for");
     REGISTER_GLOBAL_FUNC("void SetPassword(const string&in password)", SetPassword, "Sets the current server password");
-    #endif
+#endif
 
     // Logging
     REGISTER_GLOBAL_FUNC("void Log(const string&in msg)", Log, "Logs the specified message to the console");
@@ -458,23 +461,25 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
 
     // Events
     REGISTER_GLOBAL_FUNC("void On(const string&in event, const string&in handlerName)", On, "Registers an event handler for a local custom event");
-    #ifdef SERVER_MODULE
-    REGISTER_GLOBAL_FUNC("void OnClient(const string&in event, const string&in handlerName)", OnClient, "Registers an event handler for a remote custom event");
-    #endif
+#ifdef SERVER_MODULE
+    REGISTER_GLOBAL_FUNC(
+      "void OnClient(const string&in event, const string&in handlerName)", OnClient, "Registers an event handler for a remote custom event");
+#endif
     REGISTER_VARIADIC_FUNC("void", "Emit", "const string&in event", 32, Emit, "Emits a local event (Max 32 args)");
 
     // Metadata
     REGISTER_GLOBAL_FUNC("bool HasMeta(const string&in key)", HasMeta, "Returns whether the specified meta key exists");
     REGISTER_GLOBAL_FUNC("bool GetMeta(const string&in key, ?&out outValue)", GetMeta, "Sets the specified meta key to the specified value");
-    #ifdef SERVER_MODULE
+#ifdef SERVER_MODULE
     REGISTER_GLOBAL_FUNC("void SetMeta(const string&in key, ?&in value)", SetMeta, "Gets the value of the specified meta key");
     REGISTER_GLOBAL_FUNC("void DeleteMeta(const string&in key)", DeleteMeta, "Deletes the specified meta key");
-    #endif
+#endif
 
     REGISTER_GLOBAL_FUNC("bool HasSyncedMeta(const string&in key)", HasSyncedMeta, "Returns whether the specified synced meta key exists");
-    REGISTER_GLOBAL_FUNC("bool GetSyncedMeta(const string&in key, ?&out outValue)", GetSyncedMeta, "Sets the specified synced meta key to the specified value");
-    #ifdef SERVER_MODULE
+    REGISTER_GLOBAL_FUNC(
+      "bool GetSyncedMeta(const string&in key, ?&out outValue)", GetSyncedMeta, "Sets the specified synced meta key to the specified value");
+#ifdef SERVER_MODULE
     REGISTER_GLOBAL_FUNC("void SetSyncedMeta(const string&in key, ?&in value)", SetSyncedMeta, "Gets the value of the specified synced meta key");
     REGISTER_GLOBAL_FUNC("void DeleteSyncedMeta(const string&in key)", DeleteSyncedMeta, "Deletes the specified synced meta key");
-    #endif
+#endif
 });

@@ -8,55 +8,54 @@
 #include "module.h"
 
 // Registers a new event handler and creates a wrapper function for registering it
-#define REGISTER_EVENT_HANDLER(type, name, returnType, decl, argsGetter) \
-    static void On##name(asIScriptFunction* callback) { \
-        GET_RESOURCE(); \
-        resource->RegisterEventHandler(type, callback); \
-    } \
+#define REGISTER_EVENT_HANDLER(type, name, returnType, decl, argsGetter)                                                   \
+    static void On##name(asIScriptFunction* callback)                                                                      \
+    {                                                                                                                      \
+        GET_RESOURCE();                                                                                                    \
+        resource->RegisterEventHandler(type, callback);                                                                    \
+    }                                                                                                                      \
     static Event Event##name(type, #name, returnType, decl, argsGetter, [](asIScriptEngine* engine, DocsGenerator* docs) { \
-        std::stringstream funcDef; \
-        funcDef << returnType << " " << #name << "Callback(" << decl << ")"; \
-        engine->RegisterFuncdef(funcDef.str().c_str()); \
-        std::stringstream globalFunc; \
-        globalFunc << "void On" << #name << "(" << #name << "Callback@ callback)"; \
-        engine->RegisterGlobalFunction(globalFunc.str().c_str(), asFUNCTION(On##name), asCALL_CDECL); \
-        docs->PushEventDeclaration(funcDef.str(), globalFunc.str()); \
+        std::stringstream funcDef;                                                                                         \
+        funcDef << returnType << " " << #name << "Callback(" << decl << ")";                                               \
+        engine->RegisterFuncdef(funcDef.str().c_str());                                                                    \
+        std::stringstream globalFunc;                                                                                      \
+        globalFunc << "void On" << #name << "(" << #name << "Callback@ callback)";                                         \
+        engine->RegisterGlobalFunction(globalFunc.str().c_str(), asFUNCTION(On##name), asCALL_CDECL);                      \
+        docs->PushEventDeclaration(funcDef.str(), globalFunc.str());                                                       \
     });
 
 namespace Helpers
 {
-    using CallbacksGetter = std::vector<asIScriptFunction*>(*)(AngelScriptResource* resource, const alt::CEvent* event, std::string name);
-    using ExecuteCallback = int(*)(AngelScriptResource* resource, const alt::CEvent* event, asIScriptContext* context);
-    using RegisterCallback = void(*)(asIScriptEngine* engine, DocsGenerator* docs);
+    using CallbacksGetter  = std::vector<asIScriptFunction*> (*)(AngelScriptResource* resource, const alt::CEvent* event, std::string name);
+    using ExecuteCallback  = int (*)(AngelScriptResource* resource, const alt::CEvent* event, asIScriptContext* context);
+    using RegisterCallback = void (*)(asIScriptEngine* engine, DocsGenerator* docs);
 
     class Event
     {
         static std::unordered_map<alt::CEvent::Type, Event*> all;
 
-        std::string name;
+        std::string       name;
         alt::CEvent::Type type;
-        const char* callbackDecl;
-        const char* returnType;
-        ExecuteCallback executeCallback;
-        RegisterCallback registerCallback;
+        const char*       callbackDecl;
+        const char*       returnType;
+        ExecuteCallback   executeCallback;
+        RegisterCallback  registerCallback;
 
     public:
-        Event(
-            alt::CEvent::Type type, 
-            std::string name,
-            const char* returnType,
-            const char* callbackDecl, 
-            ExecuteCallback executeCallback,
-            RegisterCallback registerCallback
-        ) : 
-            type(type),
-            name(std::move(name)),
-            callbackDecl(callbackDecl),
-            returnType(returnType),
-            executeCallback(executeCallback),
-            registerCallback(registerCallback)
+        Event(alt::CEvent::Type type,
+              std::string       name,
+              const char*       returnType,
+              const char*       callbackDecl,
+              ExecuteCallback   executeCallback,
+              RegisterCallback  registerCallback)
+            : type(type),
+              name(std::move(name)),
+              callbackDecl(callbackDecl),
+              returnType(returnType),
+              executeCallback(executeCallback),
+              registerCallback(registerCallback)
         {
-            all.insert({type, this});
+            all.insert({ type, this });
         };
 
         int Execute(AngelScriptResource* resource, const alt::CEvent* event)
@@ -103,4 +102,4 @@ namespace Helpers
             }
         }
     };
-}
+}  // namespace Helpers

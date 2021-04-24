@@ -33,10 +33,9 @@ static ModuleExtension httpExtension("http", [](asIScriptEngine* engine, DocsGen
     REGISTER_VALUE_CLASS("Client", httplib::Client, asOBJ_VALUE, "An instance of the HTTP client to make HTTP requests");
     REGISTER_CONSTRUCTOR("Client", "const string&in url", Construct);
     REGISTER_DESTRUCTOR("Client", Destruct);
-    
+
     REGISTER_METHOD_WRAPPER("Client", "Result Get(const string&in path, dictionary@ headers = {})", GetRequest);
     REGISTER_METHOD_WRAPPER("Client", "Result Post(const string&in path, dictionary@ params = {})", PostRequest);
     REGISTER_METHOD_WRAPPER("Client", "Result Put(const string&in path, dictionary@ params = {})", PutRequest);
     REGISTER_METHOD_WRAPPER("Client", "Result Delete(const string&in path, dictionary@ headers = {})", DeleteRequest);
 });
-

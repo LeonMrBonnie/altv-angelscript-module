@@ -21,4 +21,4 @@ namespace Data
         REGISTER_PROPERTY("RGBA", "uint8 a", alt::RGBA, a);
         REGISTER_METHOD("RGBA", "RGBA toBGRA()", alt::RGBA, toBGRA);
     }
-}
+}  // namespace Data

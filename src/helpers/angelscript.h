@@ -38,32 +38,33 @@ namespace Helpers
 
     static std::string GetTypeName(int typeId)
     {
-        auto& runtime = AngelScriptRuntime::Instance();
+        auto&        runtime  = AngelScriptRuntime::Instance();
         asITypeInfo* typeInfo = runtime.GetEngine()->GetTypeInfoById(typeId);
         if(typeInfo != nullptr) return typeInfo->GetName();
-        else switch(typeId)
-        {
-            case asTYPEID_VOID: return "void";
-            case asTYPEID_BOOL: return "bool";
-            case asTYPEID_INT8: return "int8";
-            case asTYPEID_INT16: return "int16";
-            case asTYPEID_INT32: return "int32";
-            case asTYPEID_INT64: return "int64";
-            case asTYPEID_UINT8: return "uint8";
-            case asTYPEID_UINT16: return "uint16";
-            case asTYPEID_UINT32: return "uint32";
-            case asTYPEID_UINT64: return "uint64";
-            case asTYPEID_FLOAT: return "float";
-            case asTYPEID_DOUBLE: return "double";
-        }
+        else
+            switch(typeId)
+            {
+                case asTYPEID_VOID: return "void";
+                case asTYPEID_BOOL: return "bool";
+                case asTYPEID_INT8: return "int8";
+                case asTYPEID_INT16: return "int16";
+                case asTYPEID_INT32: return "int32";
+                case asTYPEID_INT64: return "int64";
+                case asTYPEID_UINT8: return "uint8";
+                case asTYPEID_UINT16: return "uint16";
+                case asTYPEID_UINT32: return "uint32";
+                case asTYPEID_UINT64: return "uint64";
+                case asTYPEID_FLOAT: return "float";
+                case asTYPEID_DOUBLE: return "double";
+            }
         return "unknown";
     }
     static std::string GetVarData(asIScriptContext* context, int stackLevel, int varIdx)
     {
-        auto& runtime = AngelScriptRuntime::Instance();
-        const char* name = context->GetVarName(varIdx, stackLevel);
-        void* val = context->GetAddressOfVar(varIdx, stackLevel);
-        int valTypeId = context->GetVarTypeId(varIdx, stackLevel);
+        auto&       runtime     = AngelScriptRuntime::Instance();
+        const char* name        = context->GetVarName(varIdx, stackLevel);
+        void*       val         = context->GetAddressOfVar(varIdx, stackLevel);
+        int         valTypeId   = context->GetVarTypeId(varIdx, stackLevel);
         std::string valTypeName = GetTypeName(valTypeId);
         std::string valString;
         if(val == nullptr) valTypeId = asTYPEID_VOID;
@@ -140,52 +141,49 @@ namespace Helpers
             {
                 // Because these type ids are not constant and can change with every update, we have to check
                 // them in an if chain here, instead of directly in the switch expression
-                if(valTypeId == runtime.GetStringTypeId()) 
+                if(valTypeId == runtime.GetStringTypeId())
                 {
                     valString = *(std::string*)val;
                 }
                 else if(valTypeId == runtime.GetVector3TypeId())
                 {
-                    auto vector = *static_cast<Vector3*>(val);
+                    auto              vector = *static_cast<Vector3*>(val);
                     std::stringstream stream;
                     stream << "Vector3{ x: " << vector.x << ", y: " << vector.y << ", z: " << vector.z << " }";
                     valString = stream.str();
                 }
                 else if(valTypeId == runtime.GetVector2TypeId())
                 {
-                    auto vector = *static_cast<Vector2*>(val);
+                    auto              vector = *static_cast<Vector2*>(val);
                     std::stringstream stream;
                     stream << "Vector2{ x: " << vector.x << ", y: " << vector.y << " }";
                     valString = stream.str();
                 }
                 else if(valTypeId == runtime.GetRGBATypeId())
                 {
-                    auto rgba = *static_cast<alt::RGBA*>(val);
+                    auto              rgba = *static_cast<alt::RGBA*>(val);
                     std::stringstream stream;
                     stream << "RGBA{ r: " << rgba.r << ", g: " << rgba.g << ", b: " << rgba.b << ", a: " << rgba.a << " }";
                     valString = stream.str();
                 }
-                else if(valTypeId == runtime.GetBaseObjectTypeId()  || 
-                        valTypeId == runtime.GetWorldObjectTypeId() || 
-                        valTypeId == runtime.GetEntityTypeId()      || 
-                        valTypeId == runtime.GetPlayerTypeId()      || 
-                        valTypeId == runtime.GetVehicleTypeId())
+                else if(valTypeId == runtime.GetBaseObjectTypeId() || valTypeId == runtime.GetWorldObjectTypeId() ||
+                        valTypeId == runtime.GetEntityTypeId() || valTypeId == runtime.GetPlayerTypeId() || valTypeId == runtime.GetVehicleTypeId())
                 {
-                    auto obj = static_cast<alt::IBaseObject*>(val);
+                    auto              obj = static_cast<alt::IBaseObject*>(val);
                     std::stringstream stream;
                     stream << "BaseObject{ type: " << (uint16_t)obj->GetType() << " }";
                     valString = stream.str();
                 }
                 else if(valTypeId == runtime.GetDictTypeId())
                 {
-                    auto dict = static_cast<CScriptDictionary*>(val);
+                    auto              dict = static_cast<CScriptDictionary*>(val);
                     std::stringstream stream;
                     stream << "Dictionary{ size: " << dict->GetSize() << " }";
                     valString = stream.str();
                 }
                 else if(valTypeName == "array")
                 {
-                    auto array = static_cast<CScriptArray*>(val);
+                    auto              array = static_cast<CScriptArray*>(val);
                     std::stringstream stream;
                     stream << "Array{ size: " << array->GetSize() << ", type: " << GetTypeName(array->GetElementTypeId()) << " }";
                     valString = stream.str();
@@ -211,8 +209,8 @@ namespace Helpers
         {
             Log::Colored << "~y~--------------------" << Log::Endl;
             asIScriptFunction* func = nullptr;
-            const char* scriptSection;
-            int line, column;
+            const char*        scriptSection;
+            int                line, column;
             func = context->GetFunction(i);
             line = context->GetLineNumber(i, &column, &scriptSection);
             Log::Colored << "~y~" << scriptSection << " (" << std::to_string(line) << ") : " << func->GetDeclaration() << Log::Endl;
@@ -237,7 +235,7 @@ namespace Helpers
         engine->RegisterObjectType("array<uint>", 0, asOBJ_REF);
         engine->RegisterObjectType("array<uint64>", 0, asOBJ_REF);
         // String
-        //engine->RegisterObjectType("array<string>", 0, asOBJ_REF);
+        // engine->RegisterObjectType("array<string>", 0, asOBJ_REF);
         // Bool
         engine->RegisterObjectType("array<bool>", 0, asOBJ_REF);
         // Floating point
@@ -252,4 +250,4 @@ namespace Helpers
         engine->RegisterObjectType("array<Checkpoint@>", 0, asOBJ_REF);
         engine->RegisterObjectType("array<Blip@>", 0, asOBJ_REF);
     }
-}
+}  // namespace Helpers

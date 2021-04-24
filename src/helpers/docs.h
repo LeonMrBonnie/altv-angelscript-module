@@ -6,10 +6,10 @@
 #include "angelscript/include/angelscript.h"
 #include "../resource.h"
 #ifdef AS_GENERATE_DOCUMENTATION
-#include <chrono>
-#include <ctime>
-#include <iostream>
-#include <fstream>
+    #include <chrono>
+    #include <ctime>
+    #include <iostream>
+    #include <fstream>
 #endif
 
 #define PAD_SPACE "    "
@@ -20,105 +20,109 @@ namespace Helpers
 {
     class DocsGenerator
     {
-        std::string moduleName;
-        std::vector<std::pair<std::string, std::string>> declarations;
-        std::vector<std::pair<std::string, std::string>> variables;
-        std::vector<std::pair<std::string, std::string>> funcDefs;
-        std::vector<std::pair<std::string, std::string>> eventDeclarations;
-        std::vector<std::pair<std::string, std::string>> objectTypes;
-        std::vector<std::pair<std::string, std::string>> enumTypes;
+        std::string                                                       moduleName;
+        std::vector<std::pair<std::string, std::string>>                  declarations;
+        std::vector<std::pair<std::string, std::string>>                  variables;
+        std::vector<std::pair<std::string, std::string>>                  funcDefs;
+        std::vector<std::pair<std::string, std::string>>                  eventDeclarations;
+        std::vector<std::pair<std::string, std::string>>                  objectTypes;
+        std::vector<std::pair<std::string, std::string>>                  enumTypes;
         std::unordered_multimap<std::string, std::pair<std::string, int>> enumValues;
-        std::unordered_multimap<std::string, std::string> objectDeclarations;
-        std::unordered_multimap<std::string, std::string> objectConstructors;
-        std::unordered_multimap<std::string, std::string> objectMethods;
+        std::unordered_multimap<std::string, std::string>                 objectDeclarations;
+        std::unordered_multimap<std::string, std::string>                 objectConstructors;
+        std::unordered_multimap<std::string, std::string>                 objectMethods;
+
     public:
-        DocsGenerator(std::string moduleName) : moduleName(moduleName) {};
+        DocsGenerator(std::string moduleName) : moduleName(moduleName){};
 
         void PushDeclaration(std::string decl, std::string desc)
         {
-            #ifdef AS_GENERATE_DOCUMENTATION
+#ifdef AS_GENERATE_DOCUMENTATION
             declarations.push_back(std::pair(decl, desc));
-            #endif
+#endif
         }
         void PushVariable(std::string type, std::string prop)
         {
-            #ifdef AS_GENERATE_DOCUMENTATION
-            variables.push_back({type, prop});
-            #endif
+#ifdef AS_GENERATE_DOCUMENTATION
+            variables.push_back({ type, prop });
+#endif
         }
         void PushFuncDef(std::string funcdef, std::string desc)
         {
-            #ifdef AS_GENERATE_DOCUMENTATION
+#ifdef AS_GENERATE_DOCUMENTATION
             funcDefs.push_back(std::pair(funcdef, desc));
-            #endif
+#endif
         }
         void PushEventDeclaration(std::string funcDef, std::string globalFunc)
         {
-            #ifdef AS_GENERATE_DOCUMENTATION
+#ifdef AS_GENERATE_DOCUMENTATION
             eventDeclarations.push_back(std::pair(funcDef.insert(0, "funcdef "), globalFunc));
-            #endif
+#endif
         }
         void PushObjectType(std::string name, std::string desc)
         {
-            #ifdef AS_GENERATE_DOCUMENTATION
+#ifdef AS_GENERATE_DOCUMENTATION
             objectTypes.push_back(std::pair(name, desc));
-            #endif
+#endif
         }
         void PushObjectProperty(std::string object, std::string propertyDecl)
         {
-            #ifdef AS_GENERATE_DOCUMENTATION
-            objectDeclarations.insert({object, propertyDecl});
-            #endif
+#ifdef AS_GENERATE_DOCUMENTATION
+            objectDeclarations.insert({ object, propertyDecl });
+#endif
         }
         void PushObjectConstructor(std::string object, std::string constructorDecl)
         {
-            #ifdef AS_GENERATE_DOCUMENTATION
-            objectConstructors.insert({object, constructorDecl});
-            #endif
+#ifdef AS_GENERATE_DOCUMENTATION
+            objectConstructors.insert({ object, constructorDecl });
+#endif
         }
         void PushObjectMethod(std::string object, std::string methodDecl)
         {
-            #ifdef AS_GENERATE_DOCUMENTATION
-            objectMethods.insert({object, methodDecl});
-            #endif
+#ifdef AS_GENERATE_DOCUMENTATION
+            objectMethods.insert({ object, methodDecl });
+#endif
         }
         void PushEnumValue(std::string enumName, std::string name, int value)
         {
-            #ifdef AS_GENERATE_DOCUMENTATION
-            enumValues.insert({enumName, {name, value}});
-            #endif
+#ifdef AS_GENERATE_DOCUMENTATION
+            enumValues.insert({ enumName, { name, value } });
+#endif
         }
         void PushEnumType(std::string name, std::string desc)
         {
-            #ifdef AS_GENERATE_DOCUMENTATION
-            enumTypes.push_back({name, desc});
-            #endif
+#ifdef AS_GENERATE_DOCUMENTATION
+            enumTypes.push_back({ name, desc });
+#endif
         }
 
         void Generate()
         {
-            #ifdef AS_GENERATE_DOCUMENTATION
+#ifdef AS_GENERATE_DOCUMENTATION
             std::stringstream stream;
 
             // Add generation date to top of file
             std::time_t currentTime = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-            char* timeStr = new char[40];
+            char*       timeStr     = new char[40];
             ctime_s(timeStr, 40, &currentTime);
             stream << "// Generated on " << timeStr << "\n";
 
             // Add namespace
             stream << "namespace " << moduleName << "\n";
-            stream << "{" << "\n";
+            stream << "{"
+                   << "\n";
 
             // Add func defs
-            if(funcDefs.size() > 0) 
+            if(funcDefs.size() > 0)
             {
-                stream << PAD_SPACE << "// ********** Funcdefs **********" << "\n";
+                stream << PAD_SPACE << "// ********** Funcdefs **********"
+                       << "\n";
                 for(auto def : funcDefs)
                 {
                     stream << "\n";
                     stream << PAD_SPACE << "// " << def.second << "\n";
-                    stream << PAD_SPACE << "funcdef " << def.first << ";" << "\n";
+                    stream << PAD_SPACE << "funcdef " << def.first << ";"
+                           << "\n";
                 }
 
                 stream << "\n";
@@ -127,19 +131,22 @@ namespace Helpers
             // Add enums
             if(enumTypes.size() > 0)
             {
-                stream << PAD_SPACE << "// ********** Enums **********" << "\n";
+                stream << PAD_SPACE << "// ********** Enums **********"
+                       << "\n";
                 for(auto enumType : enumTypes)
                 {
                     stream << "\n";
                     stream << PAD_SPACE << "// " << enumType.second << "\n";
                     stream << PAD_SPACE << "enum " << enumType.first << "\n";
-                    stream << PAD_SPACE << "{" << "\n";
+                    stream << PAD_SPACE << "{"
+                           << "\n";
                     for(auto value : enumValues)
                     {
                         if(value.first != enumType.first) continue;
                         stream << PAD_SPACE << PAD_SPACE << value.second.first << " = " << std::to_string(value.second.second) << ",\n";
                     }
-                    stream << PAD_SPACE << "};" << "\n";
+                    stream << PAD_SPACE << "};"
+                           << "\n";
                 }
 
                 stream << "\n";
@@ -148,11 +155,13 @@ namespace Helpers
             // Add variables
             if(variables.size() > 0)
             {
-                stream << PAD_SPACE << "// ********** Global variables **********" << "\n";
+                stream << PAD_SPACE << "// ********** Global variables **********"
+                       << "\n";
                 for(auto variable : variables)
                 {
                     stream << "\n";
-                    stream << PAD_SPACE << variable.first << " " << variable.second << ";" << "\n";
+                    stream << PAD_SPACE << variable.first << " " << variable.second << ";"
+                           << "\n";
                 }
 
                 stream << "\n";
@@ -161,12 +170,14 @@ namespace Helpers
             // Add function declarations
             if(declarations.size() > 0)
             {
-                stream << PAD_SPACE << "// ********** Functions **********" << "\n";
+                stream << PAD_SPACE << "// ********** Functions **********"
+                       << "\n";
                 for(auto decl : declarations)
                 {
                     stream << "\n";
                     stream << PAD_SPACE << "// " << decl.second << "\n";
-                    stream << PAD_SPACE << decl.first << ";" << "\n";
+                    stream << PAD_SPACE << decl.first << ";"
+                           << "\n";
                 }
 
                 stream << "\n";
@@ -175,12 +186,15 @@ namespace Helpers
             // Add event declarations
             if(eventDeclarations.size() > 0)
             {
-                stream << PAD_SPACE << "// ********** Events **********" << "\n";
+                stream << PAD_SPACE << "// ********** Events **********"
+                       << "\n";
                 for(auto decl : eventDeclarations)
                 {
                     stream << "\n";
-                    stream << PAD_SPACE << decl.first << ";" << "\n";
-                    stream << PAD_SPACE << decl.second << ";" << "\n";
+                    stream << PAD_SPACE << decl.first << ";"
+                           << "\n";
+                    stream << PAD_SPACE << decl.second << ";"
+                           << "\n";
                 }
 
                 stream << "\n";
@@ -205,7 +219,7 @@ namespace Helpers
                     for(auto kv : objectConstructors)
                     {
                         if(kv.first != obj.first) continue;
-                        stream << PAD_SPACE << PAD_SPACE << obj.first << "(" << kv.second << ");\n"; 
+                        stream << PAD_SPACE << PAD_SPACE << obj.first << "(" << kv.second << ");\n";
                     }
                     for(auto kv : objectMethods)
                     {
@@ -217,14 +231,15 @@ namespace Helpers
             }
 
             // Close namespace
-            stream << "}" << "\n";
+            stream << "}"
+                   << "\n";
 
             // Write the docs to file
             std::ofstream file;
             file.open(moduleName.append("Docs.as"));
             file << stream.str();
             file.close();
-            #endif
+#endif
         }
     };
-}
+}  // namespace Helpers

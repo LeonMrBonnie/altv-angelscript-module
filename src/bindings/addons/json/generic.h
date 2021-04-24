@@ -3,7 +3,7 @@
 #include "helpers/angelscript.h"
 
 namespace JSON
-{   
+{
     template<typename T>
     static void JsonConstructor(void* memory, T val)
     {
@@ -28,4 +28,4 @@ namespace JSON
         }
         return parsed;
     }
-}
+}  // namespace JSON

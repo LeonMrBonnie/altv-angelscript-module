@@ -30,12 +30,14 @@ static ModuleExtension utilExtension("json", [](asIScriptEngine* engine, DocsGen
     REGISTER_CONSTRUCTOR("JSON", "array<string>@ value", JsonConstructorArray<std::string>);
     REGISTER_CONSTRUCTOR("JSON", "array<JSON>@ value", JsonConstructorArray<json>);
 
-    engine->RegisterObjectMethod("JSON", "JSON &opIndex(const string &in)", 
-        asMETHODPR(json, operator[], (const std::string&), json::reference), asCALL_THISCALL);
-	engine->RegisterObjectMethod("JSON", "const JSON &opIndex(const string &in) const", 
-        asMETHODPR(json, operator[], (const std::string&) const, json::const_reference), asCALL_THISCALL);
-    engine->RegisterObjectMethod("JSON", "JSON &opAssign(const JSON &in)", 
-        asMETHODPR(json, operator=, (const json), json::reference), asCALL_THISCALL);
+    engine->RegisterObjectMethod(
+      "JSON", "JSON &opIndex(const string &in)", asMETHODPR(json, operator[], (const std::string&), json::reference), asCALL_THISCALL);
+    engine->RegisterObjectMethod("JSON",
+                                 "const JSON &opIndex(const string &in) const",
+                                 asMETHODPR(json, operator[], (const std::string&) const, json::const_reference),
+                                 asCALL_THISCALL);
+    engine->RegisterObjectMethod(
+      "JSON", "JSON &opAssign(const JSON &in)", asMETHODPR(json, operator=, (const json), json::reference), asCALL_THISCALL);
 
     REGISTER_METHOD("JSON", "string ToString(int indent = 0)", json, dump);
     REGISTER_METHOD("JSON", "string opImplConv() const", json, dump);

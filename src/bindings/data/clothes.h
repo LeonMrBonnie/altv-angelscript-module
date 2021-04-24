@@ -19,4 +19,4 @@ namespace Data
         REGISTER_PROPERTY("DlcCloth", "uint8 palette", alt::DlcCloth, paletteId);
         REGISTER_PROPERTY("DlcCloth", "uint dlc", alt::DlcCloth, dlc);
     }
-}
+}  // namespace Data

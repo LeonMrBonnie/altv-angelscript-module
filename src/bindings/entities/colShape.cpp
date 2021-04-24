@@ -1,13 +1,13 @@
 #include "Log.h"
 #include "../../helpers/module.h"
 #ifdef SERVER_MODULE
-#include "colShape.h"
+    #include "colShape.h"
 
 using namespace Helpers;
 
 static alt::IColShape* SphereFactory(Vector3& pos, float radius)
 {
-    auto shape = alt::ICore::Instance().CreateColShapeSphere({pos.x, pos.y, pos.z}, radius);
+    auto shape = alt::ICore::Instance().CreateColShapeSphere({ pos.x, pos.y, pos.z }, radius);
     if(shape.IsEmpty())
     {
         THROW_ERROR("Failed to create colshape sphere");
@@ -18,7 +18,7 @@ static alt::IColShape* SphereFactory(Vector3& pos, float radius)
 
 static alt::IColShape* CylinderFactory(Vector3& pos, float radius, float height)
 {
-    auto shape = alt::ICore::Instance().CreateColShapeCylinder({pos.x, pos.y, pos.z}, radius, height);
+    auto shape = alt::ICore::Instance().CreateColShapeCylinder({ pos.x, pos.y, pos.z }, radius, height);
     if(shape.IsEmpty())
     {
         THROW_ERROR("Failed to create colshape cylinder");
@@ -29,7 +29,7 @@ static alt::IColShape* CylinderFactory(Vector3& pos, float radius, float height)
 
 static alt::IColShape* CircleFactory(Vector3& pos, float radius)
 {
-    auto shape = alt::ICore::Instance().CreateColShapeCircle({pos.x, pos.y, pos.z}, radius);
+    auto shape = alt::ICore::Instance().CreateColShapeCircle({ pos.x, pos.y, pos.z }, radius);
     if(shape.IsEmpty())
     {
         THROW_ERROR("Failed to create colshape circle");
@@ -40,7 +40,7 @@ static alt::IColShape* CircleFactory(Vector3& pos, float radius)
 
 static alt::IColShape* CuboidFactory(Vector3& pos, Vector3& pos2)
 {
-    auto shape = alt::ICore::Instance().CreateColShapeCube({pos.x, pos.y, pos.z}, {pos2.x, pos2.y, pos2.z});
+    auto shape = alt::ICore::Instance().CreateColShapeCube({ pos.x, pos.y, pos.z }, { pos2.x, pos2.y, pos2.z });
     if(shape.IsEmpty())
     {
         THROW_ERROR("Failed to create colshape cuboid");
@@ -62,7 +62,7 @@ static alt::IColShape* RectFactory(Vector2& pos, Vector2& pos2, float z)
 
 static alt::ICheckpoint* CheckpointFactory(uint8_t type, Vector3& pos, float radius, float height, alt::RGBA& color)
 {
-    auto shape = alt::ICore::Instance().CreateCheckpoint(type, {pos.x, pos.y, pos.z}, radius, height, color);
+    auto shape = alt::ICore::Instance().CreateCheckpoint(type, { pos.x, pos.y, pos.z }, radius, height, color);
     if(shape.IsEmpty())
     {
         THROW_ERROR("Failed to create colshape checkpoint");

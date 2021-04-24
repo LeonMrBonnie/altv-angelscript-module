@@ -31,21 +31,29 @@ static ModuleExtension voiceChannelExtension("alt", [](asIScriptEngine* engine, 
     // Implicit conversion to string
     REGISTER_METHOD_WRAPPER("VoiceChannel", "string opImplConv() const", ToString);
 
-    REGISTER_PROPERTY_WRAPPER_GET("VoiceChannel", "bool", "spatial", (GenericWrapper<alt::IVoiceChannel, alt::IVoiceChannel, &alt::IVoiceChannel::IsSpatial, bool>));
-    REGISTER_PROPERTY_WRAPPER_GET("VoiceChannel", "float", "maxDistance", (GenericWrapper<alt::IVoiceChannel, alt::IVoiceChannel, &alt::IVoiceChannel::GetMaxDistance, float>));
+    REGISTER_PROPERTY_WRAPPER_GET(
+      "VoiceChannel", "bool", "spatial", (GenericWrapper<alt::IVoiceChannel, alt::IVoiceChannel, &alt::IVoiceChannel::IsSpatial, bool>));
+    REGISTER_PROPERTY_WRAPPER_GET(
+      "VoiceChannel", "float", "maxDistance", (GenericWrapper<alt::IVoiceChannel, alt::IVoiceChannel, &alt::IVoiceChannel::GetMaxDistance, float>));
 
-    REGISTER_METHOD_WRAPPER("VoiceChannel", "bool HasPlayer(Player@ player)", 
-        (GenericWrapper<alt::IVoiceChannel, alt::IVoiceChannel, &alt::IVoiceChannel::HasPlayer, bool, alt::IPlayer*>));
-    REGISTER_METHOD_WRAPPER("VoiceChannel", "void AddPlayer(Player@ player)", 
-        (GenericWrapper<alt::IVoiceChannel, alt::IVoiceChannel, &alt::IVoiceChannel::AddPlayer, void, alt::IPlayer*>));
-    REGISTER_METHOD_WRAPPER("VoiceChannel", "void RemovePlayer(Player@ player)", 
-        (GenericWrapper<alt::IVoiceChannel, alt::IVoiceChannel, &alt::IVoiceChannel::RemovePlayer, void, alt::IPlayer*>));
-    
-    REGISTER_METHOD_WRAPPER("VoiceChannel", "bool IsPlayerMuted(Player@ player)", 
-        (GenericWrapper<alt::IVoiceChannel, alt::IVoiceChannel, &alt::IVoiceChannel::IsPlayerMuted, bool, alt::IPlayer*>));
-    REGISTER_METHOD_WRAPPER("VoiceChannel", "void MutePlayer(Player@ player)", 
-        (GenericWrapper<alt::IVoiceChannel, alt::IVoiceChannel, &alt::IVoiceChannel::MutePlayer, void, alt::IPlayer*>));
-    REGISTER_METHOD_WRAPPER("VoiceChannel", "void UnmutePlayer(Player@ player)", 
-        (GenericWrapper<alt::IVoiceChannel, alt::IVoiceChannel, &alt::IVoiceChannel::UnmutePlayer, void, alt::IPlayer*>));
+    REGISTER_METHOD_WRAPPER("VoiceChannel",
+                            "bool HasPlayer(Player@ player)",
+                            (GenericWrapper<alt::IVoiceChannel, alt::IVoiceChannel, &alt::IVoiceChannel::HasPlayer, bool, alt::IPlayer*>));
+    REGISTER_METHOD_WRAPPER("VoiceChannel",
+                            "void AddPlayer(Player@ player)",
+                            (GenericWrapper<alt::IVoiceChannel, alt::IVoiceChannel, &alt::IVoiceChannel::AddPlayer, void, alt::IPlayer*>));
+    REGISTER_METHOD_WRAPPER("VoiceChannel",
+                            "void RemovePlayer(Player@ player)",
+                            (GenericWrapper<alt::IVoiceChannel, alt::IVoiceChannel, &alt::IVoiceChannel::RemovePlayer, void, alt::IPlayer*>));
+
+    REGISTER_METHOD_WRAPPER("VoiceChannel",
+                            "bool IsPlayerMuted(Player@ player)",
+                            (GenericWrapper<alt::IVoiceChannel, alt::IVoiceChannel, &alt::IVoiceChannel::IsPlayerMuted, bool, alt::IPlayer*>));
+    REGISTER_METHOD_WRAPPER("VoiceChannel",
+                            "void MutePlayer(Player@ player)",
+                            (GenericWrapper<alt::IVoiceChannel, alt::IVoiceChannel, &alt::IVoiceChannel::MutePlayer, void, alt::IPlayer*>));
+    REGISTER_METHOD_WRAPPER("VoiceChannel",
+                            "void UnmutePlayer(Player@ player)",
+                            (GenericWrapper<alt::IVoiceChannel, alt::IVoiceChannel, &alt::IVoiceChannel::UnmutePlayer, void, alt::IPlayer*>));
 });
 #endif

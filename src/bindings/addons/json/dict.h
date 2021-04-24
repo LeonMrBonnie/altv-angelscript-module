@@ -15,52 +15,52 @@ namespace JSON
         {
             switch(it.GetTypeId())
             {
-                case asTYPEID_BOOL: 
+                case asTYPEID_BOOL:
                 {
                     map.insert({ it.GetKey(), *(bool*)it.GetAddressOfValue() });
                     break;
                 }
-                case asTYPEID_INT8: 
+                case asTYPEID_INT8:
                 {
                     map.insert({ it.GetKey(), *(int8_t*)it.GetAddressOfValue() });
                     break;
                 }
-                case asTYPEID_INT16: 
+                case asTYPEID_INT16:
                 {
                     map.insert({ it.GetKey(), *(int16_t*)it.GetAddressOfValue() });
                     break;
                 }
-                case asTYPEID_INT32: 
+                case asTYPEID_INT32:
                 {
                     map.insert({ it.GetKey(), *(int32_t*)it.GetAddressOfValue() });
                     break;
                 }
-                case asTYPEID_INT64: 
+                case asTYPEID_INT64:
                 {
                     map.insert({ it.GetKey(), *(int64_t*)it.GetAddressOfValue() });
                     break;
                 }
-                case asTYPEID_UINT8: 
+                case asTYPEID_UINT8:
                 {
                     map.insert({ it.GetKey(), *(uint8_t*)it.GetAddressOfValue() });
                     break;
                 }
-                case asTYPEID_UINT16: 
+                case asTYPEID_UINT16:
                 {
                     map.insert({ it.GetKey(), *(uint16_t*)it.GetAddressOfValue() });
                     break;
                 }
-                case asTYPEID_UINT32: 
+                case asTYPEID_UINT32:
                 {
                     map.insert({ it.GetKey(), *(uint32_t*)it.GetAddressOfValue() });
                     break;
                 }
-                case asTYPEID_UINT64: 
+                case asTYPEID_UINT64:
                 {
                     map.insert({ it.GetKey(), *(uint64_t*)it.GetAddressOfValue() });
                     break;
                 }
-                case asTYPEID_FLOAT: 
+                case asTYPEID_FLOAT:
                 {
                     map.insert({ it.GetKey(), *(float*)it.GetAddressOfValue() });
                     break;
@@ -73,11 +73,12 @@ namespace JSON
                 default:
                 {
                     if(it.GetTypeId() == jsonTypeId) map.insert({ it.GetKey(), *(json*)it.GetAddressOfValue() });
-                    if(it.GetTypeId() == AngelScriptRuntime::Instance().GetStringTypeId()) map.insert({ it.GetKey(), *(std::string*)it.GetAddressOfValue() });
+                    if(it.GetTypeId() == AngelScriptRuntime::Instance().GetStringTypeId())
+                        map.insert({ it.GetKey(), *(std::string*)it.GetAddressOfValue() });
                     break;
                 }
             }
         }
         new(memory) json(map);
     }
-}
+}  // namespace JSON

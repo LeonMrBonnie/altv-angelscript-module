@@ -9,7 +9,7 @@
 #endif
 
 #define MODULE_VERSION "1.1.0"
-#define MODULE_TYPE "as"
+#define MODULE_TYPE    "as"
 
 // SDK
 #include "cpp-sdk/SDK.h"

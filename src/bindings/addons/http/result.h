@@ -17,4 +17,4 @@ namespace HTTP
     {
         return (*result)->body;
     }
-}
+}  // namespace HTTP

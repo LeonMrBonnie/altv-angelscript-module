@@ -18,12 +18,12 @@ namespace HTTP
 
     static httplib::Result GetRequest(httplib::Client* client, const std::string& path, CScriptDictionary* headersDict)
     {
-        const int stringTypeId = AngelScriptRuntime::Instance().GetStringTypeId();
+        const int        stringTypeId = AngelScriptRuntime::Instance().GetStringTypeId();
         httplib::Headers headers;
         for(auto it : *headersDict)
         {
             if(it.GetTypeId() != stringTypeId) continue;
-            headers.insert({it.GetKey(), *(std::string*)it.GetAddressOfValue()});
+            headers.insert({ it.GetKey(), *(std::string*)it.GetAddressOfValue() });
         }
 
         return client->Get(path.c_str(), headers);
@@ -31,12 +31,12 @@ namespace HTTP
 
     static httplib::Result PostRequest(httplib::Client* client, const std::string& path, CScriptDictionary* paramsDict)
     {
-        const int stringTypeId = AngelScriptRuntime::Instance().GetStringTypeId();
+        const int       stringTypeId = AngelScriptRuntime::Instance().GetStringTypeId();
         httplib::Params params;
         for(auto it : *paramsDict)
         {
             if(it.GetTypeId() != stringTypeId) continue;
-            params.insert({it.GetKey(), *(std::string*)it.GetAddressOfValue()});
+            params.insert({ it.GetKey(), *(std::string*)it.GetAddressOfValue() });
         }
 
         return client->Post(path.c_str(), params);
@@ -44,12 +44,12 @@ namespace HTTP
 
     static httplib::Result PutRequest(httplib::Client* client, const std::string& path, CScriptDictionary* paramsDict)
     {
-        const int stringTypeId = AngelScriptRuntime::Instance().GetStringTypeId();
+        const int       stringTypeId = AngelScriptRuntime::Instance().GetStringTypeId();
         httplib::Params params;
         for(auto it : *paramsDict)
         {
             if(it.GetTypeId() != stringTypeId) continue;
-            params.insert({it.GetKey(), *(std::string*)it.GetAddressOfValue()});
+            params.insert({ it.GetKey(), *(std::string*)it.GetAddressOfValue() });
         }
 
         return client->Put(path.c_str(), params);
@@ -57,14 +57,14 @@ namespace HTTP
 
     static httplib::Result DeleteRequest(httplib::Client* client, const std::string& path, CScriptDictionary* headersDict)
     {
-        const int stringTypeId = AngelScriptRuntime::Instance().GetStringTypeId();
+        const int        stringTypeId = AngelScriptRuntime::Instance().GetStringTypeId();
         httplib::Headers headers;
         for(auto it : *headersDict)
         {
             if(it.GetTypeId() != stringTypeId) continue;
-            headers.insert({it.GetKey(), *(std::string*)it.GetAddressOfValue()});
+            headers.insert({ it.GetKey(), *(std::string*)it.GetAddressOfValue() });
         }
 
         return client->Delete(path.c_str(), headers);
     }
-}
+}  // namespace HTTP
