@@ -48,12 +48,12 @@ jobs:
     - name: Build server (Windows)
       if: matrix.OS_TYPE == 'Windows'
       shell: bash
-      run: .\tools\build-server.bat
+      run: .\\tools\\build-server.bat
 
     - name: Build client (Windows)
       if: matrix.OS_TYPE == 'Windows'
       shell: bash
-      run: .\tools\build-client.bat
+      run: .\\tools\\build-client.bat
 
     - name: Build (Linux)
       if: matrix.OS_TYPE == 'Linux'
