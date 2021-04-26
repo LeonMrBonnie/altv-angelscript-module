@@ -82,10 +82,6 @@ void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine)
     REGISTER_REF_CLASS("Checkpoint", alt::IColShape, asOBJ_REF, "alt:V ColShape checkpoint");
     REGISTER_REF_CLASS("Blip", alt::IBlip, asOBJ_REF, "alt:V Blip");
 
-    // Performance
-    // todo: make template specializations work
-    // Helpers::RegisterArrayTemplateSpecializations(engine);
-
     // Register extensions
     ModuleExtension::RegisterAll("alt", engine, &docs);
     ModuleExtension::RegisterAll("crypto", engine, &cryptoDocs);
