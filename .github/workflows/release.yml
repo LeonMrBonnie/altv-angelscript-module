@@ -48,19 +48,24 @@ jobs:
     - name: Build server (Windows)
       if: matrix.OS_TYPE == 'Windows'
       shell: bash
-      run: .\\tools\\build-server.bat
+      run: |
+        cd .\\tools
+        .\\build-server.bat
 
     - name: Build client (Windows)
       if: matrix.OS_TYPE == 'Windows'
       shell: bash
-      run: .\\tools\\build-client.bat
+      run: |
+        cd .\\tools
+        .\\build-client.bat
 
     - name: Build (Linux)
       if: matrix.OS_TYPE == 'Linux'
       shell: bash
       run: |
         chmod +x ./tools/build.sh
-        ./tools/build.sh
+        cd ./tools
+        ./build.sh
 
     - name: Upload Release Server Assets
       id: upload_release_assets_server
