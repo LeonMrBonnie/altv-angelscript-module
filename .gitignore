@@ -2,7 +2,8 @@
 build
 CMakeFiles
 dist
-extra.bat
+tools/extra.bat
+tools/release.bat
 
 # CMake
 Makefile
