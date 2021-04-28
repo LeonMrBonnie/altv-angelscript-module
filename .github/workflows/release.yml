@@ -56,6 +56,7 @@ jobs:
       if: matrix.OS_TYPE == 'Windows'
       shell: bash
       run: |
+        rm -rf ./build
         cd .\\tools
         .\\build-client.bat
 
