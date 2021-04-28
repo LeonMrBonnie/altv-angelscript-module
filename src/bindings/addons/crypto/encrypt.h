@@ -29,7 +29,6 @@ namespace Crypto
         CryptoPP::byte digest[CryptoPP::SHA256::DIGESTSIZE];
         Encryption     encryption;
 
-        // todo: maybe not use this ugly hack here
         if constexpr(std::is_same_v<Encryption, CryptoPP::PKCS5_PBKDF2_HMAC<CryptoPP::SHA256>> ||
                      std::is_same_v<Encryption, CryptoPP::PKCS5_PBKDF1<CryptoPP::SHA256>>)
             encryption.DeriveKey(
