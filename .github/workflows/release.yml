@@ -52,13 +52,13 @@ jobs:
         cd .\\tools
         .\\build-server.bat
 
-    - name: Build client (Windows)
-      if: matrix.OS_TYPE == 'Windows'
-      shell: bash
-      run: |
-        rm -rf ./build
-        cd .\\tools
-        .\\build-client.bat
+    #- name: Build client (Windows)
+    #  if: matrix.OS_TYPE == 'Windows'
+    #  shell: bash
+    #  run: |
+    #    rm -rf ./build
+    #    cd .\\tools
+    #    .\\build-client.bat
 
     - name: Build (Linux)
       if: matrix.OS_TYPE == 'Linux'
