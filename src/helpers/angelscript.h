@@ -262,10 +262,25 @@ namespace Helpers
     // Handles infos, warnings, errors etc. by AngelScript
     static void MessageHandler(const asSMessageInfo* msg, void* param)
     {
-        if(msg->type == asMSGTYPE_INFORMATION) Log::Info << msg->section << " (" << std::to_string(msg->row) << "): " << msg->message << Log::Endl;
-        else if(msg->type == asMSGTYPE_WARNING)
-            Log::Error << msg->section << " (" << std::to_string(msg->row) << "): " << msg->message << Log::Endl;
-        else
-            Log::Warning << msg->section << " (" << std::to_string(msg->row) << "): " << msg->message << Log::Endl;
+        std::stringstream stream;
+        stream << msg->section << " (" << std::to_string(msg->row) << "): " << msg->message;
+        switch(msg->type)
+        {
+            case asMSGTYPE_INFORMATION:
+            {
+                Log::Info << stream.str() << Log::Endl;
+                break;
+            }
+            case asMSGTYPE_WARNING:
+            {
+                Log::Warning << stream.str() << Log::Endl;
+                break;
+            }
+            case asMSGTYPE_ERROR:
+            {
+                Log::Error << stream.str() << Log::Endl;
+                break;
+            }
+        }
     }
 }  // namespace Helpers
