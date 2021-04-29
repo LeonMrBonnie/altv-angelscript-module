@@ -11,13 +11,13 @@
 #include "angelscript/addon/scriptdictionary/scriptdictionary.h"
 #include "angelscript/addon/scriptarray/scriptarray.h"
 
-#define CHECK_FUNCTION_RETURN(r, ret)                                                              \
-    if(r == asEXECUTION_EXCEPTION)                                                                 \
-    {                                                                                              \
-        Log::Error << "An exception occured while executing the script. Exception: " << Log::Endl; \
-        Helpers::PrintException(context);                                                          \
-        context->Unprepare();                                                                      \
-        return ret;                                                                                \
+#define CHECK_FUNCTION_RETURN(r, ret)                                                           \
+    if(r == asEXECUTION_EXCEPTION)                                                              \
+    {                                                                                           \
+        Log::Error << "An exception occured while executing the script function." << Log::Endl; \
+        Helpers::PrintException(context);                                                       \
+        context->Unprepare();                                                                   \
+        return ret;                                                                             \
     }
 
 namespace Helpers
