@@ -240,4 +240,34 @@ namespace Helpers
         auto exception = context->GetExceptionString();
         Log::Error << func->GetScriptSectionName() << " (" << line << "): " << exception << Log::Endl;
     }
+
+    // Handles includes
+    static int IncludeHandler(const char* include, const char* from, CScriptBuilder* builder, void* data)
+    {
+        // todo: add support for relative paths
+        auto resource = static_cast<AngelScriptResource*>(data);
+        auto src      = resource->ReadFile(include);
+        int  r        = builder->AddSectionFromMemory(include, src.CStr(), (asUINT)src.GetSize());
+        CHECK_AS_RETURN("Include", r, -1);
+        return 0;
+    }
+
+    // Handles pragma directives
+    static int PragmaHandler(const std::string& pragmaText, CScriptBuilder& builder, void* data)
+    {
+        auto resource = static_cast<AngelScriptResource*>(data);
+        return 0;
+    }
+
+    // Handles infos, warnings, errors etc. by AngelScript
+    static void MessageHandler(const asSMessageInfo* msg, void* param)
+    {
+        if(msg->type == asMSGTYPE_INFORMATION)
+            Log::Info << msg->section << " (" << std::to_string(msg->row) << ", " << std::to_string(msg->col) << "): " << msg->message << Log::Endl;
+        else if(msg->type == asMSGTYPE_WARNING)
+            Log::Error << msg->section << " (" << std::to_string(msg->row) << ", " << std::to_string(msg->col) << "): " << msg->message << Log::Endl;
+        else
+            Log::Warning << msg->section << " (" << std::to_string(msg->row) << ", " << std::to_string(msg->col) << "): " << msg->message
+                         << Log::Endl;
+    }
 }  // namespace Helpers
