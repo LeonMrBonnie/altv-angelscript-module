@@ -66,7 +66,8 @@ public:
         return false;
     }
 
-    void RegisterMetadata(CScriptBuilder& builder, asIScriptContext* context);
+    // Returns whether registering the metadata failed or not
+    bool RegisterMetadata(CScriptBuilder& builder, asIScriptContext* context);
     void RegisterDefines(CScriptBuilder& builder);
     // Registers all the imported functions
     void RegisterImports();

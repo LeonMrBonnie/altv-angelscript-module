@@ -11,6 +11,15 @@
 #include "angelscript/addon/scriptdictionary/scriptdictionary.h"
 #include "angelscript/addon/scriptarray/scriptarray.h"
 
+#define CHECK_FUNCTION_RETURN(r, ret)                                                              \
+    if(r == asEXECUTION_EXCEPTION)                                                                 \
+    {                                                                                              \
+        Log::Error << "An exception occured while executing the script. Exception: " << Log::Endl; \
+        Helpers::PrintException(context);                                                          \
+        context->Unprepare();                                                                      \
+        return ret;                                                                                \
+    }
+
 namespace Helpers
 {
     static void CopyAngelscriptValue(asIScriptEngine* engine, void* src, int srcType, void* dest, int destType)
@@ -222,5 +231,13 @@ namespace Helpers
                 Log::Colored << "~b~-~w~ " << GetVarData(context, i, n) << Log::Endl;
             }
         }
+    }
+    static void PrintException(asIScriptContext* context)
+    {
+        if(context->GetState() != asEXECUTION_EXCEPTION) return;
+        auto func      = context->GetExceptionFunction();
+        auto line      = context->GetExceptionLineNumber();
+        auto exception = context->GetExceptionString();
+        Log::Error << func->GetScriptSectionName() << " (" << line << "): " << exception << Log::Endl;
     }
 }  // namespace Helpers

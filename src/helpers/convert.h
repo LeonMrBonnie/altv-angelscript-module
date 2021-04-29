@@ -8,6 +8,7 @@
 #include "../bindings/data/vector2.h"
 #include "../runtime.h"
 #include "angelscript/addon/scriptdictionary/scriptdictionary.h"
+#include "angelscript.h"
 
 namespace Helpers
 {
@@ -285,7 +286,8 @@ namespace Helpers
                     ret = context->SetArgObject(i, val);
                 CHECK_AS_RETURN("Call MValue function", ret, nullptr);
             }
-            context->Execute();
+            int r = context->Execute();
+            CHECK_FUNCTION_RETURN(r, alt::ICore::Instance().CreateMValueNone());
             auto value = ValueToMValue(func->GetReturnTypeId(), context->GetReturnAddress());
             context->Unprepare();
             return value;

@@ -1,5 +1,6 @@
 #include "timer.h"
 #include "../resource.h"
+#include "angelscript.h"
 
 using namespace Helpers;
 
@@ -16,7 +17,8 @@ bool Timer::Update(int64_t time)
     {
         auto context = resource->GetContext();
         context->Prepare(callback);
-        context->Execute();
+        int r = context->Execute();
+        CHECK_FUNCTION_RETURN(r, false);
 
         lastRun = time;
 

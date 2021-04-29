@@ -5,7 +5,8 @@
 #include "helpers/events.h"
 #include "angelscript/addon/scriptany/scriptany.h"
 #include "helpers/convert.h"
-#include "./helpers/benchmark.h"
+#include "helpers/benchmark.h"
+#include "helpers/angelscript.h"
 #include <regex>
 
 #include "./helpers/bytecode.h"
@@ -95,7 +96,8 @@ bool AngelScriptResource::Start()
     context->SetUserData(this);
 
     // Register Metadata
-    RegisterMetadata(builder, context);
+    bool result = RegisterMetadata(builder, context);
+    if(!result) return false;
 
     // Get the global start function if no main script class was found
     if(mainScriptClass == nullptr)
@@ -114,15 +116,7 @@ bool AngelScriptResource::Start()
 
         // Execute script
         r = context->Execute();
-        switch(r)
-        {
-            case asEXECUTION_EXCEPTION:
-            {
-                Log::Error << "An exception occured while executing the script. Exception: " << Log::Endl;
-                Log::Error << GetExceptionInfo(context, alt::ICore::Instance().IsDebug()) << Log::Endl;
-                break;
-            }
-        }
+        CHECK_FUNCTION_RETURN(r, false);
         context->Unprepare();
     }
 
@@ -155,7 +149,9 @@ bool AngelScriptResource::Stop()
             auto r = context->Prepare(func);
             CHECK_AS_RETURN("Stop function call", r, false);
 
-            context->Execute();
+            r = context->Execute();
+            CHECK_FUNCTION_RETURN(r, true);
+            context->Unprepare();
         }
         module->Discard();
     }
@@ -242,7 +238,7 @@ bool AngelScriptResource::OnEvent(const alt::CEvent* ev)
         CHECK_AS_RETURN("Prepare event handler", r, true);
         // Set the event args and execute callback
         r = event->Execute(this, ev);
-        CHECK_AS_RETURN("Execute event handler", r, true);
+        CHECK_FUNCTION_RETURN(r, true);
         if(r == asEXECUTION_FINISHED && shouldReturn)
         {
             auto result = context->GetReturnByte();
@@ -277,7 +273,7 @@ bool AngelScriptResource::OnEvent(const alt::CEvent* ev)
             r = context->SetObject(mainScriptClass);
             CHECK_AS_RETURN("Set main script class event method object", r, true);
             r = event->Execute(this, ev);
-            CHECK_AS_RETURN("Execute main script class event method", r, true);
+            CHECK_FUNCTION_RETURN(r, true);
             if(r == asEXECUTION_FINISHED && shouldReturn)
             {
                 auto result = context->GetReturnByte();
@@ -333,7 +329,7 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
                 CHECK_AS_RETURN("Set custom event handler arg", ret, );
             }
             r = context->Execute();
-            CHECK_AS_RETURN("Execute custom event handler", r, );
+            CHECK_FUNCTION_RETURN(r, );
         }
 
         // Check if the main script class has been set
@@ -370,7 +366,7 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
                     CHECK_AS_RETURN("Set custom event handler arg", ret, );
                 }
                 r = context->Execute();
-                CHECK_AS_RETURN("Execute main script class event method", r, );
+                CHECK_FUNCTION_RETURN(r, );
             }
         }
         context->Unprepare();
@@ -419,7 +415,7 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
                 CHECK_AS_RETURN("Set custom event handler arg", ret, );
             }
             r = context->Execute();
-            CHECK_AS_RETURN("Execute custom event handler", r, );
+            CHECK_FUNCTION_RETURN(r, );
         }
 
         // Check if the main script class has been set
@@ -463,10 +459,9 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
                     CHECK_AS_RETURN("Set custom event handler arg", ret, );
                 }
                 r = context->Execute();
-                CHECK_AS_RETURN("Execute main script class event method", r, );
+                CHECK_FUNCTION_RETURN(r, );
             }
         }
-
         context->Unprepare();
 
         for(auto [typeId, ptr] : handlerArgs)
@@ -565,7 +560,7 @@ void AngelScriptResource::OnRemoveBaseObject(alt::Ref<alt::IBaseObject> object)
     objectData.erase(object);
 }
 
-void AngelScriptResource::RegisterMetadata(CScriptBuilder& builder, asIScriptContext* context)
+bool AngelScriptResource::RegisterMetadata(CScriptBuilder& builder, asIScriptContext* context)
 {
     std::regex customEventLocalRegex("LocalEvent\\(\"(.*)\"\\)");
     std::regex customEventRemoteRegex("RemoteEvent\\(\"(.*)\"\\)");
@@ -587,10 +582,12 @@ void AngelScriptResource::RegisterMetadata(CScriptBuilder& builder, asIScriptCon
             if(factory == nullptr)
             {
                 Log::Error << "Main script class has no factory" << Log::Endl;
-                return;
+                return false;
             }
             context->Prepare(factory);
-            context->Execute();
+            int r = context->Execute();
+            CHECK_FUNCTION_RETURN(r, false);
+            context->Unprepare();
             asIScriptObject* obj = *(asIScriptObject**)context->GetAddressOfReturnValue();
             obj->AddRef();
             // Store our instance on the resource
@@ -635,9 +632,10 @@ void AngelScriptResource::RegisterMetadata(CScriptBuilder& builder, asIScriptCon
                 }
             }
 
-            return;
+            return true;
         }
     }
+    return true;
 }
 
 void AngelScriptResource::RegisterDefines(CScriptBuilder& builder)
