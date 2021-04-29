@@ -213,6 +213,8 @@ namespace Helpers
             int                line, column;
             func = context->GetFunction(i);
             line = context->GetLineNumber(i, &column, &scriptSection);
+            if(!func) continue;
+            if(func->GetFuncType() != asFUNC_SCRIPT) continue;
             Log::Colored << "~y~" << scriptSection << " (" << std::to_string(line) << ") : " << func->GetDeclaration() << Log::Endl;
             Log::Colored << "~b~Vars:" << Log::Endl;
             for(int n = 0; n < context->GetVarCount(i); n++)
