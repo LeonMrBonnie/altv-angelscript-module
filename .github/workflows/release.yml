@@ -9,7 +9,20 @@ env:
   BUILD_TYPE: Release
 
 jobs:
+  release:
+    runs-on: windows-latest
+    outputs:
+      url: ${{ steps.create-release.outputs.release-url }}
+    steps:
+    - name: Create a release draft for a version tag
+      if: matrix.OS_TYPE == 'Windows'
+      id: create-release
+      uses: ecampidoglio/auto-release-draft@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
   build:
+    needs: release
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -25,14 +38,8 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
       with:
-        submodules: recursive
-        lfs: true
-
-    - name: Get release
-      id: get_release
-      uses: bruceadams/get-release@v1.2.2
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
+      submodules: recursive
+      lfs: true
 
     - name: Build server (Windows)
       if: matrix.OS_TYPE == 'Windows'
@@ -63,7 +70,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ steps.get_release.outputs.upload_url }}
+        upload_url: ${{ needs.release.outputs.url }}
         asset_path: ./dist/server/angelscript-module.${{ matrix.EXT }}
         asset_name: angelscript-module.${{ matrix.EXT }}
         asset_content_type: application/octet-stream
