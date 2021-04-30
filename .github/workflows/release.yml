@@ -18,8 +18,8 @@ jobs:
       if: matrix.OS_TYPE == 'Windows'
       id: create-release
       uses: ecampidoglio/auto-release-draft@v1
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
 
   build:
     needs: release
