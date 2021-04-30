@@ -15,7 +15,6 @@ jobs:
       url: ${{ steps.create-release.outputs.release-url }}
     steps:
     - name: Create a release draft for a version tag
-      if: matrix.OS_TYPE == 'Windows'
       id: create-release
       uses: ecampidoglio/auto-release-draft@v1
       with:
