@@ -17,18 +17,15 @@ jobs:
           - os: windows-latest
             OS_TYPE: Windows
             EXT: dll
-          #- os: ubuntu-latest
-          #  OS_TYPE: Linux
-          #  EXT: so
+          - os: ubuntu-18.04
+            OS_TYPE: Linux
+            EXT: so
 
     steps:
     - uses: actions/checkout@v2
-
-    - name: Fetch Submodules
-      shell: bash
-      run: |
-        git submodule init
-        git submodule update
+    - with:
+        submodules: recursive
+        lfs: true
 
     - name: Create Release
       if: matrix.OS_TYPE == 'Windows'
@@ -64,7 +61,7 @@ jobs:
       if: matrix.OS_TYPE == 'Linux'
       shell: bash
       run: |
-        chmod +x ./tools/build.sh
+        chmod 777 ./tools/build.sh
         cd ./tools
         ./build.sh
 
