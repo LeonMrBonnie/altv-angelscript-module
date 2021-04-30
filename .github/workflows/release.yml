@@ -35,10 +35,10 @@ jobs:
         include:
           - os: windows-latest
             OS_TYPE: Windows
-            EXT: dll
+            FILE: angelscript-module.dll
           - os: ubuntu-18.04
             OS_TYPE: Linux
-            EXT: so
+            FILE: libangelscript-module.so
 
     steps:
     - name: Checkout repository
@@ -77,8 +77,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ needs.release.outputs.url }}
-        asset_path: ./dist/server/angelscript-module.${{ matrix.EXT }}
-        asset_name: angelscript-module.${{ matrix.EXT }}
+        asset_path: ./dist/server/${{ matrix.FILE }}
+        asset_name: ${{ matrix.FILE }}
         asset_content_type: application/octet-stream
 
     #- name: Upload Release Client Assets
