@@ -28,20 +28,11 @@ jobs:
         submodules: recursive
         lfs: true
 
-    - name: Create Release
-      if: matrix.OS_TYPE == 'Windows'
-      id: create_release
-      uses: actions/create-release@v1
+    - name: Get release
+      id: get_release
+      uses: bruceadams/get-release@v1.2.2
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-        body: |
-          Release ${{ github.ref }}
-          ${{ github.event.head_commit.message }}
-        draft: false
-        prerelease: false
+        GITHUB_TOKEN: ${{ github.token }}
 
     - name: Build server (Windows)
       if: matrix.OS_TYPE == 'Windows'
@@ -72,7 +63,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        upload_url: ${{ steps.get_release.outputs.upload_url }}
         asset_path: ./dist/server/angelscript-module.${{ matrix.EXT }}
         asset_name: angelscript-module.${{ matrix.EXT }}
         asset_content_type: application/octet-stream
@@ -84,7 +75,7 @@ jobs:
     #  env:
     #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     #  with:
-    ##    upload_url: ${{ steps.create_release.outputs.upload_url }}
+    ##    upload_url: ${{ steps.get_release.outputs.upload_url }}
     #    asset_path: ./dist/client/angelscript-client-module.${{ matrix.EXT }}
     #    asset_name: angelscript-client-module.${{ matrix.EXT }}
     #    asset_content_type: application/octet-stream
