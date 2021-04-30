@@ -38,8 +38,8 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
       with:
-      submodules: recursive
-      lfs: true
+        submodules: recursive
+        lfs: true
 
     - name: Build server (Windows)
       if: matrix.OS_TYPE == 'Windows'
