@@ -22,8 +22,9 @@ jobs:
             EXT: so
 
     steps:
-    - uses: actions/checkout@v2
-    - with:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      with:
         submodules: recursive
         lfs: true
 
