@@ -12,13 +12,20 @@ jobs:
   release:
     runs-on: windows-latest
     outputs:
-      url: ${{ steps.create-release.outputs.release-url }}
+      url: ${{ steps.create_release.outputs.upload_url }}
     steps:
-    - name: Create a release draft for a version tag
-      id: create-release
-      uses: ecampidoglio/auto-release-draft@v1
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        body: |
+          Release ${{ github.ref }}
+        draft: false
+        prerelease: false
 
   build:
     needs: release
