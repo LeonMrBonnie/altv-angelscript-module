@@ -1,5 +1,6 @@
 #pragma once
 #include <random>
+#include <stdint.h>
 
 #include "cpp-sdk/SDK.h"
 #include "Log.h"
@@ -35,16 +36,32 @@ namespace Helpers
             }
             case alt::IMValue::Type::INT:
             {
-                type       = asTYPEID_INT64;
-                auto value = new int64_t(val.As<alt::IMValueInt>()->Value());
-                valuePtr   = value;
+                auto mval = val.As<alt::IMValueInt>()->Value();
+                if(mval <= INT32_MAX)
+                {
+                    type     = asTYPEID_INT32;
+                    valuePtr = new int32_t(mval);
+                }
+                else
+                {
+                    type     = asTYPEID_INT64;
+                    valuePtr = new int64_t(mval);
+                }
                 break;
             }
             case alt::IMValue::Type::UINT:
             {
-                type       = asTYPEID_UINT64;
-                auto value = new uint64_t(val.As<alt::IMValueUInt>()->Value());
-                valuePtr   = value;
+                auto mval = val.As<alt::IMValueUInt>()->Value();
+                if(mval <= UINT32_MAX)
+                {
+                    type     = asTYPEID_UINT32;
+                    valuePtr = new uint32_t(mval);
+                }
+                else
+                {
+                    type     = asTYPEID_UINT64;
+                    valuePtr = new uint64_t(mval);
+                }
                 break;
             }
             case alt::IMValue::Type::DOUBLE:
