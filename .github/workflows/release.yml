@@ -36,9 +36,9 @@ jobs:
           - os: windows-latest
             OS_TYPE: Windows
             FILE: angelscript-module.dll
-          - os: ubuntu-18.04
-            OS_TYPE: Linux
-            FILE: libangelscript-module.so
+          #- os: ubuntu-18.04
+          #  OS_TYPE: Linux
+          #  FILE: libangelscript-module.so
 
     steps:
     - name: Checkout repository
