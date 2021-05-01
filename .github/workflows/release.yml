@@ -42,10 +42,17 @@ jobs:
 
     steps:
     - name: Checkout repository
+      if: matrix.OS_TYPE == 'Linux'
       uses: actions/checkout@v2
       with:
         submodules: recursive
         lfs: true
+    - name: Checkout repository
+      if: matrix.OS_TYPE == 'Windows'
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
+        lfs: false
 
     - name: Build server (Windows)
       if: matrix.OS_TYPE == 'Windows'
