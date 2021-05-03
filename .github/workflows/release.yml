@@ -54,12 +54,18 @@ jobs:
         submodules: recursive
         lfs: false
 
+    - name: Extract version
+      id: version
+      shell: bash
+      run: |
+        echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+
     - name: Build server (Windows)
       if: matrix.OS_TYPE == 'Windows'
       shell: bash
       run: |
         cd .\\tools
-        .\\build-server.bat
+        .\\build-server.bat %VERSION%
 
     #- name: Build client (Windows)
     #  if: matrix.OS_TYPE == 'Windows'
@@ -75,7 +81,7 @@ jobs:
       run: |
         chmod 777 ./tools/build.sh
         cd ./tools
-        ./build.sh
+        ./build.sh %VERSION%
 
     - name: Upload Release Server Assets
       id: upload_release_assets_server

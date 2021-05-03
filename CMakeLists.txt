@@ -11,6 +11,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_definitions(-DMODULE_NAME="${PROJECT_MODULE_NAME}")
 add_definitions(-DAS_MIPS)
 
+if(MODULE_VERSION)
+    add_definitions(-DMODULE_VERSION="${MODULE_VERSION}")
+endif()
+
 if(SERVER_MODULE)
 	set(PROJECT_MODULE_NAME "angelscript-module")
 	set(COMPILE_FOLDER "server")

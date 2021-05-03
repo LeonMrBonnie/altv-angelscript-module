@@ -18,7 +18,7 @@ void CommandHandler(alt::Array<alt::StringView> args, void* userData)
     }
     else if(args[0] == "--info")
     {
-        Log::Colored << "Module version: ~y~v" MODULE_VERSION << Log::Endl;
+        Log::Colored << "Module version: ~y~" MODULE_VERSION << Log::Endl;
         Log::Colored << "SDK version: ~y~v" << alt::ICore::SDK_VERSION << Log::Endl;
         Log::Colored << "AngelScript version: ~y~v" << asGetLibraryVersion() << Log::Endl;
     }
@@ -80,7 +80,7 @@ EXPORT bool altMain(alt::ICore* core)
     // Create instance of runtime and register
     auto& runtime = AngelScriptRuntime::Instance();
     core->RegisterScriptRuntime(MODULE_TYPE, &runtime);
-    Log::Colored << "Loaded AngelScript module. Version ~y~v" MODULE_VERSION << Log::Endl;
+    Log::Colored << "Loaded AngelScript module. Version ~y~" MODULE_VERSION << Log::Endl;
 
     // Register command
     core->SubscribeCommand("angelscript-module", CommandHandler);

@@ -8,8 +8,10 @@
 //#define AS_GENERATE_DOCUMENTATION
 #endif
 
-#define MODULE_VERSION "1.1.3"
-#define MODULE_TYPE    "as"
+#ifndef MODULE_VERSION
+    #define MODULE_VERSION "DEBUG"
+#endif
+#define MODULE_TYPE "as"
 
 // SDK
 #include "cpp-sdk/SDK.h"

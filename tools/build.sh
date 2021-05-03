@@ -1,13 +1,21 @@
-cd ..
+# Set version
+VERSION=DEBUG
 
+if [ $# -eq 1 ]
+    VERSION=$1
+fi
+
+# Build project
+cd ..
 if [ ! -d "./build" ]; then
     mkdir build
 fi
 cd build
-cmake -DSERVER_MODULE=1 -DCMAKE_BUILD_TYPE=Release ..
+cmake -DSERVER_MODULE=1 -DCMAKE_BUILD_TYPE=Release -DMODULE_VERSION=$VERSION ..
 cmake --build . --config Release
 cd ..
 
+# Copy output files
 if [ ! -d "./dist" ]; then
     mkdir dist
 fi
