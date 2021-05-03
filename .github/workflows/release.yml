@@ -62,7 +62,7 @@ jobs:
 
     - name: Build server (Windows)
       if: matrix.OS_TYPE == 'Windows'
-      shell: bash
+      shell: cmd
       run: |
         cd .\\tools
         .\\build-server.bat %VERSION%
@@ -77,7 +77,6 @@ jobs:
 
     - name: Build (Linux)
       if: matrix.OS_TYPE == 'Linux'
-      shell: bash
       run: |
         chmod 777 ./tools/build.sh
         cd ./tools
