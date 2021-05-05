@@ -39,18 +39,22 @@ public:
     AngelScriptResource(AngelScriptRuntime* runtime, alt::IResource* resource) : runtime(runtime), resource(resource){};
     ~AngelScriptResource() = default;
 
+    // Gets the alt:V IResource instance
     alt::IResource* GetIResource()
     {
         return resource;
     }
+    // Gets the module runtime that instantiated this resource
     AngelScriptRuntime* GetRuntime()
     {
         return runtime;
     }
+    // Gets the AngelScript context of this resource
     asIScriptContext* GetContext()
     {
         return context;
     }
+    // Gets the AngelScript module of this resource
     asIScriptModule* GetModule()
     {
         return module;
