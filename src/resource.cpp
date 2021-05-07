@@ -32,6 +32,11 @@ bool AngelScriptResource::Start()
 
     // Load file
     auto src = ReadFile(resource->GetMain());
+    if(src.IsEmpty())
+    {
+        Log::Error << "Failed to read resource main file" << Log::Endl;
+        return false;
+    }
 
     // Compile file
     CScriptBuilder builder;
