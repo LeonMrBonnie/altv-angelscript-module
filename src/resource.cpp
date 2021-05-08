@@ -104,26 +104,25 @@ bool AngelScriptResource::Start()
     bool result = RegisterMetadata(builder, context);
     if(!result) return false;
 
-    // Get the global start function if no main script class was found
-    if(mainScriptClass == nullptr)
-    {
-        auto func = module->GetFunctionByDecl("void Start()");
-        // If main function was still not found, return an error
-        if(func == nullptr)
-        {
-            Log::Error << "The main entrypoint ('void Start()') was not found" << Log::Endl;
-            module->Discard();
-            context->Release();
-            return false;
-        }
-        r = context->Prepare(func);
-        CHECK_AS_RETURN("Context prepare", r, false);
+    if(mainScriptClass != nullptr) return true;
 
-        // Execute script
-        r = context->Execute();
-        CHECK_FUNCTION_RETURN(r, false);
-        context->Unprepare();
+    // Get the global start function if no main script class was found
+    auto func = module->GetFunctionByDecl("void Start()");
+    // If main function was still not found, return an error
+    if(func == nullptr)
+    {
+        Log::Error << "The main entrypoint ('void Start()') was not found" << Log::Endl;
+        module->Discard();
+        context->Release();
+        return false;
     }
+    r = context->Prepare(func);
+    CHECK_AS_RETURN("Context prepare", r, false);
+
+    // Execute script
+    r = context->Execute();
+    CHECK_FUNCTION_RETURN(r, false);
+    context->Unprepare();
 
     return true;
 }
