@@ -41,11 +41,6 @@ AngelScriptRuntime::AngelScriptRuntime()
 void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine)
 {
     Helpers::DocsGenerator docs("alt");
-    Helpers::DocsGenerator cryptoDocs("crypto");
-    Helpers::DocsGenerator utilDocs("util");
-    Helpers::DocsGenerator httpDocs("http");
-    Helpers::DocsGenerator jsonDocs("json");
-    Helpers::DocsGenerator fileDocs("file");
 
     // Register add-ons
     RegisterScriptArray(engine, true);
@@ -85,25 +80,17 @@ void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine)
 
     // Register extensions
     ModuleExtension::RegisterAll("alt", engine, &docs);
-    ModuleExtension::RegisterAll("crypto", engine, &cryptoDocs);
-    ModuleExtension::RegisterAll("util", engine, &utilDocs);
-    ModuleExtension::RegisterAll("http", engine, &httpDocs);
-    ModuleExtension::RegisterAll("json", engine, &jsonDocs);
-    ModuleExtension::RegisterAll("file", engine, &fileDocs);
+    ModuleExtension::RegisterAll("crypto", engine);
+    ModuleExtension::RegisterAll("util", engine);
+    ModuleExtension::RegisterAll("http", engine);
+    ModuleExtension::RegisterAll("json", engine);
+    ModuleExtension::RegisterAll("file", engine);
 
     // Register events
     Event::RegisterAll(engine, &docs);
 
     // Cache type infos
     RegisterTypeInfos();
-
-    // Generate docs
-    docs.Generate();
-    cryptoDocs.Generate();
-    utilDocs.Generate();
-    httpDocs.Generate();
-    jsonDocs.Generate();
-    fileDocs.Generate();
 }
 
 void AngelScriptRuntime::RegisterTypeInfos()

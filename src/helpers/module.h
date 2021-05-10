@@ -194,14 +194,23 @@ namespace Helpers
         }
 
         // Registers all module extensions for the given module
-        static void RegisterAll(std::string name, asIScriptEngine* engine, DocsGenerator* docs)
+        static void RegisterAll(std::string name, asIScriptEngine* engine, DocsGenerator* docs = nullptr)
         {
+            // Create docs generator if none was passed
+            bool cleanupDocs = false;
+            if(docs == nullptr)
+            {
+                cleanupDocs = true;
+                docs        = new DocsGenerator(name);
+            }
             // Sets the namespace to the module name
             engine->SetDefaultNamespace(name.c_str());
             for(auto extension : extensions)
             {
                 if(extension->GetName() == name) extension->Register(engine, docs);
             }
+            docs->Generate();
+            if(cleanupDocs) delete docs;
         }
     };
 
