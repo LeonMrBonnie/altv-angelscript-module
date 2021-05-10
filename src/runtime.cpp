@@ -45,6 +45,7 @@ void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine)
     Helpers::DocsGenerator utilDocs("util");
     Helpers::DocsGenerator httpDocs("http");
     Helpers::DocsGenerator jsonDocs("json");
+    Helpers::DocsGenerator fileDocs("file");
 
     // Register add-ons
     RegisterScriptArray(engine, true);
@@ -88,6 +89,7 @@ void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine)
     ModuleExtension::RegisterAll("util", engine, &utilDocs);
     ModuleExtension::RegisterAll("http", engine, &httpDocs);
     ModuleExtension::RegisterAll("json", engine, &jsonDocs);
+    ModuleExtension::RegisterAll("file", engine, &fileDocs);
 
     // Register events
     Event::RegisterAll(engine, &docs);
@@ -101,6 +103,7 @@ void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine)
     utilDocs.Generate();
     httpDocs.Generate();
     jsonDocs.Generate();
+    fileDocs.Generate();
 }
 
 void AngelScriptRuntime::RegisterTypeInfos()

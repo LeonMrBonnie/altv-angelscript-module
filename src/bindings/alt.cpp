@@ -194,11 +194,6 @@ static void SetPassword(const std::string& password)
     alt::ICore::Instance().SetPassword(password);
 }
 
-static std::string GetRootDir()
-{
-    return alt::ICore::Instance().GetRootDirectory().ToString();
-}
-
 static int GetDefaultDimension()
 {
     return alt::DEFAULT_DIMENSION;
@@ -223,25 +218,6 @@ static std::string GetBranch()
 static uint32_t GetSDKVersion()
 {
     return alt::ICore::SDK_VERSION;
-}
-
-static std::string ReadFile(const std::string& path)
-{
-    GET_RESOURCE();
-    auto file = resource->ReadFile(path);
-    if(file.IsEmpty())
-    {
-        THROW_ERROR("File not found");
-        return nullptr;
-    }
-    return file.ToString();
-}
-
-static bool FileExists(const std::string& path)
-{
-    GET_RESOURCE();
-    auto file = resource->ReadFile(path);
-    return !file.IsEmpty();
 }
 
 static void On(const std::string& name, const std::string& handlerName)
@@ -416,13 +392,6 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_GLOBAL_PROPERTY("string", "branch", GetBranch);
     REGISTER_GLOBAL_PROPERTY("uint", "sdkVersion", GetSDKVersion);
     REGISTER_GLOBAL_PROPERTY("bool", "debugMode", IsDebugMode);
-
-    // Filesystem
-    REGISTER_GLOBAL_FUNC("string ReadFile(const string&in path)", ReadFile, "Reads the specified file contents");
-    REGISTER_GLOBAL_FUNC("bool FileExists(const string&in path)", FileExists, "Checks if the given file exists");
-#ifdef SERVER_MODULE
-    REGISTER_GLOBAL_PROPERTY("string", "rootDir", GetRootDir);
-#endif
 
     // Resource
     REGISTER_GLOBAL_FUNC("bool HasResource(const string&in name)", HasResource, "Returns whether the specified resource exists and is started");
