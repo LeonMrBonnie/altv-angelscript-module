@@ -156,7 +156,7 @@ namespace Helpers
 
         switch(type)
         {
-            case asTYPEID_VOID: return core.CreateMValueNone();
+            case asTYPEID_VOID: return core.CreateMValueNil();
             // Bool
             case asTYPEID_BOOL: return core.CreateMValueBool(*static_cast<bool*>(value));
             // Int
@@ -234,7 +234,7 @@ namespace Helpers
         // If the specified type is unknown, just return a nil value
         Log::Warning << "Invalid value type for MValue conversion: " << runtime.GetEngine()->GetTypeInfoById(type)->GetName() << " (" << type << ")"
                      << Log::Endl;
-        return core.CreateMValueNil();
+        return core.CreateMValueNone();
     }
     static bool IsTypePrimitive(int type)
     {
