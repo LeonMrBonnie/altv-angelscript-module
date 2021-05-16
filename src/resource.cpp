@@ -521,6 +521,7 @@ void AngelScriptResource::ShowDebugInfo()
     Log::Colored << "Global functions: ~g~" << module->GetFunctionCount() << Log::Endl;
     Log::Colored << "Global classes: ~g~" << module->GetObjectTypeCount() << Log::Endl;
     Log::Colored << "Global typedefs: ~g~" << module->GetTypedefCount() << Log::Endl;
+    Log::Colored << "Current context state: ~g~" << Helpers::GetContextStateName(context->GetState()) << Log::Endl;
 }
 
 void AngelScriptResource::OnTick()

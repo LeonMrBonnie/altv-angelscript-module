@@ -283,4 +283,20 @@ namespace Helpers
             }
         }
     }
+
+    static const char* GetContextStateName(asEContextState state)
+    {
+        switch(state)
+        {
+            case asEXECUTION_FINISHED: return "FINISHED";
+            case asEXECUTION_SUSPENDED: return "SUSPENDED";
+            case asEXECUTION_ABORTED: return "ABORTED";
+            case asEXECUTION_EXCEPTION: return "EXCEPTION";
+            case asEXECUTION_PREPARED: return "PREPARED";
+            case asEXECUTION_UNINITIALIZED: return "UNINITIALIZED";
+            case asEXECUTION_ACTIVE: return "ACTIVE";
+            case asEXECUTION_ERROR: return "ERROR";
+        }
+        return "UNKNOWN";
+    }
 }  // namespace Helpers
