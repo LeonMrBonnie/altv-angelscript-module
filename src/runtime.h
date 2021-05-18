@@ -109,6 +109,8 @@ public:
         return resources.at(resource);
     }
 
+    void ShowDebugInfo();
+
     // Gets the current runtime instance or creates one if not exists
     static AngelScriptRuntime& Instance()
     {

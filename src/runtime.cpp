@@ -93,6 +93,27 @@ void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine)
     RegisterTypeInfos();
 }
 
+void AngelScriptRuntime::ShowDebugInfo()
+{
+    Log::Colored << "*************** ~y~AngelScript ~w~***************" << Log::Endl;
+    Log::Colored << "Registered enums: ~g~" << engine->GetEnumCount() << Log::Endl;
+    Log::Colored << "Registered funcdefs: ~g~" << engine->GetFuncdefCount() << Log::Endl;
+    Log::Colored << "Registered functions: ~g~" << engine->GetGlobalFunctionCount() << Log::Endl;
+    Log::Colored << "Registered variables: ~g~" << engine->GetGlobalPropertyCount() << Log::Endl;
+    Log::Colored << "Registered classes: ~g~" << engine->GetObjectTypeCount() << Log::Endl;
+    Log::Colored << "Registered typedefs: ~g~" << engine->GetTypedefCount() << Log::Endl;
+    Log::Colored << "Running modules: ~g~" << engine->GetModuleCount() << Log::Endl;
+
+    asUINT curSize, totalDestroyed, totalDetected, newObjs, totalNewDestroyed;
+    engine->GetGCStatistics(&curSize, &totalDestroyed, &totalDetected, &newObjs, &totalNewDestroyed);
+    Log::Colored << "*** GC Stats ***" << Log::Endl;
+    Log::Colored << "Current size: ~g~" << curSize << Log::Endl;
+    Log::Colored << "Total destroyed: ~g~" << totalDestroyed << Log::Endl;
+    Log::Colored << "Total detected: ~g~" << totalDetected << Log::Endl;
+    Log::Colored << "Total new destroyed: ~g~" << totalNewDestroyed << Log::Endl;
+    Log::Colored << "New objects: ~g~" << newObjs << Log::Endl;
+}
+
 void AngelScriptRuntime::RegisterTypeInfos()
 {
     // Register all commonly used types once to save performance

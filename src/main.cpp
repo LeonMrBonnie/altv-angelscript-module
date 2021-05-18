@@ -46,6 +46,7 @@ void CommandHandler(alt::Array<alt::StringView> args, void* userData)
         if(type == "general")
         {
             // Show general debug info
+            AngelScriptRuntime::Instance().ShowDebugInfo();
         }
         else if(type == "resource")
         {
