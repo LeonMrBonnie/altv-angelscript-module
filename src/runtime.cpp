@@ -102,6 +102,7 @@ void AngelScriptRuntime::ShowDebugInfo()
     Log::Colored << "Registered variables: ~g~" << engine->GetGlobalPropertyCount() << Log::Endl;
     Log::Colored << "Registered classes: ~g~" << engine->GetObjectTypeCount() << Log::Endl;
     Log::Colored << "Registered typedefs: ~g~" << engine->GetTypedefCount() << Log::Endl;
+    Log::Colored << "Registered module extensions: ~g~" << ModuleExtension::GetCount() << Log::Endl;
     Log::Colored << "Running modules: ~g~" << engine->GetModuleCount() << Log::Endl;
 
     asUINT curSize, totalDestroyed, totalDetected, newObjs, totalNewDestroyed;

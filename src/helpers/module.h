@@ -6,6 +6,7 @@
 #include "angelscript/addon/scriptbuilder/scriptbuilder.h"
 #include "../resource.h"
 #include "./docs.h"
+#include <algorithm>
 
 // Registers a new global function (e.g. 'alt::Log')
 #define REGISTER_GLOBAL_FUNC(decl, func, desc)                                                \
@@ -211,6 +212,16 @@ namespace Helpers
             }
             docs->Generate();
             if(cleanupDocs) delete docs;
+        }
+
+        static size_t GetCount()
+        {
+            std::vector<std::string> counted;
+            for(auto extension : extensions)
+            {
+                if(std::find(counted.begin(), counted.end(), extension->GetName()) != counted.end()) counted.push_back(extension->GetName());
+            }
+            return counted.size();
         }
     };
 
