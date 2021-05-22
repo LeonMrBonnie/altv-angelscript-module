@@ -219,7 +219,7 @@ namespace Helpers
             std::vector<std::string> counted;
             for(auto extension : extensions)
             {
-                if(std::find(counted.begin(), counted.end(), extension->GetName()) != counted.end()) counted.push_back(extension->GetName());
+                if(std::find(counted.begin(), counted.end(), extension->GetName()) == counted.end()) counted.push_back(extension->GetName());
             }
             return counted.size();
         }
