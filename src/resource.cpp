@@ -592,11 +592,11 @@ bool AngelScriptResource::RegisterMetadata(CScriptBuilder& builder, asIScriptCon
             context->Prepare(factory);
             int r = context->Execute();
             CHECK_FUNCTION_RETURN(r, false);
-            context->Unprepare();
             asIScriptObject* obj = *(asIScriptObject**)context->GetAddressOfReturnValue();
             obj->AddRef();
             // Store our instance on the resource
             mainScriptClass = obj;
+            context->Unprepare();
 
             // Get all methods and check their metadata
             for(uint32_t n = 0; n < type->GetMethodCount(); n++)
