@@ -299,4 +299,18 @@ namespace Helpers
         }
         return "UNKNOWN";
     }
+
+    // first = amount of total methods, second = amount of total properties
+    static std::pair<int, int> GetRegisteredClassesStats(asIScriptEngine* engine)
+    {
+        int totalMethods    = 0;
+        int totalProperties = 0;
+        for(asUINT i = 0; i < engine->GetObjectTypeCount(); i++)
+        {
+            auto typeClass = engine->GetObjectTypeByIndex(i);
+            totalMethods += typeClass->GetMethodCount();
+            totalProperties += typeClass->GetPropertyCount();
+        }
+        return { totalMethods, totalProperties };
+    }
 }  // namespace Helpers

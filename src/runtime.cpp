@@ -101,6 +101,9 @@ void AngelScriptRuntime::ShowDebugInfo()
     Log::Colored << "Registered functions: ~g~" << engine->GetGlobalFunctionCount() << Log::Endl;
     Log::Colored << "Registered variables: ~g~" << engine->GetGlobalPropertyCount() << Log::Endl;
     Log::Colored << "Registered classes: ~g~" << engine->GetObjectTypeCount() << Log::Endl;
+    auto classesStats = Helpers::GetRegisteredClassesStats(engine);
+    Log::Colored << "Registered class methods: ~g~" << classesStats.first << Log::Endl;
+    Log::Colored << "Registered class properties: ~g~" << classesStats.second << Log::Endl;
     Log::Colored << "Registered typedefs: ~g~" << engine->GetTypedefCount() << Log::Endl;
     Log::Colored << "Registered module extensions: ~g~" << ModuleExtension::GetCount() << Log::Endl;
     Log::Colored << "Running modules: ~g~" << engine->GetModuleCount() << Log::Endl;
