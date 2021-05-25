@@ -39,6 +39,12 @@ public:
     AngelScriptResource(AngelScriptRuntime* runtime, alt::IResource* resource) : runtime(runtime), resource(resource){};
     ~AngelScriptResource() = default;
 
+    bool MakeClient(alt::IResource::CreationInfo* info, alt::Array<alt::String> files) override
+    {
+        info->type = "js";
+        return true;
+    }
+
     // Gets the alt:V IResource instance
     alt::IResource* GetIResource()
     {
