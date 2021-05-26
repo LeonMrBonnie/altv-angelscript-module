@@ -41,6 +41,7 @@ public:
 
     bool MakeClient(alt::IResource::CreationInfo* info, alt::Array<alt::String> files) override
     {
+        // todo: change this to 'as' when client module is ready
         info->type = "js";
         return true;
     }
