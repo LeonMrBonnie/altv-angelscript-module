@@ -40,14 +40,14 @@
 #define REGISTER_VALUE_CLASS(name, type, flags, desc)                                    \
     {                                                                                    \
         engine->RegisterObjectType(name, sizeof(type), flags | asGetTypeTraits<type>()); \
-        docs->PushObjectType(name, desc);                                                \
+        docs->PushObjectType(name, desc, "");                                            \
     }
 
 // Registers a new ref type class (e.g. Player)
-#define REGISTER_REF_CLASS(name, type, flags, desc) \
-    {                                               \
-        engine->RegisterObjectType(name, 0, flags); \
-        docs.PushObjectType(name, desc);            \
+#define REGISTER_REF_CLASS(name, type, flags, desc, base) \
+    {                                                     \
+        engine->RegisterObjectType(name, 0, flags);       \
+        docs.PushObjectType(name, desc, "" base);         \
     }
 
 // Registers a new class constructor

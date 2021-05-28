@@ -25,7 +25,7 @@ namespace Helpers
         std::vector<std::pair<std::string, std::string>>                  variables;
         std::vector<std::pair<std::string, std::string>>                  funcDefs;
         std::vector<std::pair<std::string, std::string>>                  eventDeclarations;
-        std::vector<std::pair<std::string, std::string>>                  objectTypes;
+        std::vector<std::tuple<std::string, std::string, std::string>>    objectTypes;
         std::vector<std::pair<std::string, std::string>>                  enumTypes;
         std::unordered_multimap<std::string, std::pair<std::string, int>> enumValues;
         std::unordered_multimap<std::string, std::string>                 objectDeclarations;
@@ -59,10 +59,10 @@ namespace Helpers
             eventDeclarations.push_back(std::pair(funcDef.insert(0, "funcdef "), globalFunc));
 #endif
         }
-        void PushObjectType(std::string name, std::string desc)
+        void PushObjectType(std::string name, std::string desc, std::string base)
         {
 #ifdef AS_GENERATE_DOCUMENTATION
-            objectTypes.push_back(std::pair(name, desc));
+            objectTypes.push_back(std::tuple(name, desc, base));
 #endif
         }
         void PushObjectProperty(std::string object, std::string propertyDecl)
@@ -206,24 +206,27 @@ namespace Helpers
                 stream << PAD_SPACE << "// ********** Objects **********\n";
                 for(auto obj : objectTypes)
                 {
+                    auto [name, desc, base] = obj;
                     stream << "\n";
-                    stream << PAD_SPACE << "// " << obj.second << "\n";
-                    stream << PAD_SPACE << "class " << obj.first << "\n";
+                    stream << PAD_SPACE << "// " << desc << "\n";
+                    stream << PAD_SPACE << "class " << name;
+                    if(base != "") stream << " : " << base;
+                    stream << "\n";
                     stream << PAD_SPACE << "{\n";
                     for(auto kv : objectDeclarations)
                     {
-                        if(kv.first != obj.first) continue;
+                        if(kv.first != name) continue;
                         stream << PAD_SPACE << PAD_SPACE << kv.second << ";\n";
                     }
                     stream << "\n";
                     for(auto kv : objectConstructors)
                     {
-                        if(kv.first != obj.first) continue;
-                        stream << PAD_SPACE << PAD_SPACE << obj.first << "(" << kv.second << ");\n";
+                        if(kv.first != name) continue;
+                        stream << PAD_SPACE << PAD_SPACE << name << "(" << kv.second << ");\n";
                     }
                     for(auto kv : objectMethods)
                     {
-                        if(kv.first != obj.first) continue;
+                        if(kv.first != name) continue;
                         stream << PAD_SPACE << PAD_SPACE << kv.second << ";\n";
                     }
                     stream << PAD_SPACE << "};\n";
