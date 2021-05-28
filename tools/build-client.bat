@@ -18,6 +18,6 @@ IF NOT EXIST dist\ (
 copy build\win64\client\Release\angelscript-client-module.dll dist\client
 copy build\win64\client\Release\angelscript-client-module.pdb dist\client
 
-IF EXIST tools\extra.bat (
-    tools\extra.bat
+IF EXIST tools\extra-client.bat (
+    tools\extra-client.bat
 )

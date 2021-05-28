@@ -2,7 +2,8 @@
 build
 CMakeFiles
 dist
-tools/extra.bat
+tools/extra-client.bat
+tools/extra-server.bat
 tools/release.bat
 
 # CMake

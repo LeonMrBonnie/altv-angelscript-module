@@ -26,6 +26,6 @@ copy build\win64\server\Release\angelscript-module.dll dist\server
 copy build\win64\server\Release\angelscript-module.pdb dist\server
 
 :: Run post-compile script
-IF EXIST tools\extra.bat (
-    tools\extra.bat
+IF EXIST tools\extra-server.bat (
+    tools\extra-server.bat
 )
