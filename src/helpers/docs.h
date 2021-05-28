@@ -242,7 +242,7 @@ namespace Helpers
             file.open(moduleName + "Docs.as");
             file << stream.str();
             file.close();
-            Log::Info << "[AS] Generated " << moduleName << " docs" << Log::Endl;
+            Log::Colored << "~y~Generated ~w~" << moduleName << " ~y~docs" << Log::Endl;
 #endif
         }
     };
