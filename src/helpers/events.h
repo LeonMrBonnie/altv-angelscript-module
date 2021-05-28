@@ -8,27 +8,41 @@
 #include "module.h"
 
 // Registers a new event handler and creates a wrapper function for registering it
-#define REGISTER_EVENT_HANDLER(type, name, returnType, decl, argsGetter)                                                   \
-    static void On##name(asIScriptFunction* callback)                                                                      \
-    {                                                                                                                      \
-        GET_RESOURCE();                                                                                                    \
-        resource->RegisterEventHandler(type, callback);                                                                    \
-    }                                                                                                                      \
-    static Event Event##name(type, #name, returnType, decl, argsGetter, [](asIScriptEngine* engine, DocsGenerator* docs) { \
-        std::stringstream funcDef;                                                                                         \
-        funcDef << returnType << " " << #name << "Callback(" << decl << ")";                                               \
-        engine->RegisterFuncdef(funcDef.str().c_str());                                                                    \
-        std::stringstream globalFunc;                                                                                      \
-        globalFunc << "void On" << #name << "(" << #name << "Callback@ callback)";                                         \
-        engine->RegisterGlobalFunction(globalFunc.str().c_str(), asFUNCTION(On##name), asCALL_CDECL);                      \
-        docs->PushEventDeclaration(funcDef.str(), globalFunc.str());                                                       \
-    });
+#define REGISTER_EVENT_HANDLER(type, name, returnType, decl, argsGetter, flag)                          \
+    static void On##name(asIScriptFunction* callback)                                                   \
+    {                                                                                                   \
+        GET_RESOURCE();                                                                                 \
+        resource->RegisterEventHandler(type, callback);                                                 \
+    }                                                                                                   \
+    static Event Event##name(                                                                           \
+      type,                                                                                             \
+      #name,                                                                                            \
+      returnType,                                                                                       \
+      decl,                                                                                             \
+      argsGetter,                                                                                       \
+      [](asIScriptEngine* engine, DocsGenerator* docs) {                                                \
+          std::stringstream funcDef;                                                                    \
+          funcDef << returnType << " " << #name << "Callback(" << decl << ")";                          \
+          engine->RegisterFuncdef(funcDef.str().c_str());                                               \
+          std::stringstream globalFunc;                                                                 \
+          globalFunc << "void On" << #name << "(" << #name << "Callback@ callback)";                    \
+          engine->RegisterGlobalFunction(globalFunc.str().c_str(), asFUNCTION(On##name), asCALL_CDECL); \
+          docs->PushEventDeclaration(funcDef.str(), globalFunc.str());                                  \
+      },                                                                                                \
+      flag);
 
 namespace Helpers
 {
     using CallbacksGetter  = std::vector<asIScriptFunction*> (*)(AngelScriptResource* resource, const alt::CEvent* event, std::string name);
     using ExecuteCallback  = int (*)(AngelScriptResource* resource, const alt::CEvent* event, asIScriptContext* context);
     using RegisterCallback = void (*)(asIScriptEngine* engine, DocsGenerator* docs);
+
+    enum class EventFlag : uint8_t
+    {
+        SHARED,
+        CLIENT_ONLY,
+        SERVER_ONLY
+    };
 
     class Event
     {
@@ -47,7 +61,8 @@ namespace Helpers
               const char*       returnType,
               const char*       callbackDecl,
               ExecuteCallback   executeCallback,
-              RegisterCallback  registerCallback)
+              RegisterCallback  registerCallback,
+              EventFlag         flag = EventFlag::SHARED)
             : type(type),
               name(std::move(name)),
               callbackDecl(callbackDecl),
@@ -55,7 +70,22 @@ namespace Helpers
               executeCallback(executeCallback),
               registerCallback(registerCallback)
         {
-            all.insert({ type, this });
+            bool isAvailable = false;
+            if(flag == EventFlag::SHARED) isAvailable = true;
+            else if(flag == EventFlag::CLIENT_ONLY)
+            {
+#ifdef CLIENT_MODULE
+                isAvailable = true;
+#endif
+            }
+            else if(flag == EventFlag::SERVER_ONLY)
+            {
+#ifdef SERVER_MODULE
+                isAvailable = true;
+#endif
+            }
+
+            if(isAvailable) all.insert({ type, this });
         };
 
         int Execute(AngelScriptResource* resource, const alt::CEvent* event)

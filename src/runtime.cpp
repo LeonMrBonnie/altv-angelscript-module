@@ -79,8 +79,8 @@ void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine)
     REGISTER_REF_CLASS("ColShapeCircle", alt::IColShape, asOBJ_REF, "alt:V ColShape circle", "ColShape");
     REGISTER_REF_CLASS("ColShapeCuboid", alt::IColShape, asOBJ_REF, "alt:V ColShape cuboid", "ColShape");
     REGISTER_REF_CLASS("ColShapeRect", alt::IColShape, asOBJ_REF, "alt:V ColShape rectangle", "ColShape");
-#endif
     REGISTER_REF_CLASS("Checkpoint", alt::IColShape, asOBJ_REF, "alt:V ColShape checkpoint", "ColShape");
+#endif
     REGISTER_REF_CLASS("Blip", alt::IBlip, asOBJ_REF, "alt:V Blip", "WorldObject");
 
     // Register extensions
