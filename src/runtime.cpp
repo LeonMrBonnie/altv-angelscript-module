@@ -40,7 +40,12 @@ AngelScriptRuntime::AngelScriptRuntime()
 
 void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine)
 {
-    Helpers::DocsGenerator docs("alt");
+#ifdef SERVER_MODULE
+    Helpers::DocsGenerator docs("altServer");
+#endif
+#ifdef CLIENT_MODULE
+    Helpers::DocsGenerator docs("altClient");
+#endif
 
     // Register add-ons
     RegisterScriptArray(engine, true);

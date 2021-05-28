@@ -1,4 +1,4 @@
-// Generated on Thu Mar 25 15:14:10 2021
+// Generated on Fri May 28 22:57:24 2021
 
 namespace alt
 {
@@ -80,8 +80,6 @@ namespace alt
 
     bool debugMode;
 
-    string rootDir;
-
     string resourceMain;
 
     string resourceName;
@@ -108,12 +106,6 @@ namespace alt
 
     // Gets the entity with the specified ID
     Entity@ GetEntityByID(uint16 id);
-
-    // Reads the specified file contents
-    string ReadFile(const string&in path);
-
-    // Checks if the given file exists
-    bool FileExists(const string&in path);
 
     // Returns whether the specified resource exists and is started
     bool HasResource(const string&in name);
@@ -207,71 +199,6 @@ namespace alt
 
     // Deletes the specified synced meta key
     void DeleteSyncedMeta(const string&in key);
-
-    // ********** Events **********
-
-    funcdef void RemoveEntityCallback(Entity@ entity);
-    void OnRemoveEntity(RemoveEntityCallback@ callback);
-
-    funcdef void RemoveBaseObjectCallback(BaseObject@ object);
-    void OnRemoveBaseObject(RemoveBaseObjectCallback@ callback);
-
-    funcdef void CreateBaseObjectCallback(BaseObject@ object);
-    void OnCreateBaseObject(CreateBaseObjectCallback@ callback);
-
-    funcdef void ResourceStartCallback(const string &in resource);
-    void OnResourceStart(ResourceStartCallback@ callback);
-
-    funcdef void ResourceStopCallback(const string &in resource);
-    void OnResourceStop(ResourceStopCallback@ callback);
-
-    funcdef void ConsoleCommandCallback(const string&in command, array<string> args);
-    void OnConsoleCommand(ConsoleCommandCallback@ callback);
-
-    funcdef void ColshapeStateChangeCallback(ColShape@ colshape, Entity@ entity, bool&in state);
-    void OnColshapeStateChange(ColshapeStateChangeCallback@ callback);
-
-    funcdef void PlayerConnectCallback(Player@ player);
-    void OnPlayerConnect(PlayerConnectCallback@ callback);
-
-    funcdef void PlayerDisconnectCallback(Player@ player, string reason);
-    void OnPlayerDisconnect(PlayerDisconnectCallback@ callback);
-
-    funcdef void PlayerDamageCallback(Player@ player, Entity@ attacker, uint&in damage, uint&in weapon);
-    void OnPlayerDamage(PlayerDamageCallback@ callback);
-
-    funcdef void PlayerDeathCallback(Player@ player, Entity@ killer, uint&in weapon);
-    void OnPlayerDeath(PlayerDeathCallback@ callback);
-
-    funcdef void PlayerWeaponChangeCallback(Player@ player, uint&in oldWeapon, uint&in newWeapon);
-    void OnPlayerWeaponChange(PlayerWeaponChangeCallback@ callback);
-
-    funcdef void WeaponDamageCallback(Player@ source, Entity@ target, uint&in weapon, uint&in damage, Vector3 offset, uint&in bodyPart);
-    void OnWeaponDamage(WeaponDamageCallback@ callback);
-
-    funcdef void PlayerEnteredVehicleCallback(Player@ player, Vehicle@ vehicle, uint8&in seat);
-    void OnPlayerEnteredVehicle(PlayerEnteredVehicleCallback@ callback);
-
-    funcdef void PlayerEnteringVehicleCallback(Player@ player, Vehicle@ vehicle, uint8&in seat);
-    void OnPlayerEnteringVehicle(PlayerEnteringVehicleCallback@ callback);
-
-    funcdef void PlayerLeaveVehicleCallback(Player@ player, Vehicle@ vehicle, uint8&in seat);
-    void OnPlayerLeaveVehicle(PlayerLeaveVehicleCallback@ callback);
-
-    funcdef void PlayerChangedVehicleSeatCallback(Player@ player, Vehicle@ vehicle, uint&in oldSeat, uint&in newSeat);
-    void OnPlayerChangedVehicleSeat(PlayerChangedVehicleSeatCallback@ callback);
-
-    funcdef void VehicleDestroyCallback(Vehicle@ vehicle);
-    void OnVehicleDestroy(VehicleDestroyCallback@ callback);
-
-    funcdef void VehicleAttachCallback(Vehicle@ vehicle, Vehicle@ attachedVehicle);
-    void OnVehicleAttach(VehicleAttachCallback@ callback);
-
-    funcdef void VehicleDetachCallback(Vehicle@ vehicle, Vehicle@ detachedVehicle);
-    void OnVehicleDetach(VehicleDetachCallback@ callback);
-
-    funcdef void NetOwnerChangeCallback(Vehicle@ vehicle, Player@ oldOwner, Player@ newOwner);
-    void OnNetOwnerChange(NetOwnerChangeCallback@ callback);
 
     // ********** Objects **********
 
@@ -396,7 +323,7 @@ namespace alt
     };
 
     // World object superclass for all alt:V world objects
-    class WorldObject
+    class WorldObject : BaseObject
     {
         uint8 type;
         bool valid;
@@ -415,7 +342,7 @@ namespace alt
     };
 
     // Entity superclass for all alt:V entities
-    class Entity
+    class Entity : WorldObject
     {
         uint8 type;
         bool valid;
@@ -450,7 +377,7 @@ namespace alt
     };
 
     // alt:V Player Entity
-    class Player
+    class Player : Entity
     {
         uint8 type;
         bool valid;
@@ -540,7 +467,7 @@ namespace alt
     };
 
     // alt:V Vehicle Entity
-    class Vehicle
+    class Vehicle : Entity
     {
         uint8 type;
         bool valid;
@@ -663,7 +590,7 @@ namespace alt
     };
 
     // alt:V Voice Channel
-    class VoiceChannel
+    class VoiceChannel : BaseObject
     {
         uint8 type;
         bool valid;
@@ -690,7 +617,7 @@ namespace alt
     };
 
     // alt:V Generic ColShape
-    class ColShape
+    class ColShape : WorldObject
     {
         uint8 type;
         bool valid;
@@ -714,7 +641,7 @@ namespace alt
     };
 
     // alt:V ColShape sphere
-    class ColShapeSphere
+    class ColShapeSphere : ColShape
     {
         uint8 type;
         bool valid;
@@ -739,7 +666,7 @@ namespace alt
     };
 
     // alt:V ColShape cylinder
-    class ColShapeCylinder
+    class ColShapeCylinder : ColShape
     {
         uint8 type;
         bool valid;
@@ -764,7 +691,7 @@ namespace alt
     };
 
     // alt:V ColShape circle
-    class ColShapeCircle
+    class ColShapeCircle : ColShape
     {
         uint8 type;
         bool valid;
@@ -789,7 +716,7 @@ namespace alt
     };
 
     // alt:V ColShape cuboid
-    class ColShapeCuboid
+    class ColShapeCuboid : ColShape
     {
         uint8 type;
         bool valid;
@@ -814,7 +741,7 @@ namespace alt
     };
 
     // alt:V ColShape rectangle
-    class ColShapeRect
+    class ColShapeRect : ColShape
     {
         uint8 type;
         bool valid;
@@ -839,7 +766,7 @@ namespace alt
     };
 
     // alt:V ColShape checkpoint
-    class Checkpoint
+    class Checkpoint : ColShape
     {
         uint8 type;
         bool valid;
@@ -864,7 +791,7 @@ namespace alt
     };
 
     // alt:V Blip
-    class Blip
+    class Blip : WorldObject
     {
         uint8 type;
         bool valid;

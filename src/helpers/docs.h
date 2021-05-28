@@ -239,7 +239,7 @@ namespace Helpers
 
             // Write the docs to file
             std::ofstream file;
-            file.open(moduleName.append("Docs.as"));
+            file.open(moduleName + "Docs.as");
             file << stream.str();
             file.close();
 #endif

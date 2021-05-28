@@ -42,7 +42,7 @@ public:
     bool MakeClient(alt::IResource::CreationInfo* info, alt::Array<alt::String> files)
     {
         // todo: change this to 'as' when client module is ready
-        info->type = "js";
+        // info->type = "as";
         return true;
     }
 
