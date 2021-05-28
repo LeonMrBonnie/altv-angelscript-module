@@ -22,10 +22,12 @@ static bool FileExists(const std::string& path)
     return !file.IsEmpty();
 }
 
+#ifdef SERVER_MODULE
 static std::string GetRootDir()
 {
     return alt::ICore::Instance().GetRootDirectory().ToString();
 }
+#endif
 
 static ModuleExtension fileExtension("file", [](asIScriptEngine* engine, DocsGenerator* docs) {
     REGISTER_GLOBAL_FUNC("string ReadFile(const string&in path)", ReadFile, "Reads the specified file contents");
