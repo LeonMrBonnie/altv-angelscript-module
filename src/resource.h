@@ -39,7 +39,7 @@ public:
     AngelScriptResource(AngelScriptRuntime* runtime, alt::IResource* resource) : runtime(runtime), resource(resource){};
     ~AngelScriptResource() = default;
 
-    bool MakeClient(alt::IResource::CreationInfo* info, alt::Array<alt::String> files) override
+    bool MakeClient(alt::IResource::CreationInfo* info, alt::Array<alt::String> files)
     {
         // todo: change this to 'as' when client module is ready
         info->type = "js";
