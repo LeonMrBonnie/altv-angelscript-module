@@ -96,6 +96,8 @@ void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine)
 
     // Cache type infos
     RegisterTypeInfos();
+
+    engine->SetDefaultNamespace("alt");
 }
 
 void AngelScriptRuntime::ShowDebugInfo()
