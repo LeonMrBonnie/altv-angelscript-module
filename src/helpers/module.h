@@ -226,9 +226,9 @@ namespace Helpers
     };
 
     // Generic Wrapper for class methods
-    template<typename FC, typename TC, auto Func, typename R = void, typename... Args>
-    static R GenericWrapper(FC* c, Args... args)
+    template<typename Type, typename OriginalType, auto Func, typename ReturnType = void, typename... Args>
+    static ReturnType GenericWrapper(Type* c, Args... args)
     {
-        return std::invoke(Func, dynamic_cast<TC*>(c), args...);
+        return std::invoke(Func, dynamic_cast<OriginalType*>(c), args...);
     }
 }  // namespace Helpers
