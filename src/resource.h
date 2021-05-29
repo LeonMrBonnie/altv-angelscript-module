@@ -22,7 +22,7 @@ class AngelScriptResource : public alt::IResource::Impl
     ObjectsMap    objects;
     ObjectDataMap objectData;
 
-    asIScriptObject* mainScriptClass = nullptr;
+    std::vector<asIScriptObject*> scriptClasses = {};
 
     // Timers
     std::unordered_map<uint32_t, Helpers::Timer*> timers;

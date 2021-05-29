@@ -104,7 +104,7 @@ bool AngelScriptResource::Start()
     bool result = RegisterMetadata(builder, context);
     if(!result) return false;
 
-    if(mainScriptClass != nullptr) return true;
+    if(scriptClasses.size() != 0) return true;
 
     // Get the global start function if no main script class was found
     auto func = module->GetFunctionByDecl("void Start()");
@@ -179,18 +179,22 @@ bool AngelScriptResource::Stop()
     }
     customRemoteEventHandlers.clear();
 
-    if(mainScriptClass != nullptr)
+    if(scriptClasses.size() != 0)
     {
-        auto type = mainScriptClass->GetObjectType();
-        for(uint32_t n = 0; n < type->GetMethodCount(); n++)
+        for(auto scriptClass : scriptClasses)
         {
-            auto method     = type->GetMethodByIndex(n);
-            auto localEvent = method->GetUserData(1);
-            if(localEvent != nullptr) delete(std::string*)localEvent;
-            auto remoteEvent = method->GetUserData(2);
-            if(remoteEvent != nullptr) delete(std::string*)remoteEvent;
+            auto type = scriptClass->GetObjectType();
+            for(uint32_t n = 0; n < type->GetMethodCount(); n++)
+            {
+                auto method     = type->GetMethodByIndex(n);
+                auto localEvent = method->GetUserData(1);
+                if(localEvent != nullptr) delete(std::string*)localEvent;
+                auto remoteEvent = method->GetUserData(2);
+                if(remoteEvent != nullptr) delete(std::string*)remoteEvent;
+            }
+            scriptClass->Release();
         }
-        mainScriptClass->Release();
+        scriptClasses.clear();
     }
 
     if(context != nullptr) context->Release();
@@ -252,39 +256,42 @@ bool AngelScriptResource::OnEvent(const alt::CEvent* ev)
         context->Unprepare();
     }
 
-    // Check if the main script class has been set
-    if(mainScriptClass != nullptr)
+    // Check if any script class exists
+    if(scriptClasses.size() != 0)
     {
-        // Get the method of the main script class for the event if it exists
-        auto               type      = mainScriptClass->GetObjectType();
-        asIScriptFunction* eventFunc = nullptr;
-        for(asUINT i = 0; i < type->GetMethodCount(); i++)
+        for(auto scriptClass : scriptClasses)
         {
-            auto func = type->GetMethodByIndex(i, true);
-            auto data = func->GetUserData();
-            if(data == nullptr) continue;
-
-            Event* eventData = static_cast<Event*>(data);
-            if(eventData->GetType() != ev->GetType()) continue;
-
-            eventFunc = func;
-            break;
-        }
-        if(eventFunc != nullptr)
-        {
-            int r = context->Prepare(eventFunc);
-            CHECK_AS_RETURN("Prepare main script class event method", r, true);
-            r = context->SetObject(mainScriptClass);
-            CHECK_AS_RETURN("Set main script class event method object", r, true);
-            r = event->Execute(this, ev);
-            CHECK_FUNCTION_RETURN(r, true);
-            if(r == asEXECUTION_FINISHED && shouldReturn)
+            // Get the method of the script class for the event if it exists
+            auto               type      = scriptClass->GetObjectType();
+            asIScriptFunction* eventFunc = nullptr;
+            for(asUINT i = 0; i < type->GetMethodCount(); i++)
             {
-                auto result = context->GetReturnByte();
-                context->Unprepare();
-                return result == 1 ? true : false;
+                auto func = type->GetMethodByIndex(i, true);
+                auto data = func->GetUserData();
+                if(data == nullptr) continue;
+
+                Event* eventData = static_cast<Event*>(data);
+                if(eventData->GetType() != ev->GetType()) continue;
+
+                eventFunc = func;
+                break;
             }
-            context->Unprepare();
+            if(eventFunc != nullptr)
+            {
+                int r = context->Prepare(eventFunc);
+                CHECK_AS_RETURN("Prepare script class event method", r, true);
+                r = context->SetObject(scriptClass);
+                CHECK_AS_RETURN("Set script class event method object", r, true);
+                r = event->Execute(this, ev);
+                CHECK_FUNCTION_RETURN(r, true);
+                if(r == asEXECUTION_FINISHED && shouldReturn)
+                {
+                    auto result = context->GetReturnByte();
+                    context->Unprepare();
+                    return result == 1 ? true : false;
+                }
+                context->Unprepare();
+            }
         }
     }
 
@@ -310,7 +317,7 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
         name                                     = ev->GetName().ToString();
         args                                     = ev->GetArgs();
         std::vector<asIScriptFunction*> handlers = GetCustomEventHandlers(name, true);
-        if(handlers.size() == 0 && mainScriptClass == nullptr) return;
+        if(handlers.size() == 0 && scriptClasses.size() == 0) return;
 
         alt::Array<std::tuple<int, void*>> handlerArgs;
         for(auto arg : args)
@@ -336,41 +343,44 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
             CHECK_FUNCTION_RETURN(r, );
         }
 
-        // Check if the main script class has been set
-        if(mainScriptClass != nullptr)
+        // Check if any script class exists
+        if(scriptClasses.size() != 0)
         {
-            // Get the method of the main script class for the event if it exists
-            auto               type      = mainScriptClass->GetObjectType();
-            asIScriptFunction* eventFunc = nullptr;
-            for(asUINT i = 0; i < type->GetMethodCount(); i++)
+            for(auto scriptClass : scriptClasses)
             {
-                auto func = type->GetMethodByIndex(i, true);
-                auto data = func->GetUserData(1);
-                if(data == nullptr) continue;
-
-                std::string* name = static_cast<std::string*>(data);
-                if(*name != ev->GetName().ToString()) continue;
-
-                eventFunc = func;
-                break;
-            }
-            if(eventFunc != nullptr)
-            {
-                int r = context->Prepare(eventFunc);
-                CHECK_AS_RETURN("Prepare main script class event method", r, );
-                r = context->SetObject(mainScriptClass);
-                CHECK_AS_RETURN("Set main script class event method object", r, );
-                for(int i = 0; i < handlerArgs.GetSize(); i++)
+                // Get the method of the script class for the event if it exists
+                auto               type      = scriptClass->GetObjectType();
+                asIScriptFunction* eventFunc = nullptr;
+                for(asUINT i = 0; i < type->GetMethodCount(); i++)
                 {
-                    auto [typeId, ptr] = handlerArgs[i];
-                    int ret;
-                    if(Helpers::IsTypePrimitive(typeId)) ret = context->SetArgAddress(i, ptr);
-                    else
-                        ret = context->SetArgObject(i, ptr);
-                    CHECK_AS_RETURN("Set custom event handler arg", ret, );
+                    auto func = type->GetMethodByIndex(i, true);
+                    auto data = func->GetUserData(1);
+                    if(data == nullptr) continue;
+
+                    std::string* name = static_cast<std::string*>(data);
+                    if(*name != ev->GetName().ToString()) continue;
+
+                    eventFunc = func;
+                    break;
                 }
-                r = context->Execute();
-                CHECK_FUNCTION_RETURN(r, );
+                if(eventFunc != nullptr)
+                {
+                    int r = context->Prepare(eventFunc);
+                    CHECK_AS_RETURN("Prepare script class event method", r, );
+                    r = context->SetObject(scriptClass);
+                    CHECK_AS_RETURN("Set script class event method object", r, );
+                    for(int i = 0; i < handlerArgs.GetSize(); i++)
+                    {
+                        auto [typeId, ptr] = handlerArgs[i];
+                        int ret;
+                        if(Helpers::IsTypePrimitive(typeId)) ret = context->SetArgAddress(i, ptr);
+                        else
+                            ret = context->SetArgObject(i, ptr);
+                        CHECK_AS_RETURN("Set custom event handler arg", ret, );
+                    }
+                    r = context->Execute();
+                    CHECK_FUNCTION_RETURN(r, );
+                }
             }
         }
         context->Unprepare();
@@ -422,48 +432,51 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
             CHECK_FUNCTION_RETURN(r, );
         }
 
-        // Check if the main script class has been set
-        if(mainScriptClass != nullptr)
+        // Check if any script classes exist
+        if(scriptClasses.size() != 0)
         {
-            // Get the method of the main script class for the event if it exists
-            auto               type      = mainScriptClass->GetObjectType();
-            asIScriptFunction* eventFunc = nullptr;
-            for(asUINT i = 0; i < type->GetMethodCount(); i++)
+            for(auto scriptClass : scriptClasses)
             {
-                auto func = type->GetMethodByIndex(i, true);
-                auto data = func->GetUserData(2);
-                if(data == nullptr) continue;
-
-                std::string* name = static_cast<std::string*>(data);
-                if(*name != ev->GetName().ToString()) continue;
-
-                eventFunc = func;
-                break;
-            }
-            if(eventFunc != nullptr)
-            {
-                int r = context->Prepare(eventFunc);
-                CHECK_AS_RETURN("Prepare main script class event method", r, );
-                r = context->SetObject(mainScriptClass);
-                CHECK_AS_RETURN("Set main script class event method object", r, );
-#ifdef SERVER_MODULE
-                context->SetArgObject(0, player.Get());
-#endif
-                for(int i = 0; i < handlerArgs.GetSize(); i++)
+                // Get the method of the script class for the event if it exists
+                auto               type      = scriptClass->GetObjectType();
+                asIScriptFunction* eventFunc = nullptr;
+                for(asUINT i = 0; i < type->GetMethodCount(); i++)
                 {
-                    int argOffset = i;
-#ifdef SERVER_MODULE
-                    argOffset += 1;
-#endif
-                    auto [typeId, ptr] = handlerArgs[i];
-                    int ret;
-                    if(Helpers::IsTypePrimitive(typeId)) ret = context->SetArgAddress(argOffset, ptr);
-                    else
-                        ret = context->SetArgObject(argOffset, ptr);
-                    CHECK_AS_RETURN("Set custom event handler arg", ret, );
+                    auto func = type->GetMethodByIndex(i, true);
+                    auto data = func->GetUserData(2);
+                    if(data == nullptr) continue;
+
+                    std::string* name = static_cast<std::string*>(data);
+                    if(*name != ev->GetName().ToString()) continue;
+
+                    eventFunc = func;
+                    break;
                 }
-                r = context->Execute();
-                CHECK_FUNCTION_RETURN(r, );
+                if(eventFunc != nullptr)
+                {
+                    int r = context->Prepare(eventFunc);
+                    CHECK_AS_RETURN("Prepare main script class event method", r, );
+                    r = context->SetObject(scriptClass);
+                    CHECK_AS_RETURN("Set main script class event method object", r, );
+#ifdef SERVER_MODULE
+                    context->SetArgObject(0, player.Get());
+#endif
+                    for(int i = 0; i < handlerArgs.GetSize(); i++)
+                    {
+                        int argOffset = i;
+#ifdef SERVER_MODULE
+                        argOffset += 1;
+#endif
+                        auto [typeId, ptr] = handlerArgs[i];
+                        int ret;
+                        if(Helpers::IsTypePrimitive(typeId)) ret = context->SetArgAddress(argOffset, ptr);
+                        else
+                            ret = context->SetArgObject(argOffset, ptr);
+                        CHECK_AS_RETURN("Set custom event handler arg", ret, );
+                    }
+                    r = context->Execute();
+                    CHECK_FUNCTION_RETURN(r, );
+                }
             }
         }
         context->Unprepare();
@@ -507,7 +520,7 @@ void AngelScriptResource::DeleteObjectData(alt::IBaseObject* object, const std::
 void AngelScriptResource::ShowDebugInfo()
 {
     Log::Colored << "*************** ~y~" << resource->GetName() << " ~w~***************" << Log::Endl;
-    Log::Colored << "Has main script class: ~g~" << (mainScriptClass != nullptr ? "true" : "false") << Log::Endl;
+    Log::Colored << "Script classes: ~g~" << scriptClasses.size() << Log::Endl;
     Log::Colored << "Timers: ~g~" << timers.size() << Log::Endl;
     Log::Colored << "Current timer id: ~g~" << nextTimerId << Log::Endl;
     Log::Colored << "Stored objects: ~g~" << objectData.size() << Log::Endl;
@@ -579,23 +592,23 @@ bool AngelScriptResource::RegisterMetadata(CScriptBuilder& builder, asIScriptCon
         std::vector<std::string> metadata = builder.GetMetadataForType(type->GetTypeId());
         for(auto meta : metadata)
         {
-            // The metadata equals Main so its our main server class
-            if(meta != "Main") continue;
+            // The metadata equals Script so its a script class
+            if(meta != "Script") continue;
 
-            // Create an instance
+            // Create an instance of the script class
             auto factory = type->GetFactoryByIndex(0);
             if(factory == nullptr)
             {
-                Log::Error << "Main script class has no factory" << Log::Endl;
-                return false;
+                Log::Error << "Script class '" << type->GetName() << "' has no factory" << Log::Endl;
+                continue;
             }
             context->Prepare(factory);
             int r = context->Execute();
             CHECK_FUNCTION_RETURN(r, false);
             asIScriptObject* obj = *(asIScriptObject**)context->GetAddressOfReturnValue();
             obj->AddRef();
-            // Store our instance on the resource
-            mainScriptClass = obj;
+            // Store our script class instance
+            scriptClasses.push_back(obj);
             context->Unprepare();
 
             // Get all methods and check their metadata
@@ -636,8 +649,6 @@ bool AngelScriptResource::RegisterMetadata(CScriptBuilder& builder, asIScriptCon
                     }
                 }
             }
-
-            return true;
         }
     }
     return true;
