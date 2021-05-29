@@ -112,13 +112,12 @@ static void SpawnPlayerVector(alt::IPlayer* player, Vector3& pos, uint32_t delay
 }
 #endif
 #pragma endregion
+#pragma region Client
+#ifdef CLIENT_MODULE
 static alt::IPlayer* GetLocalPlayer()
 {
     return alt::ICore::Instance().GetLocalPlayer().Get();
 }
-#pragma region Client
-#ifdef CLIENT_MODULE
-
 #endif
 #pragma endregion
 

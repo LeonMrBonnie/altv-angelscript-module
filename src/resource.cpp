@@ -317,184 +317,124 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
 
     std::string     name;
     alt::MValueArgs args;
-#ifdef SERVER_MODULE
+
+#ifdef CLIENT_MODULE
     if(local)
-#else
-    if(!local)
-#endif
     {
-        auto ev                                  = static_cast<const alt::CServerScriptEvent*>(event);
-        name                                     = ev->GetName().ToString();
-        args                                     = ev->GetArgs();
-        std::vector<asIScriptFunction*> handlers = GetCustomEventHandlers(name, true);
-        if(handlers.size() == 0 && scriptClasses.size() == 0) return;
-
-        alt::Array<std::tuple<int, void*>> handlerArgs;
-        for(auto arg : args)
-        {
-            std::tuple<int, void*> converted = Helpers::MValueToValue(runtime, arg);
-            handlerArgs.Push(converted);
-        }
-
-        for(auto handler : handlers)
-        {
-            auto r = context->Prepare(handler);
-            CHECK_AS_RETURN("Prepare custom event handler", r, );
-            for(int i = 0; i < handlerArgs.GetSize(); i++)
-            {
-                auto [typeId, ptr] = handlerArgs[i];
-                int ret;
-                if(Helpers::IsTypePrimitive(typeId)) ret = context->SetArgAddress(i, ptr);
-                else
-                    ret = context->SetArgObject(i, ptr);
-                CHECK_AS_RETURN("Set custom event handler arg", ret, );
-            }
-            r = context->Execute();
-            CHECK_FUNCTION_RETURN(r, );
-        }
-
-        // Check if any script class exists
-        if(scriptClasses.size() != 0)
-        {
-            for(auto scriptClass : scriptClasses)
-            {
-                // Get the method of the script class for the event if it exists
-                auto               type      = scriptClass->GetObjectType();
-                asIScriptFunction* eventFunc = nullptr;
-                for(asUINT i = 0; i < type->GetMethodCount(); i++)
-                {
-                    auto func = type->GetMethodByIndex(i, true);
-                    auto data = func->GetUserData(1);
-                    if(data == nullptr) continue;
-
-                    std::string* name = static_cast<std::string*>(data);
-                    if(*name != ev->GetName().ToString()) continue;
-
-                    eventFunc = func;
-                    break;
-                }
-                if(eventFunc != nullptr)
-                {
-                    int r = context->Prepare(eventFunc);
-                    CHECK_AS_RETURN("Prepare script class event method", r, );
-                    r = context->SetObject(scriptClass);
-                    CHECK_AS_RETURN("Set script class event method object", r, );
-                    for(int i = 0; i < handlerArgs.GetSize(); i++)
-                    {
-                        auto [typeId, ptr] = handlerArgs[i];
-                        int ret;
-                        if(Helpers::IsTypePrimitive(typeId)) ret = context->SetArgAddress(i, ptr);
-                        else
-                            ret = context->SetArgObject(i, ptr);
-                        CHECK_AS_RETURN("Set custom event handler arg", ret, );
-                    }
-                    r = context->Execute();
-                    CHECK_FUNCTION_RETURN(r, );
-                }
-            }
-        }
-        context->Unprepare();
-
-        for(auto [typeId, ptr] : handlerArgs)
-        {
-            if(typeId != runtime->GetBaseObjectTypeId()) delete ptr;
-        }
+        auto ev = static_cast<const alt::CClientScriptEvent*>(event);
+        name    = ev->GetName().ToString();
+        args    = ev->GetArgs();
+    }
+    else
+    {
+        auto ev = static_cast<const alt::CServerScriptEvent*>(event);
+        name    = ev->GetName().ToString();
+        args    = ev->GetArgs();
+    }
+#endif
+#ifdef SERVER_MODULE
+    alt::Ref<alt::IPlayer> player;
+    if(local)
+    {
+        auto ev = static_cast<const alt::CServerScriptEvent*>(event);
+        name    = ev->GetName().ToString();
+        args    = ev->GetArgs();
     }
     else
     {
         auto ev = static_cast<const alt::CClientScriptEvent*>(event);
         name    = ev->GetName().ToString();
         args    = ev->GetArgs();
-#ifdef SERVER_MODULE
-        alt::Ref<alt::IPlayer> player = ev->GetTarget();
+        player  = ev->GetTarget();
+    }
 #endif
-        std::vector<asIScriptFunction*> handlers = GetCustomEventHandlers(name, false);
-        if(handlers.size() == 0) return;
 
-        alt::Array<std::tuple<int, void*>> handlerArgs;
-        for(auto arg : args)
+    std::vector<asIScriptFunction*> handlers = GetCustomEventHandlers(name, false);
+    if(handlers.size() == 0) return;
+
+    std::vector<std::tuple<int, void*>> handlerArgs;
+    for(auto arg : args)
+    {
+        std::tuple<int, void*> converted = Helpers::MValueToValue(runtime, arg);
+        handlerArgs.push_back(converted);
+    }
+
+    for(auto handler : handlers)
+    {
+        auto r = context->Prepare(handler);
+        CHECK_AS_RETURN("Prepare custom event handler", r, );
+#ifdef SERVER_MODULE
+        context->SetArgObject(0, player.Get());
+#endif
+        for(int i = 0; i < handlerArgs.size(); i++)
         {
-            std::tuple<int, void*> converted = Helpers::MValueToValue(runtime, arg);
-            handlerArgs.Push(converted);
+            int argOffset = i;
+#ifdef SERVER_MODULE
+            argOffset += 1;
+#endif
+            auto [typeId, ptr] = handlerArgs[i];
+            int ret;
+            if(Helpers::IsTypePrimitive(typeId)) ret = context->SetArgAddress(argOffset, ptr);
+            else
+                ret = context->SetArgObject(argOffset, ptr);
+            CHECK_AS_RETURN("Set custom event handler arg", ret, );
         }
+        r = context->Execute();
+        CHECK_FUNCTION_RETURN(r, );
+    }
 
-        for(auto handler : handlers)
+    // Check if any script classes exist
+    if(scriptClasses.size() != 0)
+    {
+        for(auto scriptClass : scriptClasses)
         {
-            auto r = context->Prepare(handler);
-            CHECK_AS_RETURN("Prepare custom event handler", r, );
-#ifdef SERVER_MODULE
-            context->SetArgObject(0, player.Get());
-#endif
-            for(int i = 0; i < handlerArgs.GetSize(); i++)
+            // Get the method of the script class for the event if it exists
+            auto               type      = scriptClass->GetObjectType();
+            asIScriptFunction* eventFunc = nullptr;
+            for(asUINT i = 0; i < type->GetMethodCount(); i++)
             {
-                int argOffset = i;
-#ifdef SERVER_MODULE
-                argOffset += 1;
-#endif
-                auto [typeId, ptr] = handlerArgs[i];
-                int ret;
-                if(Helpers::IsTypePrimitive(typeId)) ret = context->SetArgAddress(argOffset, ptr);
-                else
-                    ret = context->SetArgObject(argOffset, ptr);
-                CHECK_AS_RETURN("Set custom event handler arg", ret, );
-            }
-            r = context->Execute();
-            CHECK_FUNCTION_RETURN(r, );
-        }
+                auto func = type->GetMethodByIndex(i, true);
+                auto data = func->GetUserData(2);
+                if(data == nullptr) continue;
 
-        // Check if any script classes exist
-        if(scriptClasses.size() != 0)
-        {
-            for(auto scriptClass : scriptClasses)
+                std::string* evName = static_cast<std::string*>(data);
+                if(*evName != name) continue;
+
+                eventFunc = func;
+                break;
+            }
+            if(eventFunc != nullptr)
             {
-                // Get the method of the script class for the event if it exists
-                auto               type      = scriptClass->GetObjectType();
-                asIScriptFunction* eventFunc = nullptr;
-                for(asUINT i = 0; i < type->GetMethodCount(); i++)
-                {
-                    auto func = type->GetMethodByIndex(i, true);
-                    auto data = func->GetUserData(2);
-                    if(data == nullptr) continue;
-
-                    std::string* name = static_cast<std::string*>(data);
-                    if(*name != ev->GetName().ToString()) continue;
-
-                    eventFunc = func;
-                    break;
-                }
-                if(eventFunc != nullptr)
-                {
-                    int r = context->Prepare(eventFunc);
-                    CHECK_AS_RETURN("Prepare main script class event method", r, );
-                    r = context->SetObject(scriptClass);
-                    CHECK_AS_RETURN("Set main script class event method object", r, );
+                int r = context->Prepare(eventFunc);
+                CHECK_AS_RETURN("Prepare script class event method", r, );
+                r = context->SetObject(scriptClass);
+                CHECK_AS_RETURN("Set script class event method object", r, );
 #ifdef SERVER_MODULE
-                    context->SetArgObject(0, player.Get());
+                context->SetArgObject(0, player.Get());
 #endif
-                    for(int i = 0; i < handlerArgs.GetSize(); i++)
-                    {
-                        int argOffset = i;
+                for(int i = 0; i < handlerArgs.size(); i++)
+                {
+                    int argOffset = i;
 #ifdef SERVER_MODULE
-                        argOffset += 1;
+                    argOffset += 1;
 #endif
-                        auto [typeId, ptr] = handlerArgs[i];
-                        int ret;
-                        if(Helpers::IsTypePrimitive(typeId)) ret = context->SetArgAddress(argOffset, ptr);
-                        else
-                            ret = context->SetArgObject(argOffset, ptr);
-                        CHECK_AS_RETURN("Set custom event handler arg", ret, );
-                    }
-                    r = context->Execute();
-                    CHECK_FUNCTION_RETURN(r, );
+                    auto [typeId, ptr] = handlerArgs[i];
+                    int ret;
+                    if(Helpers::IsTypePrimitive(typeId)) ret = context->SetArgAddress(argOffset, ptr);
+                    else
+                        ret = context->SetArgObject(argOffset, ptr);
+                    CHECK_AS_RETURN("Set custom event handler arg", ret, );
                 }
+                r = context->Execute();
+                CHECK_FUNCTION_RETURN(r, );
             }
         }
-        context->Unprepare();
+    }
+    context->Unprepare();
 
-        for(auto [typeId, ptr] : handlerArgs)
-        {
-            if(typeId != runtime->GetBaseObjectTypeId()) delete ptr;
-        }
+    for(auto [typeId, ptr] : handlerArgs)
+    {
+        if(typeId != runtime->GetBaseObjectTypeId()) delete ptr;
     }
 }
 
