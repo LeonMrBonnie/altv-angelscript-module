@@ -226,6 +226,16 @@ bool AngelScriptResource::OnEvent(const alt::CEvent* ev)
 #endif
         return true;
     }
+#ifdef CLIENT_MODULE
+    else if(ev->GetType() == alt::CEvent::Type::WEB_VIEW_EVENT)
+    {
+        HandleWebviewEvent(static_cast<const alt::CWebViewEvent*>(ev));
+    }
+    else if(ev->GetType() == alt::CEvent::Type::WEB_SOCKET_CLIENT_EVENT)
+    {
+        HandleWebsocketEvent(static_cast<const alt::CWebSocketClientEvent*>(ev));
+    }
+#endif
     // Get the handler for the specified event
     auto event = Helpers::Event::GetEvent(ev->GetType());
     if(event == nullptr)
@@ -487,6 +497,18 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
         }
     }
 }
+
+#ifdef CLIENT_MODULE
+void AngelScriptResource::HandleWebviewEvent(const alt::CWebViewEvent* event)
+{
+    // todo: implement webview events
+}
+
+void AngelScriptResource::HandleWebsocketEvent(const alt::CWebSocketClientEvent* event)
+{
+    // todo: implement web socket client events
+}
+#endif
 
 void AngelScriptResource::SetObjectData(alt::IBaseObject* object, const std::string& key, int type, void* value)
 {

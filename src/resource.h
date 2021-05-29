@@ -7,6 +7,7 @@
 #include "angelscript/addon/scriptarray/scriptarray.h"
 #include "angelscript/addon/scriptbuilder/scriptbuilder.h"
 #include "angelscript/addon/scripthelper/scripthelper.h"
+#include "cpp-sdk/events/CWebSocketClientEvent.h"
 
 class AngelScriptRuntime;
 class AngelScriptResource : public alt::IResource::Impl
@@ -123,6 +124,10 @@ public:
         return arr;
     }
     void HandleCustomEvent(const alt::CEvent* event, bool local = true);
+#ifdef CLIENT_MODULE
+    void HandleWebviewEvent(const alt::CWebViewEvent* event);
+    void HandleWebsocketEvent(const alt::CWebSocketClientEvent* event);
+#endif
 
     // Creates a new timer
     uint32_t CreateTimer(uint32_t timeout, asIScriptFunction* callback, bool once)

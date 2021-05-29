@@ -451,4 +451,10 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_GLOBAL_FUNC("void SetSyncedMeta(const string&in key, ?&in value)", SetSyncedMeta, "Gets the value of the specified synced meta key");
     REGISTER_GLOBAL_FUNC("void DeleteSyncedMeta(const string&in key)", DeleteSyncedMeta, "Deletes the specified synced meta key");
 #endif
+
+#ifdef CLIENT_MODULE
+    REGISTER_ENUM("KeyState", "Keypress state used for keypress event");
+    REGISTER_ENUM_VALUE("KeyState", "UP", alt::CKeyboardEvent::KeyState::UP);
+    REGISTER_ENUM_VALUE("KeyState", "DOWN", alt::CKeyboardEvent::KeyState::DOWN);
+#endif
 });
