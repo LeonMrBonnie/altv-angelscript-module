@@ -71,7 +71,7 @@ jobs:
       if: matrix.OS_TYPE == 'Windows'
       shell: bash
       run: |
-        rmdir /s /q "build"
+        rmdir "build" /s /q
         cd .\\tools
         .\\build-client.bat %VERSION%
 
