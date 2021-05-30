@@ -12,7 +12,7 @@ IF NOT EXIST build\ (
     mkdir build
 )
 pushd build
-cmake -DSERVER_MODULE=1 -DMODULE_VERSION=%VERSION% ..
+cmake -G"Visual Studio 16" -DSERVER_MODULE=1 -DMODULE_VERSION=%VERSION% ..
 cmake --build . --config Release
 popd
 

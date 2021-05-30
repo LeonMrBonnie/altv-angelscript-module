@@ -8,12 +8,8 @@ project ("altv-angelscript-module")
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_definitions(-DMODULE_NAME="${PROJECT_MODULE_NAME}")
 add_definitions(-DAS_MIPS)
-
-if(MODULE_VERSION)
-    add_definitions(-DMODULE_VERSION="${MODULE_VERSION}")
-endif()
+add_definitions(-DMODULE_VERSION="${MODULE_VERSION}")
 
 if(SERVER_MODULE)
 	set(PROJECT_MODULE_NAME "angelscript-module")
