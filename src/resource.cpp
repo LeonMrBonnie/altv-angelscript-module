@@ -148,7 +148,7 @@ bool AngelScriptResource::Stop()
     if(module != nullptr)
     {
         asIScriptFunction* func = module->GetFunctionByDecl("void Stop()");
-        if(func != 0 && context != nullptr)
+        if(func != nullptr && context != nullptr)
         {
             auto r = context->Prepare(func);
             CHECK_AS_RETURN("Stop function call", r, false);
