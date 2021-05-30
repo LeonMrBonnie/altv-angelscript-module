@@ -67,11 +67,16 @@ jobs:
         cd .\\tools
         .\\build-server.bat %VERSION%
 
+    - name: Clear build directory
+      if: matrix.OS_TYPE == 'Windows'
+      uses: JesseTG/rm@v1.0.0
+      with:
+        path: ./build
+
     - name: Build client (Windows)
       if: matrix.OS_TYPE == 'Windows'
       shell: bash
       run: |
-        del /s /q build
         cd .\\tools
         .\\build-client.bat %VERSION%
 
