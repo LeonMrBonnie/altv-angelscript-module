@@ -66,6 +66,8 @@ jobs:
       run: |
         cd .\\tools
         .\\build-server.bat %VERSION%
+      env:
+        VERSION: ${{ steps.version.outputs.VERSION }}
 
     - name: Clear build directory
       if: matrix.OS_TYPE == 'Windows'
@@ -79,6 +81,8 @@ jobs:
       run: |
         cd .\\tools
         .\\build-client.bat %VERSION%
+      env:
+        VERSION: ${{ steps.version.outputs.VERSION }}
 
     - name: Build (Linux)
       if: matrix.OS_TYPE == 'Linux'
