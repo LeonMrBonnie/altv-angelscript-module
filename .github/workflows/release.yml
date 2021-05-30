@@ -75,7 +75,7 @@ jobs:
 
     - name: Build client (Windows)
       if: matrix.OS_TYPE == 'Windows'
-      shell: bash
+      shell: cmd
       run: |
         cd .\\tools
         .\\build-client.bat %VERSION%
