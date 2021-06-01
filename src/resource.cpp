@@ -230,10 +230,12 @@ bool AngelScriptResource::OnEvent(const alt::CEvent* ev)
     else if(ev->GetType() == alt::CEvent::Type::WEB_VIEW_EVENT)
     {
         HandleWebviewEvent(static_cast<const alt::CWebViewEvent*>(ev));
+        return true;
     }
     else if(ev->GetType() == alt::CEvent::Type::WEB_SOCKET_CLIENT_EVENT)
     {
         HandleWebsocketEvent(static_cast<const alt::CWebSocketClientEvent*>(ev));
+        return true;
     }
 #endif
     // Get the handler for the specified event
