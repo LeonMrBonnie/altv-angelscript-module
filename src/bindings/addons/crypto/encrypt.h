@@ -71,8 +71,7 @@ namespace Crypto
             ENCRYPTION_ALGORITHM_CASE(SCRYPT, Scrypt);
             default:
             {
-                THROW_ERROR("Invalid algorithm specified");
-                return "";
+                AS_ASSERT(false, "Invalid encryption algorithm", "");
             }
         }
     }

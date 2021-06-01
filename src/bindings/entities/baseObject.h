@@ -36,11 +36,8 @@ template<class T>
 static void SetMeta(T* obj, const std::string& key, void* ref, int typeId)
 {
     auto mvalue = Helpers::ValueToMValue(typeId, ref);
-    if(mvalue->GetType() == alt::IMValue::Type::NIL)
-    {
-        THROW_ERROR("Invalid value passed to SetMeta");
-        return;
-    }
+    AS_ASSERT(mvalue->GetType() != alt::IMValue::Type::NIL, "Invalid value passed", );
+
     obj->SetMetaData(key, mvalue);
 }
 

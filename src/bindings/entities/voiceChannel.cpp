@@ -15,11 +15,8 @@ static std::string ToString(alt::IVoiceChannel* channel)
 static alt::IVoiceChannel* Factory(bool spatial = false, float maxDistance = 0)
 {
     auto channel = alt::ICore::Instance().CreateVoiceChannel(spatial, maxDistance);
-    if(channel.IsEmpty())
-    {
-        THROW_ERROR("Failed to create the voice channel, the voice chat is not enabled");
-        return nullptr;
-    }
+    AS_ASSERT(!channel.IsEmpty(), "Failed to create the voice channel, the voice chat is not enabled", nullptr);
+
     return channel.Get();
 }
 

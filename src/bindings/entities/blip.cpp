@@ -9,11 +9,8 @@ static alt::IBlip* BlipFactory(alt::IPlayer* target, alt::IBlip::BlipType type, 
 {
     GET_RESOURCE();
     auto blip = alt::ICore::Instance().CreateBlip(target, type, { pos.x, pos.y, pos.z });
-    if(blip.IsEmpty())
-    {
-        THROW_ERROR("Failed to create blip");
-        return nullptr;
-    }
+    AS_ASSERT(!blip.IsEmpty(), "Failed to create blip", nullptr);
+
     blip->AddRef();
     return blip.Get();
 }
@@ -22,11 +19,8 @@ static alt::IBlip* BlipFactoryAttach(alt::IPlayer* target, alt::IBlip::BlipType 
 {
     GET_RESOURCE();
     auto blip = alt::ICore::Instance().CreateBlip(target, type, attach);
-    if(blip.IsEmpty())
-    {
-        THROW_ERROR("Failed to create blip");
-        return nullptr;
-    }
+    AS_ASSERT(!blip.IsEmpty(), "Failed to create blip", nullptr);
+
     blip->AddRef();
     return blip.Get();
 }

@@ -132,11 +132,7 @@ static std::string GetResourceMain()
 static std::string GetResourcePath(const std::string& name)
 {
     auto resource = alt::ICore::Instance().GetResource(name);
-    if(resource == nullptr)
-    {
-        THROW_ERROR("Resource not found");
-        return nullptr;
-    }
+    AS_ASSERT(resource != nullptr, "Resource not found", std::string());
     return resource->GetPath().ToString();
 }
 
@@ -150,11 +146,8 @@ static CScriptDictionary* GetResourceExports(const std::string& name)
 {
     GET_RESOURCE();
     auto res = alt::ICore::Instance().GetResource(name);
-    if(res == nullptr)
-    {
-        THROW_ERROR("Resource not found");
-        return nullptr;
-    }
+    AS_ASSERT(res != nullptr, "Resource not found", nullptr);
+
     auto exports = res->GetExports();
     auto dict    = CScriptDictionary::Create(resource->GetRuntime()->GetEngine());
     for(auto it = exports->Begin(); it; it = exports->Next())
@@ -225,11 +218,8 @@ static void On(const std::string& name, const std::string& handlerName)
 {
     GET_RESOURCE();
     auto handler = resource->GetModule()->GetFunctionByName(handlerName.c_str());
-    if(handler == nullptr)
-    {
-        THROW_ERROR("Invalid handler function");
-        return;
-    }
+    AS_ASSERT(handler != nullptr, "Invalid handler function", );
+
     handler->AddRef();
     resource->RegisterCustomEventHandler(name, handler, true);
 }
@@ -239,11 +229,8 @@ static void OnClient(const std::string& name, const std::string& handlerName)
 {
     GET_RESOURCE();
     auto handler = resource->GetModule()->GetFunctionByName(handlerName.c_str());
-    if(handler == nullptr)
-    {
-        THROW_ERROR("Invalid handler function");
-        return;
-    }
+    AS_ASSERT(handler != nullptr, "Invalid handler function", );
+
     handler->AddRef();
     resource->RegisterCustomEventHandler(name, handler, false);
 }
@@ -314,21 +301,14 @@ static bool GetMeta(const std::string& key, void* ref, int typeId)
 static void SetMeta(const std::string& key, void* ref, int typeId)
 {
     auto mvalue = Helpers::ValueToMValue(typeId, ref);
-    if(mvalue->GetType() == alt::IMValue::Type::NIL)
-    {
-        THROW_ERROR("Invalid value passed to SetMeta");
-        return;
-    }
+    AS_ASSERT(mvalue->GetType() != alt::IMValue::Type::NIL, "Invalid value passed", );
+
     alt::ICore::Instance().SetMetaData(key, mvalue);
 }
 
 static void DeleteMeta(const std::string& key)
 {
-    if(!HasMeta(key))
-    {
-        THROW_ERROR("The specified meta key does not exist");
-        return;
-    }
+    AS_ASSERT(HasMeta(key), "Specified meta key does not exist", );
 
     alt::ICore::Instance().DeleteMetaData(key);
 }
@@ -356,21 +336,14 @@ static bool GetSyncedMeta(const std::string& key, void* ref, int typeId)
 static void SetSyncedMeta(const std::string& key, void* ref, int typeId)
 {
     auto mvalue = Helpers::ValueToMValue(typeId, ref);
-    if(mvalue->GetType() == alt::IMValue::Type::NIL)
-    {
-        THROW_ERROR("Invalid value passed to SetMeta");
-        return;
-    }
+    AS_ASSERT(mvalue->GetType() != alt::IMValue::Type::NIL, "Invalid value passed", );
+
     alt::ICore::Instance().SetSyncedMetaData(key, mvalue);
 }
 
 static void DeleteSyncedMeta(const std::string& key)
 {
-    if(!HasSyncedMeta(key))
-    {
-        THROW_ERROR("The specified meta key does not exist");
-        return;
-    }
+    AS_ASSERT(HasSyncedMeta(key), "Specified meta key does not exist", );
 
     alt::ICore::Instance().DeleteSyncedMetaData(key);
 }

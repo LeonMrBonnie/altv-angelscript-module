@@ -21,11 +21,8 @@ namespace JSON
     static nlohmann::json Parse(const std::string& jsonString)
     {
         nlohmann::json parsed = nlohmann::json::parse(jsonString, nullptr, false, true);
-        if(parsed.type() == nlohmann::json::value_t::discarded)
-        {
-            THROW_ERROR("Invalid JSON string");
-            return nullptr;
-        }
+        AS_ASSERT(parsed.type() != nlohmann::json::value_t::discarded, "Invalid JSON string", nlohmann::json());
+
         return parsed;
     }
 }  // namespace JSON

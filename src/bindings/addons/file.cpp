@@ -7,11 +7,8 @@ static std::string ReadFile(const std::string& path)
 {
     GET_RESOURCE();
     auto file = resource->ReadFile(path);
-    if(file.IsEmpty())
-    {
-        THROW_ERROR("File not found");
-        return nullptr;
-    }
+    AS_ASSERT(!file.IsEmpty(), "File not found", std::string());
+
     return file.ToString();
 }
 

@@ -54,11 +54,8 @@ template<class T>
 static void SetSyncedMeta(T* obj, const std::string& key, void* ref, int typeId)
 {
     auto mvalue = Helpers::ValueToMValue(typeId, ref);
-    if(mvalue->GetType() == alt::IMValue::Type::NIL)
-    {
-        THROW_ERROR("Invalid value passed to SetSyncedMeta");
-        return;
-    }
+    AS_ASSERT(mvalue->GetType() != alt::IMValue::Type::NIL, "Invalid value passed", );
+
     obj->SetSyncedMetaData(key, mvalue);
 }
 #endif
@@ -82,11 +79,8 @@ template<class T>
 static void SetStreamSyncedMeta(T* obj, const std::string& key, void* ref, int typeId)
 {
     auto mvalue = Helpers::ValueToMValue(typeId, ref);
-    if(mvalue->GetType() == alt::IMValue::Type::NIL)
-    {
-        THROW_ERROR("Invalid value passed to SetStreamSyncedMeta");
-        return;
-    }
+    AS_ASSERT(mvalue->GetType() != alt::IMValue::Type::NIL, "Invalid value passed", );
+
     obj->SetStreamSyncedMetaData(key, mvalue);
 }
 #endif

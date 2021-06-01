@@ -42,11 +42,8 @@ namespace Helpers
         }
         else
         {
-            if(destType != srcType)
-            {
-                THROW_ERROR("The specified destination value does not have the correct type");
-                return;
-            }
+            AS_ASSERT(destType == srcType, "Specified destination value does not have the correct type", );
+
             int size = engine->GetSizeOfPrimitiveType(destType);
             memcpy(dest, src, size);
         }

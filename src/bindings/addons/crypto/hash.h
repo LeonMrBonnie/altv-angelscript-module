@@ -52,8 +52,7 @@ namespace Crypto
             HASH_ALGORITHM_CASE(MD5);
             default:
             {
-                THROW_ERROR("Invalid algorithm specified");
-                return "";
+                AS_ASSERT(false, "Invalid hash algorithm", "");
             }
         }
     }
