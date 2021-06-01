@@ -414,7 +414,6 @@ static void SetStat(const std::string& stat, void* ref, int typeId)
         statData->SetUInt64Value(*static_cast<uint64_t*>(ref));
     }
 }
-
 static void GetStat(const std::string& stat, void* ref, int typeId)
 {
     auto statData = alt::ICore::Instance().GetStatData(stat);
@@ -479,7 +478,6 @@ static void GetStat(const std::string& stat, void* ref, int typeId)
         Helpers::CopyAngelscriptValue(engine, ptr, typeId, ref, typeId);
     }
 }
-
 static void ResetStat(const std::string& stat)
 {
     auto statData = alt::ICore::Instance().GetStatData(stat);
@@ -489,6 +487,87 @@ static void ResetStat(const std::string& stat)
     AS_ASSERT(type != "NONE" && type != "PROFILE_SETTING", "Stat cannot be reset", );
 
     statData->Reset();
+}
+
+static void TakeScreenshotCallback(asIScriptFunction* callback)
+{
+    GET_RESOURCE();
+
+    auto pair = new std::pair<AngelScriptResource*, asIScriptFunction*>(resource, callback);
+    alt::ICore::Instance().TakeScreenshot(
+      [](alt::StringView image, const void* userData) {
+          auto pair     = static_cast<const std::pair<AngelScriptResource*, asIScriptFunction*>*>(userData);
+          auto context  = pair->first->GetContext();
+          auto callback = pair->second;
+
+          context->Prepare(callback);
+          context->SetArgObject(0, (void*)image.CStr());
+          context->Execute();
+          context->Unprepare();
+
+          callback->Release();
+          delete pair;
+      },
+      pair);
+}
+static void TakeScreenshotEvent(const std::string& eventName)
+{
+    GET_RESOURCE();
+
+    auto pair = new std::pair<AngelScriptResource*, std::string>(resource, eventName);
+    alt::ICore::Instance().TakeScreenshot(
+      [](alt::StringView image, const void* userData) {
+          auto pair      = static_cast<const std::pair<AngelScriptResource*, std::string>*>(userData);
+          auto context   = pair->first->GetContext();
+          auto eventName = pair->second;
+
+          alt::MValueArgs args;
+          args.Push(alt::ICore::Instance().CreateMValueString(image));
+          alt::ICore::Instance().TriggerLocalEvent(eventName, args);
+
+          delete pair;
+      },
+      pair);
+}
+static void TakeScreenshotGameOnlyCallback(asIScriptFunction* callback)
+{
+    GET_RESOURCE();
+
+    auto pair = new std::pair<AngelScriptResource*, asIScriptFunction*>(resource, callback);
+    alt::ICore::Instance().TakeScreenshotGameOnly(
+      [](alt::StringView image, const void* userData) {
+          auto pair     = static_cast<const std::pair<AngelScriptResource*, asIScriptFunction*>*>(userData);
+          auto context  = pair->first->GetContext();
+          auto callback = pair->second;
+
+          context->Prepare(callback);
+          context->SetArgObject(0, (void*)image.CStr());
+          context->Execute();
+          context->Unprepare();
+
+          callback->Release();
+          delete pair;
+      },
+      pair);
+}
+static void TakeScreenshotGameOnlyEvent(const std::string& eventName)
+{
+    GET_RESOURCE();
+
+    auto pair = new std::pair<AngelScriptResource*, std::string>(resource, eventName);
+    alt::ICore::Instance().TakeScreenshotGameOnly(
+      [](alt::StringView image, const void* userData) {
+          auto pair      = static_cast<const std::pair<AngelScriptResource*, std::string>*>(userData);
+          auto context   = pair->first->GetContext();
+          auto eventName = pair->second;
+
+          alt::MValueArgs args;
+          args.Push(alt::ICore::Instance().CreateMValueString(image));
+          alt::ICore::Instance().TriggerLocalEvent(eventName, args);
+
+          delete pair;
+      },
+      pair);
 }
 #endif
 
@@ -579,5 +658,16 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_GLOBAL_FUNC("void SetStat(const string&in stat, ?&in value)", SetStat, "Sets the specified stat to the specified value");
     REGISTER_GLOBAL_FUNC("void GetStat(const string&in stat, ?&out value)", GetStat, "Gets the specified stat value");
     REGISTER_GLOBAL_FUNC("void ResetStat(const string&in stat)", ResetStat, "Resets the specified stat value");
+
+    REGISTER_FUNCDEF("void ScreenshotCallback(const string&in base64Image)", "Callback used for screenshot methods");
+    REGISTER_GLOBAL_FUNC("void TakeScreenshot(ScreenshotCallback callback)", TakeScreenshotCallback, "Takes a screenshot of the alt:V window");
+    REGISTER_GLOBAL_FUNC("void TakeScreenshot(const string&in eventName)",
+                         TakeScreenshotEvent,
+                         "Takes a screenshot of the alt:V window and emits the result to the specified event");
+    REGISTER_GLOBAL_FUNC(
+      "void TakeScreenshotGameOnly(ScreenshotCallback callback)", TakeScreenshotGameOnlyCallback, "Takes a screenshot of the GTA V window");
+    REGISTER_GLOBAL_FUNC("void TakeScreenshotGameOnly(const string&in eventName)",
+                         TakeScreenshotGameOnlyEvent,
+                         "Takes a screenshot of the GTA V window and emits the result to the specified event");
 #endif
 });
