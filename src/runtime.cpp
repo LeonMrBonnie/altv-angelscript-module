@@ -9,6 +9,7 @@
 #include "bindings/data/clothes.h"
 #include "bindings/data/props.h"
 #include "bindings/data/benchmark.h"
+#include "bindings/data/discord.h"
 #include "angelscript/addon/scriptstdstring/scriptstdstring.h"
 #include "angelscript/addon/scripthelper/scripthelper.h"
 #include "angelscript/addon/scriptarray/scriptarray.h"
@@ -61,11 +62,15 @@ void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine)
     Data::RegisterVector3(engine, &docs);
     Data::RegisterVector2(engine, &docs);
     Data::RegisterRGBA(engine, &docs);
+    Data::RegisterBenchmark(engine, &docs);
 #ifdef SERVER_MODULE
     Data::RegisterClothes(engine, &docs);
     Data::RegisterProps(engine, &docs);
 #endif
-    Data::RegisterBenchmark(engine, &docs);
+#ifdef CLIENT_MODULE
+    Data::RegisterDiscordData(engine, &docs);
+#endif
+
     REGISTER_REF_CLASS("BaseObject", alt::IBaseObject, asOBJ_REF, "Base object superclass for all alt:V base objects", "");
     REGISTER_REF_CLASS("WorldObject", alt::IWorldObject, asOBJ_REF, "World object superclass for all alt:V world objects", "BaseObject");
     REGISTER_REF_CLASS("Entity", alt::IEntity, asOBJ_REF, "Entity superclass for all alt:V entities", "WorldObject");
@@ -91,13 +96,14 @@ void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine)
     ModuleExtension::RegisterAll("json", engine);
     ModuleExtension::RegisterAll("file", engine);
 
+    // Set default namespace back to alt namespace
+    engine->SetDefaultNamespace("alt");
+
     // Register events
     Event::RegisterAll(engine, &docs);
 
     // Cache type infos
     RegisterTypeInfos();
-
-    engine->SetDefaultNamespace("alt");
 }
 
 void AngelScriptRuntime::ShowDebugInfo()

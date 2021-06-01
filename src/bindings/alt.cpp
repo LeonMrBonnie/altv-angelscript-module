@@ -6,6 +6,7 @@
 #include "../helpers/convert.h"
 #include "../helpers/angelscript.h"
 #include "../helpers/benchmark.h"
+#include "data/discord.h"
 
 using namespace Helpers;
 
@@ -375,6 +376,18 @@ static void DeleteSyncedMeta(const std::string& key)
 }
 #endif
 
+#ifdef CLIENT_MODULE
+static Data::DiscordData GetDiscordData()
+{
+    auto state = alt::ICore::Instance().GetDiscordManager();
+    return Data::DiscordData{ state->IsUserDataReady(),
+                              state->GetUserID().ToString(),
+                              state->GetUsername().ToString(),
+                              state->GetDiscriminator().ToString(),
+                              state->GetAvatar().ToString() };
+}
+#endif
+
 static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs) {
     // Generic
     REGISTER_GLOBAL_FUNC("uint Hash(const string&in value)", Hash, "Hashes the given string using the joaat algorithm");
@@ -456,5 +469,7 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_ENUM("KeyState", "Keypress state used for keypress event");
     REGISTER_ENUM_VALUE("KeyState", "UP", alt::CKeyboardEvent::KeyState::UP);
     REGISTER_ENUM_VALUE("KeyState", "DOWN", alt::CKeyboardEvent::KeyState::DOWN);
+
+    REGISTER_GLOBAL_FUNC("DiscordData GetDiscordData()", GetDiscordData, "Gets the current discord state");
 #endif
 });
