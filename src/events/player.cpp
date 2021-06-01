@@ -22,7 +22,7 @@ REGISTER_EVENT_HANDLER(alt::CEvent::Type::PLAYER_CONNECT,
 REGISTER_EVENT_HANDLER(alt::CEvent::Type::PLAYER_DISCONNECT,
                        PlayerDisconnect,
                        "void",
-                       "Player@ player, string reason",
+                       "Player@ player, const string&in reason",
                        [](AngelScriptResource* resource, const alt::CEvent* event, asIScriptContext* context) {
                            auto ev = static_cast<const alt::CPlayerDisconnectEvent*>(event);
 
