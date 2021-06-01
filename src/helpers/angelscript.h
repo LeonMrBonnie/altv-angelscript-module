@@ -20,6 +20,13 @@
         return ret;                                                                             \
     }
 
+#define AS_ASSERT(condition, error, result) \
+    if(!(condition))                        \
+    {                                       \
+        THROW_ERROR(error);                 \
+        return result;                      \
+    }
+
 namespace Helpers
 {
     static void CopyAngelscriptValue(asIScriptEngine* engine, void* src, int srcType, void* dest, int destType)
