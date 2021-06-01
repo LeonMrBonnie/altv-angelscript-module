@@ -386,6 +386,137 @@ static Data::DiscordData GetDiscordData()
                               state->GetDiscriminator().ToString(),
                               state->GetAvatar().ToString() };
 }
+
+static void SetStat(const std::string& stat, void* ref, int typeId)
+{
+    auto statData = alt::ICore::Instance().GetStatData(stat);
+    AS_ASSERT(statData != nullptr, "Stat does not exist", );
+
+    std::string type = statData->GetStatType();
+    AS_ASSERT(type != "NONE" && type != "PROFILE_SETTING", "Stat cannot be modified", );
+
+    if(type == "INT" || type == "TEXTLABEL")
+    {
+        AS_ASSERT(typeId == asTYPEID_INT32, "Invalid type, expected int32", );
+        statData->SetInt32Value(*static_cast<int32_t*>(ref));
+    }
+    else if(type == "INT64")
+    {
+        AS_ASSERT(typeId == asTYPEID_INT64, "Invalid type, expected int64", );
+        statData->SetInt64Value(*static_cast<int64_t*>(ref));
+    }
+    else if(type == "FLOAT")
+    {
+        AS_ASSERT(typeId == asTYPEID_FLOAT, "Invalid type, expected float", );
+        statData->SetFloatValue(*static_cast<float*>(ref));
+    }
+    else if(type == "BOOL")
+    {
+        AS_ASSERT(typeId == asTYPEID_BOOL, "Invalid type, expected bool", );
+        statData->SetBoolValue(*static_cast<bool*>(ref));
+    }
+    else if(type == "STRING")
+    {
+        AS_ASSERT(typeId == AngelScriptRuntime::Instance().GetStringTypeId(), "Invalid type, expected float", );
+        statData->SetStringValue(static_cast<std::string*>(ref)->c_str());
+    }
+    else if(type == "UINT8")
+    {
+        AS_ASSERT(typeId == asTYPEID_UINT8, "Invalid type, expected uint8", );
+        statData->SetUInt8Value(*static_cast<uint8_t*>(ref));
+    }
+    else if(type == "UINT16")
+    {
+        AS_ASSERT(typeId == asTYPEID_UINT16, "Invalid type, expected uint16", );
+        statData->SetUInt16Value(*static_cast<uint16_t*>(ref));
+    }
+    else if(type == "UINT32")
+    {
+        AS_ASSERT(typeId == asTYPEID_UINT32, "Invalid type, expected uint32", );
+        statData->SetUInt32Value(*static_cast<uint32_t*>(ref));
+    }
+    else if(type == "UINT64" || type == "POS" || type == "DATE" || type == "PACKED" || type == "USERID")
+    {
+        AS_ASSERT(typeId == asTYPEID_UINT64, "Invalid type, expected uint64", );
+        statData->SetUInt64Value(*static_cast<uint64_t*>(ref));
+    }
+}
+
+static void GetStat(const std::string& stat, void* ref, int typeId)
+{
+    auto statData = alt::ICore::Instance().GetStatData(stat);
+    AS_ASSERT(statData != nullptr, "Stat does not exist", );
+
+    std::string type = statData->GetStatType();
+    AS_ASSERT(type != "NONE" && type != "PROFILE_SETTING", "Stat cannot be read", );
+
+    auto engine = AngelScriptRuntime::Instance().GetEngine();
+    if(type == "INT" || type == "TEXTLABEL")
+    {
+        AS_ASSERT(typeId == asTYPEID_INT32, "Invalid type, expected int32", );
+        auto ptr = new int32_t(statData->GetInt32Value());
+        Helpers::CopyAngelscriptValue(engine, ptr, typeId, ref, typeId);
+    }
+    else if(type == "INT64")
+    {
+        AS_ASSERT(typeId == asTYPEID_INT64, "Invalid type, expected int64", );
+        auto ptr = new int64_t(statData->GetInt64Value());
+        Helpers::CopyAngelscriptValue(engine, ptr, typeId, ref, typeId);
+    }
+    else if(type == "FLOAT")
+    {
+        AS_ASSERT(typeId == asTYPEID_FLOAT, "Invalid type, expected float", );
+        auto ptr = new float(statData->GetFloatValue());
+        Helpers::CopyAngelscriptValue(engine, ptr, typeId, ref, typeId);
+    }
+    else if(type == "BOOL")
+    {
+        AS_ASSERT(typeId == asTYPEID_BOOL, "Invalid type, expected bool", );
+        auto ptr = new bool(statData->GetBoolValue());
+        Helpers::CopyAngelscriptValue(engine, ptr, typeId, ref, typeId);
+    }
+    else if(type == "STRING")
+    {
+        AS_ASSERT(typeId == AngelScriptRuntime::Instance().GetStringTypeId(), "Invalid type, expected float", );
+        auto ptr = new std::string(statData->GetStringValue());
+        Helpers::CopyAngelscriptValue(engine, ptr, typeId, ref, typeId);
+    }
+    else if(type == "UINT8")
+    {
+        AS_ASSERT(typeId == asTYPEID_UINT8, "Invalid type, expected uint8", );
+        auto ptr = new uint8_t(statData->GetUInt8Value());
+        Helpers::CopyAngelscriptValue(engine, ptr, typeId, ref, typeId);
+    }
+    else if(type == "UINT16")
+    {
+        AS_ASSERT(typeId == asTYPEID_UINT16, "Invalid type, expected uint16", );
+        auto ptr = new uint16_t(statData->GetUInt16Value());
+        Helpers::CopyAngelscriptValue(engine, ptr, typeId, ref, typeId);
+    }
+    else if(type == "UINT32")
+    {
+        AS_ASSERT(typeId == asTYPEID_UINT32, "Invalid type, expected uint32", );
+        auto ptr = new uint32_t(statData->GetUInt32Value());
+        Helpers::CopyAngelscriptValue(engine, ptr, typeId, ref, typeId);
+    }
+    else if(type == "UINT64" || type == "POS" || type == "DATE" || type == "PACKED" || type == "USERID")
+    {
+        AS_ASSERT(typeId == asTYPEID_UINT64, "Invalid type, expected uint64", );
+        auto ptr = new uint64_t(statData->GetUInt64Value());
+        Helpers::CopyAngelscriptValue(engine, ptr, typeId, ref, typeId);
+    }
+}
+
+static void ResetStat(const std::string& stat)
+{
+    auto statData = alt::ICore::Instance().GetStatData(stat);
+    AS_ASSERT(statData != nullptr, "Stat does not exist", );
+
+    std::string type = statData->GetStatType();
+    AS_ASSERT(type != "NONE" && type != "PROFILE_SETTING", "Stat cannot be reset", );
+
+    statData->Reset();
+}
 #endif
 
 static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs) {
@@ -471,5 +602,9 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_ENUM_VALUE("KeyState", "DOWN", alt::CKeyboardEvent::KeyState::DOWN);
 
     REGISTER_GLOBAL_FUNC("DiscordData GetDiscordData()", GetDiscordData, "Gets the current discord state");
+
+    REGISTER_GLOBAL_FUNC("void SetStat(const string&in stat, ?&in value)", SetStat, "Sets the specified stat to the specified value");
+    REGISTER_GLOBAL_FUNC("void GetStat(const string&in stat, ?&out value)", GetStat, "Gets the specified stat value");
+    REGISTER_GLOBAL_FUNC("void ResetStat(const string&in stat)", ResetStat, "Resets the specified stat value");
 #endif
 });
