@@ -599,21 +599,21 @@ bool AngelScriptResource::RegisterMetadata(CScriptBuilder& builder, asIScriptCon
                     }
                     // Check for local custom events
                     std::smatch results;
-                    auto        result = std::regex_search(methodMeta.cbegin(), methodMeta.cend(), results, customEventLocalRegex);
-                    if(result)
-                    {
-                        auto eventName = results[1].str();
-                        // Store the custom event name on the method
-                        method->SetUserData(new std::string(eventName), 1);
-                        continue;
-                    }
                     // Check for remote custom events
-                    result = std::regex_search(methodMeta.cbegin(), methodMeta.cend(), results, customEventRemoteRegex);
+                    auto result = std::regex_search(methodMeta.cbegin(), methodMeta.cend(), results, customEventRemoteRegex);
                     if(result)
                     {
                         auto eventName = results[1].str();
                         // Store the custom event name on the method
                         method->SetUserData(new std::string(eventName), 2);
+                        continue;
+                    }
+                    result = std::regex_search(methodMeta.cbegin(), methodMeta.cend(), results, customEventLocalRegex);
+                    if(result)
+                    {
+                        auto eventName = results[1].str();
+                        // Store the custom event name on the method
+                        method->SetUserData(new std::string(eventName), 1);
                         continue;
                     }
                 }
