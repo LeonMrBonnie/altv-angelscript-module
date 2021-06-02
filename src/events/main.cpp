@@ -7,7 +7,7 @@ using namespace Helpers;
 REGISTER_EVENT_HANDLER(alt::CEvent::Type::RESOURCE_START,
                        ResourceStart,
                        "void",
-                       "const string &in resource",
+                       "const string&in resource",
                        [](AngelScriptResource* resource, const alt::CEvent* event, asIScriptContext* context) {
                            auto ev = static_cast<const alt::CResourceStartEvent*>(event);
 
@@ -18,7 +18,7 @@ REGISTER_EVENT_HANDLER(alt::CEvent::Type::RESOURCE_START,
 REGISTER_EVENT_HANDLER(alt::CEvent::Type::RESOURCE_STOP,
                        ResourceStop,
                        "void",
-                       "const string &in resource",
+                       "const string&in resource",
                        [](AngelScriptResource* resource, const alt::CEvent* event, asIScriptContext* context) {
                            auto ev = static_cast<const alt::CResourceStopEvent*>(event);
 
