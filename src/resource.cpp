@@ -544,9 +544,14 @@ void AngelScriptResource::OnRemoveBaseObject(alt::Ref<alt::IBaseObject> object)
 
 bool AngelScriptResource::RegisterMetadata(CScriptBuilder& builder, asIScriptContext* context)
 {
-    std::regex customEventLocalRegex("LocalEvent\\(\"(.*)\"\\)");
-    std::regex customEventRemoteRegex("RemoteEvent\\(\"(.*)\"\\)");
-    uint32_t   count = module->GetObjectTypeCount();
+    std::regex customEventLocalRegex("Event\\(\"(.*)\"\\)");
+#ifdef SERVER_MODULE
+    std::regex customEventRemoteRegex("ClientEvent\\(\"(.*)\"\\)");
+#endif
+#ifdef CLIENT_MODULE
+    std::regex customEventRemoteRegex("ServerEvent\\(\"(.*)\"\\)");
+#endif
+    uint32_t count = module->GetObjectTypeCount();
     for(uint32_t i = 0; i < count; i++)
     {
         // Get the type for the class
