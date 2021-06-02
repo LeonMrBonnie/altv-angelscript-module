@@ -689,12 +689,12 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_GLOBAL_FUNC("void ResetStat(const string&in stat)", ResetStat, "Resets the specified stat value");
 
     REGISTER_FUNCDEF("void ScreenshotCallback(const string&in base64Image)", "Callback used for screenshot methods");
-    REGISTER_GLOBAL_FUNC("void TakeScreenshot(ScreenshotCallback callback)", TakeScreenshotCallback, "Takes a screenshot of the alt:V window");
+    REGISTER_GLOBAL_FUNC("void TakeScreenshot(ScreenshotCallback@ callback)", TakeScreenshotCallback, "Takes a screenshot of the alt:V window");
     REGISTER_GLOBAL_FUNC("void TakeScreenshot(const string&in eventName)",
                          TakeScreenshotEvent,
                          "Takes a screenshot of the alt:V window and emits the result to the specified event");
     REGISTER_GLOBAL_FUNC(
-      "void TakeScreenshotGameOnly(ScreenshotCallback callback)", TakeScreenshotGameOnlyCallback, "Takes a screenshot of the GTA V window");
+      "void TakeScreenshotGameOnly(ScreenshotCallback@ callback)", TakeScreenshotGameOnlyCallback, "Takes a screenshot of the GTA V window");
     REGISTER_GLOBAL_FUNC("void TakeScreenshotGameOnly(const string&in eventName)",
                          TakeScreenshotGameOnlyEvent,
                          "Takes a screenshot of the GTA V window and emits the result to the specified event");
