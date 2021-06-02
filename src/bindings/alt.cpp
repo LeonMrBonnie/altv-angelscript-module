@@ -569,6 +569,35 @@ static void TakeScreenshotGameOnlyEvent(const std::string& eventName)
       },
       pair);
 }
+
+static void EmitServer(asIScriptGeneric* gen)
+{
+    #ifdef DEBUG_MODE
+    Helpers::Benchmark benchmark("EmitServer");
+    #endif
+
+    GET_RESOURCE();
+    void*           ref    = gen->GetArgAddress(0);
+    int             typeId = 0;
+    std::string     event  = *static_cast<std::string*>(ref);
+    alt::MValueArgs args;
+
+    for(int i = 1; i < gen->GetArgCount(); i++)
+    {
+        ref    = gen->GetArgAddress(i);
+        typeId = gen->GetArgTypeId(i);
+        if(typeId & asTYPEID_OBJHANDLE)
+        {
+            // We're receiving a reference to the handle, so we need to dereference it
+            ref = *(void**)ref;
+            resource->GetRuntime()->GetEngine()->AddRefScriptObject(ref, resource->GetRuntime()->GetEngine()->GetTypeInfoById(typeId));
+        }
+        if(typeId == asTYPEID_VOID) continue;
+        auto mvalue = Helpers::ValueToMValue(typeId, ref);
+        args.Push(mvalue);
+    }
+    alt::ICore::Instance().TriggerServerEvent(event, args);
+}
 #endif
 
 static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs) {
@@ -669,5 +698,7 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_GLOBAL_FUNC("void TakeScreenshotGameOnly(const string&in eventName)",
                          TakeScreenshotGameOnlyEvent,
                          "Takes a screenshot of the GTA V window and emits the result to the specified event");
+
+    REGISTER_VARIADIC_FUNC("void", "EmitServer", "const string&in event", 32, EmitServer, "Emits an event to the server (Max 32 args)");
 #endif
 });
