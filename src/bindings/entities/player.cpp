@@ -77,7 +77,7 @@ static std::string GetAuthToken(alt::IPlayer* player)
 static void Emit(asIScriptGeneric* gen)
 {
     GET_RESOURCE();
-    alt::IPlayer*   player = static_cast<alt::IPlayer*>(asGetActiveContext()->GetThisPointer());
+    alt::IPlayer*   player = static_cast<alt::IPlayer*>(gen->GetObject());
     void*           ref    = gen->GetArgAddress(0);
     int             typeId = 0;
     std::string     event  = *static_cast<std::string*>(ref);
