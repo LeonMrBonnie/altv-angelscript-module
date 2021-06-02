@@ -316,7 +316,6 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
     Helpers::Benchmark benchmark("HandleCustomEvent_" + resource->GetName().ToString() + "_" +
                                  static_cast<const alt::CServerScriptEvent*>(event)->GetName().ToString());
 #endif
-
     std::string     name;
     alt::MValueArgs args;
 
@@ -352,7 +351,7 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
 #endif
 
     std::vector<asIScriptFunction*> handlers = GetCustomEventHandlers(name, false);
-    if(handlers.size() == 0) return;
+    if(handlers.size() == 0 && scriptClasses.size() == 0) return;
 
     std::vector<std::tuple<int, void*>> handlerArgs;
     for(auto arg : args)
