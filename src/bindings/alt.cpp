@@ -610,6 +610,16 @@ static Data::KeyState GetKeyState(uint32_t key)
     auto state = alt::ICore::Instance().GetKeyState(key);
     return Data::KeyState{ state.IsDown(), state.IsToggled() };
 }
+
+static void SetGameControlsEnabled(bool state)
+{
+    GET_RESOURCE();
+    resource->GetIResource()->ToggleGameControls(state);
+}
+static bool AreGameControlsEnabled()
+{
+    return alt::ICore::Instance().AreControlsEnabled();
+}
 #endif
 
 static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs) {
@@ -716,5 +726,8 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_GLOBAL_PROPERTY("bool", "sandboxMode", IsSandboxMode);
 
     REGISTER_GLOBAL_FUNC("KeyState GetKeyState(uint key)", GetKeyState, "Gets the state of the specified key");
+
+    REGISTER_GLOBAL_FUNC("void SetGameControlsEnabled(bool state)", SetGameControlsEnabled, "Toggles whether the game receives control inputs");
+    REGISTER_GLOBAL_FUNC("bool AreGameControlsEnabled()", AreGameControlsEnabled, "Returns whether the game controls are enabled");
 #endif
 });
