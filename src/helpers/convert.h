@@ -122,14 +122,14 @@ namespace Helpers
             {
                 type       = runtime->GetVector3TypeId();
                 auto value = val.As<alt::IMValueVector3>()->Value();
-                valuePtr   = new Vector3(value[0], value[1], value[2]);
+                valuePtr   = new Data::Vector3(value[0], value[1], value[2]);
                 break;
             }
             case alt::IMValue::Type::VECTOR2:
             {
                 type       = runtime->GetVector2TypeId();
                 auto value = val.As<alt::IMValueVector2>()->Value();
-                valuePtr   = new Vector2(value[0], value[1]);
+                valuePtr   = new Data::Vector2(value[0], value[1]);
                 break;
             }
             case alt::IMValue::Type::RGBA:
@@ -180,12 +180,12 @@ namespace Helpers
                 if(type == runtime.GetStringTypeId()) return core.CreateMValueString(*static_cast<std::string*>(value));
                 else if(type == runtime.GetVector3TypeId())
                 {
-                    auto vector = *static_cast<Vector3*>(value);
+                    auto vector = *static_cast<Data::Vector3*>(value);
                     return core.CreateMValueVector3({ vector.x, vector.y, vector.z });
                 }
                 else if(type == runtime.GetVector2TypeId())
                 {
-                    auto vector = *static_cast<Vector2*>(value);
+                    auto vector = *static_cast<Data::Vector2*>(value);
                     return core.CreateMValueVector2({ vector.x, vector.y });
                 }
                 else if(type == runtime.GetRGBATypeId())

@@ -30,16 +30,16 @@ static CScriptArray* GetWeaponComponents(alt::IPlayer* player)
     return arr;
 }
 
-static Vector3 GetAimPos(alt::IPlayer* player)
+static Data::Vector3 GetAimPos(alt::IPlayer* player)
 {
     alt::Vector3f vector = player->GetAimPos();
-    return Vector3(vector[0], vector[1], vector[2]);
+    return Data::Vector3(vector[0], vector[1], vector[2]);
 }
 
-static Vector3 GetHeadRotation(alt::IPlayer* player)
+static Data::Vector3 GetHeadRotation(alt::IPlayer* player)
 {
     alt::Vector3f vector = player->GetHeadRotation();
-    return Vector3(vector[0], vector[1], vector[2]);
+    return Data::Vector3(vector[0], vector[1], vector[2]);
 }
 
 static alt::IVehicle* GetVehicle(alt::IPlayer* player)
@@ -56,10 +56,10 @@ static alt::IEntity* GetEntityAimingAt(alt::IPlayer* player)
     return entity.Get();
 }
 
-static Vector3 GetEntityAimOffset(alt::IPlayer* player)
+static Data::Vector3 GetEntityAimOffset(alt::IPlayer* player)
 {
     alt::Vector3f vector = player->GetEntityAimOffset();
-    return Vector3(vector[0], vector[1], vector[2]);
+    return Data::Vector3(vector[0], vector[1], vector[2]);
 }
 
 #pragma region Server
@@ -106,7 +106,7 @@ static void SpawnPlayer(alt::IPlayer* player, T x, T y, T z, uint32_t delay = 0)
     player->Spawn({ x, y, z }, delay);
 }
 
-static void SpawnPlayerVector(alt::IPlayer* player, Vector3& pos, uint32_t delay = 0)
+static void SpawnPlayerVector(alt::IPlayer* player, Data::Vector3& pos, uint32_t delay = 0)
 {
     player->Spawn({ pos.x, pos.y, pos.z }, delay);
 }

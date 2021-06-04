@@ -6,6 +6,7 @@
 #include "cpp-sdk/events/CPlayerChangeVehicleSeatEvent.h"
 
 using namespace Helpers;
+using namespace Data;
 
 #ifdef SERVER_MODULE
 REGISTER_EVENT_HANDLER(alt::CEvent::Type::PLAYER_CONNECT,

@@ -11,7 +11,7 @@ static std::string ToString(alt::IColShape* shape)
     return str.str();
 }
 
-static bool IsPointIn(alt::IColShape* shape, Vector3 point)
+static bool IsPointIn(alt::IColShape* shape, Data::Vector3 point)
 {
     return shape->IsPointIn({ point.x, point.y, point.z });
 }

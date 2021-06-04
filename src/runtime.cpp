@@ -59,20 +59,10 @@ void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine)
     RegisterScriptDateTime(engine);
     RegisterExceptionRoutines(engine);
 
-    // Register classes
-    Data::RegisterVector3(engine, &docs);
-    Data::RegisterVector2(engine, &docs);
-    Data::RegisterRGBA(engine, &docs);
-    Data::RegisterBenchmark(engine, &docs);
-#ifdef SERVER_MODULE
-    Data::RegisterClothes(engine, &docs);
-    Data::RegisterProps(engine, &docs);
-#endif
-#ifdef CLIENT_MODULE
-    Data::RegisterDiscordData(engine, &docs);
-    Data::RegisterKeyState(engine, &docs);
-#endif
+    // Register data
+    Helpers::ModuleExtension::RegisterAllData(engine, &docs);
 
+    // Register ref classes
     REGISTER_REF_CLASS("BaseObject", alt::IBaseObject, asOBJ_REF, "Base object superclass for all alt:V base objects", "");
     REGISTER_REF_CLASS("WorldObject", alt::IWorldObject, asOBJ_REF, "World object superclass for all alt:V world objects", "BaseObject");
     REGISTER_REF_CLASS("Entity", alt::IEntity, asOBJ_REF, "Entity superclass for all alt:V entities", "WorldObject");

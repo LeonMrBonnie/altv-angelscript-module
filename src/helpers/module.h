@@ -167,19 +167,20 @@
 
 namespace Helpers
 {
+    using CreateCallback = void (*)(asIScriptEngine*, DocsGenerator*);
     class ModuleExtension
     {
         static std::vector<ModuleExtension*> extensions;
 
-        using CreateCallback = void (*)(asIScriptEngine*, DocsGenerator*);
-
         std::string    name;
         CreateCallback callback;
+        bool           isDataExtension;
 
     public:
         // Creates a new module extension
         // Module extensions are used to register new classes, properties, methods etc.
-        ModuleExtension(std::string name, CreateCallback callback) : name(std::move(name)), callback(callback)
+        ModuleExtension(std::string name, CreateCallback callback, bool isDataExtension = false)
+            : name(std::move(name)), callback(callback), isDataExtension(isDataExtension)
         {
             extensions.push_back(this);
         }
@@ -187,6 +188,10 @@ namespace Helpers
         std::string GetName()
         {
             return name;
+        }
+        bool IsDataExtension()
+        {
+            return isDataExtension;
         }
 
         void Register(asIScriptEngine* engine, DocsGenerator* docs)
@@ -208,10 +213,19 @@ namespace Helpers
             engine->SetDefaultNamespace(name.c_str());
             for(auto extension : extensions)
             {
-                if(extension->GetName() == name) extension->Register(engine, docs);
+                if(!extension->IsDataExtension() && extension->GetName() == name) extension->Register(engine, docs);
             }
             docs->Generate();
             if(cleanupDocs) delete docs;
+        }
+        // Registers all data extensions
+        static void RegisterAllData(asIScriptEngine* engine, DocsGenerator* docs)
+        {
+            engine->SetDefaultNamespace("alt");
+            for(auto extension : extensions)
+            {
+                if(extension->IsDataExtension()) extension->Register(engine, docs);
+            }
         }
 
         static size_t GetCount()
@@ -223,6 +237,11 @@ namespace Helpers
             }
             return counted.size();
         }
+    };
+    class DataExtension : public ModuleExtension
+    {
+    public:
+        DataExtension(CreateCallback callback) : ModuleExtension("alt", callback, true) {}
     };
 
     // Generic Wrapper for class methods

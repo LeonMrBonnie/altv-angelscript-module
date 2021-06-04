@@ -3,6 +3,7 @@
 #include "entity.h"
 
 using namespace Helpers;
+using namespace Data;
 
 static std::string ToString(alt::IVehicle* vehicle)
 {

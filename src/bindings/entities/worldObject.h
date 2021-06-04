@@ -5,14 +5,14 @@
 #include "../data/vector3.h"
 
 template<class T>
-static Vector3 GetPosition(T* obj)
+static Data::Vector3 GetPosition(T* obj)
 {
     alt::Vector3f pos = obj->GetPosition();
-    return Vector3(pos[0], pos[1], pos[2]);
+    return Data::Vector3(pos[0], pos[1], pos[2]);
 }
 
 template<class T>
-static void SetPosition(T* obj, Vector3 pos)
+static void SetPosition(T* obj, Data::Vector3 pos)
 {
     obj->SetPosition(alt::Position{ pos.x, pos.y, pos.z });
 }

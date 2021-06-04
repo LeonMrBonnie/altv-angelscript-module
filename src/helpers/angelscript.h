@@ -160,14 +160,14 @@ namespace Helpers
                 }
                 else if(valTypeId == runtime.GetVector3TypeId())
                 {
-                    auto              vector = *static_cast<Vector3*>(val);
+                    auto              vector = *static_cast<Data::Vector3*>(val);
                     std::stringstream stream;
                     stream << "Vector3{ x: " << vector.x << ", y: " << vector.y << ", z: " << vector.z << " }";
                     valString = stream.str();
                 }
                 else if(valTypeId == runtime.GetVector2TypeId())
                 {
-                    auto              vector = *static_cast<Vector2*>(val);
+                    auto              vector = *static_cast<Data::Vector2*>(val);
                     std::stringstream stream;
                     stream << "Vector2{ x: " << vector.x << ", y: " << vector.y << " }";
                     valString = stream.str();

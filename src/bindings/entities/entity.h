@@ -7,14 +7,14 @@
 using namespace Helpers;
 
 template<class T>
-static Vector3 GetRotation(T* obj)
+static Data::Vector3 GetRotation(T* obj)
 {
     alt::Vector3f rot = obj->GetRotation();
-    return Vector3(rot[0], rot[1], rot[2]);
+    return Data::Vector3(rot[0], rot[1], rot[2]);
 }
 
 template<class T>
-static void SetRotation(T* obj, Vector3& pos)
+static void SetRotation(T* obj, Data::Vector3& pos)
 {
     obj->SetRotation(alt::Rotation{ pos.x, pos.y, pos.z });
 }

@@ -1,10 +1,11 @@
 #include "Log.h"
 #include "../../helpers/module.h"
-#ifdef SERVER_MODULE
-    #include "colShape.h"
+#include "colShape.h"
 
 using namespace Helpers;
+using namespace Data;
 
+#ifdef SERVER_MODULE
 static alt::IColShape* SphereFactory(Vector3& pos, float radius)
 {
     auto shape = alt::ICore::Instance().CreateColShapeSphere({ pos.x, pos.y, pos.z }, radius);

@@ -3,6 +3,7 @@
 #include "worldObject.h"
 
 using namespace Helpers;
+using namespace Data;
 
 #ifdef SERVER_MODULE
 static alt::IBlip* BlipFactory(alt::IPlayer* target, alt::IBlip::BlipType type, Vector3& pos)
