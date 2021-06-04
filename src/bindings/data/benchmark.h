@@ -14,7 +14,7 @@ static void DestructBenchmark(void* memory)
     ((Benchmark*)memory)->~Benchmark();
 }
 
-static DataExtension benchmarkExtension([](asIScriptEngine* engine, DocsGenerator* docs) {
+static ModuleExtension benchmarkExtension("util", [](asIScriptEngine* engine, DocsGenerator* docs) {
     REGISTER_VALUE_CLASS("Benchmark", Benchmark, asOBJ_VALUE, "Benchmarking utility");
     REGISTER_CONSTRUCTOR("Benchmark", "const string&in name = \"Unnamed_Benchmark\", bool autoStart = true, bool showLog = true", ConstructBenchmark);
     REGISTER_DESTRUCTOR("Benchmark", DestructBenchmark);
