@@ -620,6 +620,37 @@ static bool AreGameControlsEnabled()
 {
     return alt::ICore::Instance().AreControlsEnabled();
 }
+
+static void AddGxtTextString(const std::string& gxt, const std::string& text)
+{
+    GET_IRESOURCE();
+    resource->AddGxtText(alt::ICore::Instance().Hash(gxt), text);
+}
+static void AddGxtTextHash(uint32_t gxt, const std::string& text)
+{
+    GET_IRESOURCE();
+    resource->AddGxtText(gxt, text);
+}
+static void RemoveGxtTextString(const std::string& gxt)
+{
+    GET_IRESOURCE();
+    resource->RemoveGxtText(alt::ICore::Instance().Hash(gxt));
+}
+static void RemoveGxtTextHash(uint32_t gxt)
+{
+    GET_IRESOURCE();
+    resource->RemoveGxtText(gxt);
+}
+static std::string GetGxtTextString(const std::string& gxt)
+{
+    GET_IRESOURCE();
+    return resource->GetGxtText(alt::ICore::Instance().Hash(gxt));
+}
+static std::string GetGxtTextHash(uint32_t gxt)
+{
+    GET_IRESOURCE();
+    return resource->GetGxtText(gxt);
+}
 #endif
 
 static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs) {
@@ -730,5 +761,11 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_GLOBAL_FUNC("void SetGameControlsEnabled(bool state)", SetGameControlsEnabled, "Toggles whether the game receives control inputs");
     REGISTER_GLOBAL_FUNC("bool AreGameControlsEnabled()", AreGameControlsEnabled, "Returns whether the game controls are enabled");
 
+    REGISTER_GLOBAL_FUNC("void AddGxtText(const string&in gxt, const string&in text)", AddGxtTextString, "Adds a gxt text");
+    REGISTER_GLOBAL_FUNC("void AddGxtText(uint hash, const string&in text)", AddGxtTextHash, "Adds a gxt text");
+    REGISTER_GLOBAL_FUNC("void RemoveGxtText(const string&in gxt)", RemoveGxtTextString, "Removes a gxt text");
+    REGISTER_GLOBAL_FUNC("void RemoveGxtText(uint hash)", RemoveGxtTextHash, "Removes a gxt text");
+    REGISTER_GLOBAL_FUNC("bool GetGxtText(const string&in gxt)", GetGxtTextString, "Gets a gxt text value");
+    REGISTER_GLOBAL_FUNC("void GetGxtText(uint hash)", GetGxtTextHash, "Gets a gxt text value");
 #endif
 });
