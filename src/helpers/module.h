@@ -152,7 +152,8 @@
     }
 
 // Gets the currently active resource
-#define GET_RESOURCE() auto resource = static_cast<AngelScriptResource*>(asGetActiveContext()->GetUserData())
+#define GET_RESOURCE()  auto resource = static_cast<AngelScriptResource*>(asGetActiveContext()->GetUserData())
+#define GET_IRESOURCE() auto resource = static_cast<AngelScriptResource*>(asGetActiveContext()->GetUserData())->GetIResource()
 
 // Throws a script error
 #define THROW_ERROR(error) asGetActiveContext()->SetException(error)
