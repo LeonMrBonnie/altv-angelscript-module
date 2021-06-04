@@ -651,6 +651,17 @@ static std::string GetGxtTextHash(uint32_t gxt)
     GET_IRESOURCE();
     return resource->GetGxtText(gxt);
 }
+
+static bool ToggleCursor(bool state)
+{
+    GET_IRESOURCE();
+    return resource->ToggleCursor(state);
+}
+static bool IsCursorEnabled()
+{
+    GET_IRESOURCE();
+    return resource->CursorVisible();
+}
 #endif
 
 static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs) {
@@ -767,5 +778,8 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_GLOBAL_FUNC("void RemoveGxtText(uint hash)", RemoveGxtTextHash, "Removes a gxt text");
     REGISTER_GLOBAL_FUNC("bool GetGxtText(const string&in gxt)", GetGxtTextString, "Gets a gxt text value");
     REGISTER_GLOBAL_FUNC("void GetGxtText(uint hash)", GetGxtTextHash, "Gets a gxt text value");
+
+    REGISTER_GLOBAL_FUNC("bool ShowCursor(bool state)", ToggleCursor, "Shows or hides the cursor, returns whether the operation succeeded or not");
+    REGISTER_GLOBAL_FUNC("bool IsCursorShown()", IsCursorEnabled, "Returns whether the cursor is currently visible");
 #endif
 });
