@@ -663,6 +663,19 @@ static bool IsCursorEnabled()
     GET_IRESOURCE();
     return resource->CursorVisible();
 }
+
+static bool SetConfigFlag(const std::string& flag, bool state)
+{
+    return alt::ICore::Instance().SetConfigFlag(flag, state);
+}
+static bool GetConfigFlag(const std::string& flag)
+{
+    return alt::ICore::Instance().GetConfigFlag(flag);
+}
+static bool DoesConfigFlagExist(const std::string& flag)
+{
+    return alt::ICore::Instance().DoesConfigFlagExist(flag);
+}
 #endif
 
 static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs) {
@@ -782,5 +795,11 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
 
     REGISTER_GLOBAL_FUNC("bool ShowCursor(bool state)", ToggleCursor, "Shows or hides the cursor, returns whether the operation succeeded or not");
     REGISTER_GLOBAL_FUNC("bool IsCursorShown()", IsCursorEnabled, "Returns whether the cursor is currently visible");
+
+    REGISTER_GLOBAL_FUNC("bool SetConfigFlag(const string&in flag, bool state)",
+                         SetConfigFlag,
+                         "Sets the specified config flag, returns whether the operation succeded or not");
+    REGISTER_GLOBAL_FUNC("bool GetConfigFlag(const string&in flag)", GetConfigFlag, "Gets the value of the specified config flag");
+    REGISTER_GLOBAL_FUNC("bool DoesConfigFlagExist(const string&in flag)", DoesConfigFlagExist, "Returns whether the given config flag exists");
 #endif
 });
