@@ -72,7 +72,7 @@ static ModuleExtension playerExtension("alt", [](asIScriptEngine* engine, DocsGe
 
 #ifdef SERVER_MODULE
     REGISTER_FACTORY("Vehicle", "uint model, Vector3 pos, Vector3 rot", VehicleFactory);
-    REGISTER_FACTORY("Vehicle", "string&in model, Vector3 pos, Vector3 rot", VehicleFactoryString);
+    REGISTER_FACTORY("Vehicle", "const string&in model, Vector3 pos, Vector3 rot", VehicleFactoryString);
 #endif
 
     // Implicit conversion to string
