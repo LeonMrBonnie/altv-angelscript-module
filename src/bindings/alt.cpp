@@ -598,6 +598,11 @@ static void EmitServer(asIScriptGeneric* gen)
     }
     alt::ICore::Instance().TriggerServerEvent(event, args);
 }
+
+static bool IsSandboxMode()
+{
+    return alt::ICore::Instance().IsSandbox();
+}
 #endif
 
 static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs) {
@@ -700,5 +705,7 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
                          "Takes a screenshot of the GTA V window and emits the result to the specified event");
 
     REGISTER_VARIADIC_FUNC("void", "EmitServer", "const string&in event", 32, EmitServer, "Emits an event to the server (Max 32 args)");
+
+    REGISTER_GLOBAL_PROPERTY("bool", "sandboxMode", IsSandboxMode);
 #endif
 });
