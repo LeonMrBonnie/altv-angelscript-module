@@ -618,7 +618,8 @@ static void SetGameControlsEnabled(bool state)
 }
 static bool AreGameControlsEnabled()
 {
-    return alt::ICore::Instance().AreControlsEnabled();
+    GET_IRESOURCE();
+    return resource->GameControlsActive();
 }
 
 static void AddGxtTextString(const std::string& gxt, const std::string& text)
