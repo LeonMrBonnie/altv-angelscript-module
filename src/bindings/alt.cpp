@@ -805,7 +805,7 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_GLOBAL_FUNC("KeyState GetKeyState(uint key)", GetKeyState, "Gets the state of the specified key");
 
     REGISTER_GLOBAL_FUNC("void SetGameControlsEnabled(bool state)", SetGameControlsEnabled, "Toggles whether the game receives control inputs");
-    REGISTER_GLOBAL_FUNC("bool AreGameControlsEnabled()", AreGameControlsEnabled, "Returns whether the game controls are enabled");
+    REGISTER_GLOBAL_PROPERTY("bool", "gameControlsEnabled", AreGameControlsEnabled);
 
     REGISTER_GLOBAL_FUNC("void AddGxtText(const string&in gxt, const string&in text)", AddGxtTextString, "Adds a gxt text");
     REGISTER_GLOBAL_FUNC("void AddGxtText(uint hash, const string&in text)", AddGxtTextHash, "Adds a gxt text");
@@ -815,7 +815,7 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_GLOBAL_FUNC("void GetGxtText(uint hash)", GetGxtTextHash, "Gets a gxt text value");
 
     REGISTER_GLOBAL_FUNC("bool ShowCursor(bool state)", ToggleCursor, "Shows or hides the cursor, returns whether the operation succeeded or not");
-    REGISTER_GLOBAL_FUNC("bool IsCursorShown()", IsCursorEnabled, "Returns whether the cursor is currently visible");
+    REGISTER_GLOBAL_PROPERTY("bool", "cursorShown", IsCursorEnabled);
 
     REGISTER_GLOBAL_FUNC("bool SetConfigFlag(const string&in flag, bool state)",
                          SetConfigFlag,
@@ -824,8 +824,8 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_GLOBAL_FUNC("bool DoesConfigFlagExist(const string&in flag)", DoesConfigFlagExist, "Returns whether the given config flag exists");
 
     REGISTER_GLOBAL_FUNC("void SetVoiceInputMuted(bool state)", SetVoiceInputMuted, "Mutes/Unmutes the voice input in the alt:V voice chat");
-    REGISTER_GLOBAL_FUNC("bool IsVoiceInputMuted()", IsVoiceInputMuted, "Returns whether the voice input is muted");
-    REGISTER_GLOBAL_FUNC("bool IsVoiceActivationEnabled()", IsVoiceActivationEnabled, "Returns whether voice activation or push-to-talk is enabled");
+    REGISTER_GLOBAL_PROPERTY("bool", "voiceInputMuted", IsVoiceInputMuted);
+    REGISTER_GLOBAL_PROPERTY("bool", "voiceActivationEnabled", IsVoiceActivationEnabled);
     REGISTER_GLOBAL_FUNC("void SetVoiceControlsEnabled(bool state)", ToggleVoiceControls, "Toggles whether the voice controls are enabled or not");
     REGISTER_GLOBAL_PROPERTY("uint", "voiceActivationKey", GetVoiceActivationKey);
 #endif
