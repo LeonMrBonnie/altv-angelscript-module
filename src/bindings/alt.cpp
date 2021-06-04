@@ -29,25 +29,25 @@ static void LogError(const std::string& msg)
 static uint32_t SetTimeout(asIScriptFunction* callback, uint32_t timeout)
 {
     GET_RESOURCE();
-    return resource->CreateTimer(timeout, callback, true);
+    return resource->CreateTimer(timeout, callback, nullptr, true);
 }
 
 static uint32_t SetInterval(asIScriptFunction* callback, uint32_t interval)
 {
     GET_RESOURCE();
-    return resource->CreateTimer(interval, callback, false);
+    return resource->CreateTimer(interval, callback, nullptr, false);
 }
 
 static uint32_t NextTick(asIScriptFunction* callback)
 {
     GET_RESOURCE();
-    return resource->CreateTimer(0, callback, true);
+    return resource->CreateTimer(0, callback, nullptr, true);
 }
 
 static uint32_t EveryTick(asIScriptFunction* callback)
 {
     GET_RESOURCE();
-    return resource->CreateTimer(0, callback, false);
+    return resource->CreateTimer(0, callback, nullptr, false);
 }
 
 static void ClearTimer(uint32_t id)

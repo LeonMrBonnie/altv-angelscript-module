@@ -130,10 +130,10 @@ public:
 #endif
 
     // Creates a new timer
-    uint32_t CreateTimer(uint32_t timeout, asIScriptFunction* callback, bool once)
+    uint32_t CreateTimer(uint32_t timeout, asIScriptFunction* callback, asIScriptObject* object, bool once)
     {
         uint32_t id = nextTimerId++;
-        timers[id]  = new Helpers::Timer{ this, callback, timeout, GetTime(), once };
+        timers[id]  = new Helpers::Timer{ this, callback, object, timeout, GetTime(), once };
 
         return id;
     }

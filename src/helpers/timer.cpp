@@ -4,8 +4,8 @@
 
 using namespace Helpers;
 
-Timer::Timer(AngelScriptResource* resource, asIScriptFunction* callback, uint32_t interval, int64_t curTime, bool once)
-    : resource(resource), callback(callback), lastRun(curTime), interval(interval), once(once)
+Timer::Timer(AngelScriptResource* resource, asIScriptFunction* callback, asIScriptObject* object, uint32_t interval, int64_t curTime, bool once)
+    : resource(resource), callback(callback), object(object), lastRun(curTime), interval(interval), once(once)
 {
 }
 
@@ -16,9 +16,15 @@ bool Timer::Update(int64_t time)
     if(elapsed >= interval)
     {
         auto context = resource->GetContext();
-        context->Prepare(callback);
-        int r = context->Execute();
-        CHECK_FUNCTION_RETURN(r, false);
+        int  r       = context->Prepare(callback);
+        CHECK_AS_RETURN("Timer prepare callback", r, false);
+        if(object)
+        {
+            r = context->SetObject(object);
+            CHECK_AS_RETURN("Timer set object", r, false);
+        }
+        r = context->Execute();
+        CHECK_AS_RETURN("Timer execute callback", r, false);
 
         lastRun = time;
 

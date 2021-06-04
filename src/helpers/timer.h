@@ -12,12 +12,13 @@ namespace Helpers
     {
         AngelScriptResource* resource;
         asIScriptFunction*   callback;
+        asIScriptObject*     object;
         uint32_t             interval;
         int64_t              lastRun;
         bool                 once;
 
     public:
-        Timer(AngelScriptResource* resource, asIScriptFunction* callback, uint32_t interval, int64_t curTime, bool once);
+        Timer(AngelScriptResource* resource, asIScriptFunction* callback, asIScriptObject* object, uint32_t interval, int64_t curTime, bool once);
 
         bool Update(int64_t time);
     };
