@@ -7,6 +7,7 @@
 #include "../helpers/angelscript.h"
 #include "../helpers/benchmark.h"
 #include "data/discord.h"
+#include "data/keyState.h"
 
 using namespace Helpers;
 
@@ -603,6 +604,12 @@ static bool IsSandboxMode()
 {
     return alt::ICore::Instance().IsSandbox();
 }
+
+static Data::KeyState GetKeyState(uint32_t key)
+{
+    auto state = alt::ICore::Instance().GetKeyState(key);
+    return Data::KeyState{ state.IsDown(), state.IsToggled() };
+}
 #endif
 
 static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs) {
@@ -707,5 +714,7 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_VARIADIC_FUNC("void", "EmitServer", "const string&in event", 32, EmitServer, "Emits an event to the server (Max 32 args)");
 
     REGISTER_GLOBAL_PROPERTY("bool", "sandboxMode", IsSandboxMode);
+
+    REGISTER_GLOBAL_FUNC("KeyState GetKeyState(uint key)", GetKeyState, "Gets the state of the specified key");
 #endif
 });

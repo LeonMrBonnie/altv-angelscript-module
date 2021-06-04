@@ -10,6 +10,7 @@
 #include "bindings/data/props.h"
 #include "bindings/data/benchmark.h"
 #include "bindings/data/discord.h"
+#include "bindings/data/keyState.h"
 #include "angelscript/addon/scriptstdstring/scriptstdstring.h"
 #include "angelscript/addon/scripthelper/scripthelper.h"
 #include "angelscript/addon/scriptarray/scriptarray.h"
@@ -69,6 +70,7 @@ void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine)
 #endif
 #ifdef CLIENT_MODULE
     Data::RegisterDiscordData(engine, &docs);
+    Data::RegisterKeyState(engine, &docs);
 #endif
 
     REGISTER_REF_CLASS("BaseObject", alt::IBaseObject, asOBJ_REF, "Base object superclass for all alt:V base objects", "");
