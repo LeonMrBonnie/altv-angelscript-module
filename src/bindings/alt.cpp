@@ -697,6 +697,27 @@ static uint32_t GetVoiceActivationKey()
 {
     return alt::ICore::Instance().GetVoiceActivationKey();
 }
+
+static std::string GetLicenseHash()
+{
+    return alt::ICore::Instance().GetLicenseHash().ToString();
+}
+static std::string GetLocale()
+{
+    return alt::ICore::Instance().GetLocale().ToString();
+}
+static bool IsStreamerModeEnabled()
+{
+    return alt::ICore::Instance().IsInStreamerMode();
+}
+static bool IsMenuOpen()
+{
+    return alt::ICore::Instance().IsMenuOpen();
+}
+static bool IsConsoleOpen()
+{
+    return alt::ICore::Instance().IsConsoleOpen();
+}
 #endif
 
 static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs) {
@@ -828,5 +849,11 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_GLOBAL_PROPERTY("bool", "voiceActivationEnabled", IsVoiceActivationEnabled);
     REGISTER_GLOBAL_FUNC("void SetVoiceControlsEnabled(bool state)", ToggleVoiceControls, "Toggles whether the voice controls are enabled or not");
     REGISTER_GLOBAL_PROPERTY("uint", "voiceActivationKey", GetVoiceActivationKey);
+
+    REGISTER_GLOBAL_PROPERTY("string", "licenseHash", GetLicenseHash);
+    REGISTER_GLOBAL_PROPERTY("string", "locale", GetLocale);
+    REGISTER_GLOBAL_PROPERTY("bool", "streamerMode", IsStreamerModeEnabled);
+    REGISTER_GLOBAL_PROPERTY("bool", "menuOpen", IsMenuOpen);
+    REGISTER_GLOBAL_PROPERTY("bool", "consoleOpen", IsConsoleOpen);
 #endif
 });
