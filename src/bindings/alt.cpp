@@ -676,6 +676,27 @@ static bool DoesConfigFlagExist(const std::string& flag)
 {
     return alt::ICore::Instance().DoesConfigFlagExist(flag);
 }
+
+static void SetVoiceInputMuted(bool state)
+{
+    alt::ICore::Instance().SetVoiceInputMuted(state);
+}
+static bool IsVoiceInputMuted()
+{
+    return alt::ICore::Instance().IsVoiceInputMuted();
+}
+static bool IsVoiceActivationEnabled()
+{
+    return alt::ICore::Instance().IsVoiceActivationEnabled();
+}
+static void ToggleVoiceControls(bool state)
+{
+    alt::ICore::Instance().ToggleVoiceControls(state);
+}
+static uint32_t GetVoiceActivationKey()
+{
+    return alt::ICore::Instance().GetVoiceActivationKey();
+}
 #endif
 
 static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs) {
@@ -801,5 +822,11 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
                          "Sets the specified config flag, returns whether the operation succeded or not");
     REGISTER_GLOBAL_FUNC("bool GetConfigFlag(const string&in flag)", GetConfigFlag, "Gets the value of the specified config flag");
     REGISTER_GLOBAL_FUNC("bool DoesConfigFlagExist(const string&in flag)", DoesConfigFlagExist, "Returns whether the given config flag exists");
+
+    REGISTER_GLOBAL_FUNC("void SetVoiceInputMuted(bool state)", SetVoiceInputMuted, "Mutes/Unmutes the voice input in the alt:V voice chat");
+    REGISTER_GLOBAL_FUNC("bool IsVoiceInputMuted()", IsVoiceInputMuted, "Returns whether the voice input is muted");
+    REGISTER_GLOBAL_FUNC("bool IsVoiceActivationEnabled()", IsVoiceActivationEnabled, "Returns whether voice activation or push-to-talk is enabled");
+    REGISTER_GLOBAL_FUNC("void SetVoiceControlsEnabled(bool state)", ToggleVoiceControls, "Toggles whether the voice controls are enabled or not");
+    REGISTER_GLOBAL_PROPERTY("uint", "voiceActivationKey", GetVoiceActivationKey);
 #endif
 });
