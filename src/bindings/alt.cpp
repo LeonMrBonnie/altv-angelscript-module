@@ -120,14 +120,14 @@ static CScriptArray* GetAllEntities()
 
 static std::string GetResourceName()
 {
-    GET_RESOURCE();
-    return resource->GetIResource()->GetName().ToString();
+    GET_IRESOURCE();
+    return resource->GetName().ToString();
 }
 
 static std::string GetResourceMain()
 {
-    GET_RESOURCE();
-    return resource->GetIResource()->GetMain().ToString();
+    GET_IRESOURCE();
+    return resource->GetMain().ToString();
 }
 
 static std::string GetResourcePath(const std::string& name)
@@ -613,8 +613,8 @@ static Data::KeyState GetKeyState(uint32_t key)
 
 static void SetGameControlsEnabled(bool state)
 {
-    GET_RESOURCE();
-    resource->GetIResource()->ToggleGameControls(state);
+    GET_IRESOURCE();
+    resource->ToggleGameControls(state);
 }
 static bool AreGameControlsEnabled()
 {
@@ -729,5 +729,6 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
 
     REGISTER_GLOBAL_FUNC("void SetGameControlsEnabled(bool state)", SetGameControlsEnabled, "Toggles whether the game receives control inputs");
     REGISTER_GLOBAL_FUNC("bool AreGameControlsEnabled()", AreGameControlsEnabled, "Returns whether the game controls are enabled");
+
 #endif
 });
