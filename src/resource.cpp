@@ -633,7 +633,16 @@ bool AngelScriptResource::RegisterMetadata(CScriptBuilder& builder, asIScriptCon
                     result = std::regex_search(methodMeta.cbegin(), methodMeta.cend(), results, intervalRegex);
                     if(result)
                     {
-                        auto interval = std::stoul(results[1].str());
+                        uint32_t interval;
+                        try
+                        {
+                            interval = std::stoul(results[1].str());
+                        }
+                        catch(...)
+                        {
+                            Log::Error << "Failed to register interval on method '" << method->GetName() << "'" << Log::Endl;
+                            continue;
+                        }
                         CreateTimer(interval, method, obj, false);
                         continue;
                     }
