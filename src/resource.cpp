@@ -8,6 +8,7 @@
 #include "helpers/benchmark.h"
 #include "helpers/angelscript.h"
 #include <regex>
+#include <string>
 
 #include "./helpers/bytecode.h"
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
@@ -198,6 +199,12 @@ bool AngelScriptResource::Stop()
     }
 
     if(context != nullptr) context->Release();
+
+    for(auto timer : timers)
+    {
+        delete timer.second;
+    }
+    timers.clear();
 
     return true;
 }
@@ -550,6 +557,8 @@ bool AngelScriptResource::RegisterMetadata(CScriptBuilder& builder, asIScriptCon
 #ifdef CLIENT_MODULE
     std::regex customEventRemoteRegex("ServerEvent\\(\"(.*)\"\\)");
 #endif
+    std::regex intervalRegex("Interval\\((.*)\\)");
+
     uint32_t count = module->GetObjectTypeCount();
     for(uint32_t i = 0; i < count; i++)
     {
@@ -613,6 +622,19 @@ bool AngelScriptResource::RegisterMetadata(CScriptBuilder& builder, asIScriptCon
                         auto eventName = results[1].str();
                         // Store the custom event name on the method
                         method->SetUserData(new std::string(eventName), 1);
+                        continue;
+                    }
+
+                    if(methodMeta == "EveryTick")
+                    {
+                        CreateTimer(0, method, obj, false);
+                        continue;
+                    }
+                    result = std::regex_search(methodMeta.cbegin(), methodMeta.cend(), results, intervalRegex);
+                    if(result)
+                    {
+                        auto interval = std::stoul(results[1].str());
+                        CreateTimer(interval, method, obj, false);
                         continue;
                     }
                 }
