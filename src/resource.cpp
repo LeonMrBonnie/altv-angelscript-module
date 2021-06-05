@@ -389,6 +389,7 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
         }
         r = context->Execute();
         CHECK_FUNCTION_RETURN(r, );
+        context->Unprepare();
     }
 
     // Check if any script classes exist
@@ -399,16 +400,21 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
             // Get the method of the script class for the event if it exists
             auto               type      = scriptClass->GetObjectType();
             asIScriptFunction* eventFunc = nullptr;
+            bool               isGeneric = false;
             for(asUINT i = 0; i < type->GetMethodCount(); i++)
             {
-                auto func = type->GetMethodByIndex(i, true);
-                auto data = func->GetUserData(2);
+                auto  func = type->GetMethodByIndex(i, true);
+                void* data;
+                if(local) data = func->GetUserData(1);
+                else
+                    data = func->GetUserData(2);
                 if(data == nullptr) continue;
 
                 std::string* evName = static_cast<std::string*>(data);
-                if(*evName != name) continue;
+                if(*evName != name && *evName != "*") continue;
 
                 eventFunc = func;
+                if(*evName == "*") isGeneric = true;
                 break;
             }
             if(eventFunc != nullptr)
@@ -418,14 +424,31 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
                 r = context->SetObject(scriptClass);
                 CHECK_AS_RETURN("Set script class event method object", r, );
 #ifdef SERVER_MODULE
-                context->SetArgObject(0, player.Get());
+                if(!local)
+                {
+                    r = context->SetArgObject(0, player.Get());
+                    CHECK_AS_RETURN("Set script class event method player object", r, );
+                }
 #endif
+                if(isGeneric)
+                {
+#ifdef SERVER_MODULE
+                    auto offset = local ? 0 : 1;
+#endif
+#ifdef CLIENT_MODULE
+                    auto offset = 0;
+#endif
+                    r = context->SetArgObject(offset, (void*)name.c_str());
+                    CHECK_AS_RETURN("Set generic script class event method event name", r, );
+                }
                 for(int i = 0; i < handlerArgs.size(); i++)
                 {
                     int argOffset = i;
 #ifdef SERVER_MODULE
-                    argOffset += 1;
+                    if(!local) argOffset += 1;
 #endif
+                    if(isGeneric) argOffset += 1;
+
                     auto [typeId, ptr] = handlerArgs[i];
                     int ret;
                     if(Helpers::IsTypePrimitive(typeId)) ret = context->SetArgAddress(argOffset, ptr);
@@ -435,10 +458,10 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
                 }
                 r = context->Execute();
                 CHECK_FUNCTION_RETURN(r, );
+                context->Unprepare();
             }
         }
     }
-    context->Unprepare();
 
     for(auto [typeId, ptr] : handlerArgs)
     {
@@ -605,7 +628,7 @@ bool AngelScriptResource::RegisterMetadata(CScriptBuilder& builder, asIScriptCon
                         method->SetUserData(event);
                         continue;
                     }
-                    // Check for local custom events
+
                     std::smatch results;
                     // Check for remote custom events
                     auto result = std::regex_search(methodMeta.cbegin(), methodMeta.cend(), results, customEventRemoteRegex);
@@ -616,6 +639,7 @@ bool AngelScriptResource::RegisterMetadata(CScriptBuilder& builder, asIScriptCon
                         method->SetUserData(new std::string(eventName), 2);
                         continue;
                     }
+                    // Check for local custom events
                     result = std::regex_search(methodMeta.cbegin(), methodMeta.cend(), results, customEventLocalRegex);
                     if(result)
                     {
