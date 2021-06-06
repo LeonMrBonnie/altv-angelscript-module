@@ -718,6 +718,11 @@ static bool IsConsoleOpen()
 {
     return alt::ICore::Instance().IsConsoleOpen();
 }
+
+static alt::IEntity* GetEntityByScriptId(int32_t scriptId)
+{
+    return alt::ICore::Instance().GetEntityByScriptGuid(scriptId).Get();
+}
 #endif
 
 static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs) {
@@ -726,9 +731,9 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_GLOBAL_FUNC("array<Player@>@ GetAllPlayers()", GetAllPlayers, "Gets all players on the server");
     REGISTER_GLOBAL_FUNC("array<Vehicle@>@ GetAllVehicles()", GetAllVehicles, "Gets all vehicles on the server");
     REGISTER_GLOBAL_FUNC("array<Entity@>@ GetAllEntities()", GetAllEntities, "Gets all entities on the server");
-    REGISTER_GLOBAL_FUNC("Player@ GetPlayerByID(uint16 id)", (GetByID<alt::IPlayer>), "Gets the player with the specified ID");
-    REGISTER_GLOBAL_FUNC("Vehicle@ GetVehicleByID(uint16 id)", (GetByID<alt::IVehicle>), "Gets the vehicle with the specified ID");
-    REGISTER_GLOBAL_FUNC("Entity@ GetEntityByID(uint16 id)", (GetByID<alt::IEntity>), "Gets the entity with the specified ID");
+    REGISTER_GLOBAL_FUNC("Player@+ GetPlayerByID(uint16 id)", (GetByID<alt::IPlayer>), "Gets the player with the specified ID");
+    REGISTER_GLOBAL_FUNC("Vehicle@+ GetVehicleByID(uint16 id)", (GetByID<alt::IVehicle>), "Gets the vehicle with the specified ID");
+    REGISTER_GLOBAL_FUNC("Entity@+ GetEntityByID(uint16 id)", (GetByID<alt::IEntity>), "Gets the entity with the specified ID");
 #ifdef SERVER_MODULE
     REGISTER_GLOBAL_PROPERTY("int", "defaultDimension", GetDefaultDimension);
     REGISTER_GLOBAL_PROPERTY("int", "globalDimension", GetGlobalDimension);
@@ -855,5 +860,8 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_GLOBAL_PROPERTY("bool", "streamerMode", IsStreamerModeEnabled);
     REGISTER_GLOBAL_PROPERTY("bool", "menuOpen", IsMenuOpen);
     REGISTER_GLOBAL_PROPERTY("bool", "consoleOpen", IsConsoleOpen);
+
+    REGISTER_GLOBAL_FUNC(
+      "Entity@+ GetEntityByScriptId(int scriptId)", GetEntityByScriptId, "Gets the entity with the specified script id, or null if not found");
 #endif
 });
