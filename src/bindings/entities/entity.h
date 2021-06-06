@@ -94,7 +94,7 @@ namespace Helpers
 
         REGISTER_PROPERTY_WRAPPER_GET(type, "uint16", "id", (GenericWrapper<T, alt::IEntity, &alt::IEntity::GetID, uint16_t>));
 
-        REGISTER_PROPERTY_WRAPPER_GET(type, "uint", "model", (GenericWrapper<T, alt::IEntity, &alt::IEntity::GetModel, uint32_t>));
+        REGISTER_PROPERTY_WRAPPER_GET(type, "Hash", "model", (GenericWrapper<T, alt::IEntity, &alt::IEntity::GetModel, uint32_t>));
 
         REGISTER_PROPERTY_WRAPPER_GET(type, "Vector3", "rot", GetRotation<T>);
         REGISTER_PROPERTY_WRAPPER_SET(type, "Vector3", "rot", SetRotation<T>);

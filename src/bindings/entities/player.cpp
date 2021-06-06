@@ -130,7 +130,7 @@ static ModuleExtension playerExtension("alt", [](asIScriptEngine* engine, DocsGe
     REGISTER_PROPERTY_WRAPPER_GET("Player", "string", "name", GetName);
 
 #ifdef SERVER_MODULE
-    REGISTER_PROPERTY_WRAPPER_SET("Player", "uint", "model", (GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::SetModel, void, uint32_t>));
+    REGISTER_PROPERTY_WRAPPER_SET("Player", "Hash", "model", (GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::SetModel, void, uint32_t>));
 #endif
 
     REGISTER_PROPERTY_WRAPPER_GET("Player", "uint", "health", (GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::GetHealth, uint32_t>));

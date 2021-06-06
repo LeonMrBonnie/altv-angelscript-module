@@ -24,6 +24,7 @@ namespace Helpers
         std::vector<std::pair<std::string, std::string>>                  declarations;
         std::vector<std::pair<std::string, std::string>>                  variables;
         std::vector<std::pair<std::string, std::string>>                  funcDefs;
+        std::vector<std::pair<std::string, std::string>>                  typeDefs;
         std::vector<std::pair<std::string, std::string>>                  eventDeclarations;
         std::vector<std::tuple<std::string, std::string, std::string>>    objectTypes;
         std::vector<std::pair<std::string, std::string>>                  enumTypes;
@@ -51,6 +52,12 @@ namespace Helpers
         {
 #ifdef AS_GENERATE_DOCUMENTATION
             funcDefs.push_back(std::pair(funcdef, desc));
+#endif
+        }
+        void PushTypedef(std::string type, std::string original)
+        {
+#ifdef AS_GENERATE_DOCUMENTATION
+            typeDefs.push_back(std::pair(type, original));
 #endif
         }
         void PushEventDeclaration(std::string funcDef, std::string globalFunc)
@@ -125,6 +132,20 @@ namespace Helpers
                            << "\n";
                 }
 
+                stream << "\n";
+            }
+
+            // Add typedefs
+            if(typeDefs.size() > 0)
+            {
+                stream << PAD_SPACE << "// ********** Typedefs **********"
+                       << "\n";
+                for(auto def : typeDefs)
+                {
+                    stream << "\n";
+                    stream << PAD_SPACE << "typedef " << def.second << " " << def.first << ";"
+                           << "\n";
+                }
                 stream << "\n";
             }
 

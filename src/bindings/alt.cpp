@@ -727,7 +727,7 @@ static alt::IEntity* GetEntityByScriptId(int32_t scriptId)
 
 static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs) {
     // Generic
-    REGISTER_GLOBAL_FUNC("uint Hash(const string&in value)", Hash, "Hashes the given string using the joaat algorithm");
+    REGISTER_GLOBAL_FUNC("Hash ToHash(const string&in value)", Hash, "Hashes the given string using the joaat algorithm");
     REGISTER_GLOBAL_FUNC("array<Player@>@ GetAllPlayers()", GetAllPlayers, "Gets all players on the server");
     REGISTER_GLOBAL_FUNC("array<Vehicle@>@ GetAllVehicles()", GetAllVehicles, "Gets all vehicles on the server");
     REGISTER_GLOBAL_FUNC("array<Entity@>@ GetAllEntities()", GetAllEntities, "Gets all entities on the server");
@@ -834,11 +834,11 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_GLOBAL_PROPERTY("bool", "gameControlsEnabled", AreGameControlsEnabled);
 
     REGISTER_GLOBAL_FUNC("void AddGxtText(const string&in gxt, const string&in text)", AddGxtTextString, "Adds a gxt text");
-    REGISTER_GLOBAL_FUNC("void AddGxtText(uint hash, const string&in text)", AddGxtTextHash, "Adds a gxt text");
+    REGISTER_GLOBAL_FUNC("void AddGxtText(Hash hash, const string&in text)", AddGxtTextHash, "Adds a gxt text");
     REGISTER_GLOBAL_FUNC("void RemoveGxtText(const string&in gxt)", RemoveGxtTextString, "Removes a gxt text");
-    REGISTER_GLOBAL_FUNC("void RemoveGxtText(uint hash)", RemoveGxtTextHash, "Removes a gxt text");
+    REGISTER_GLOBAL_FUNC("void RemoveGxtText(Hash hash)", RemoveGxtTextHash, "Removes a gxt text");
     REGISTER_GLOBAL_FUNC("bool GetGxtText(const string&in gxt)", GetGxtTextString, "Gets a gxt text value");
-    REGISTER_GLOBAL_FUNC("void GetGxtText(uint hash)", GetGxtTextHash, "Gets a gxt text value");
+    REGISTER_GLOBAL_FUNC("void GetGxtText(Hash hash)", GetGxtTextHash, "Gets a gxt text value");
 
     REGISTER_GLOBAL_FUNC("bool ShowCursor(bool state)", ToggleCursor, "Shows or hides the cursor, returns whether the operation succeeded or not");
     REGISTER_GLOBAL_PROPERTY("bool", "cursorShown", IsCursorEnabled);

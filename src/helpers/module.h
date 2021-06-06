@@ -23,17 +23,31 @@
     }
 
 // Registers a new function definition
-#define REGISTER_FUNCDEF(decl, desc)                                                   \
-    {                                                                                  \
-        auto r = engine->RegisterFuncdef(decl);                                        \
-        if(r < 0)                                                                      \
-        {                                                                              \
-            Log::Error << "Failed to register func def '" << decl << "'" << Log::Endl; \
-        }                                                                              \
-        else                                                                           \
-        {                                                                              \
-            docs->PushFuncDef(decl, desc);                                             \
-        }                                                                              \
+#define REGISTER_FUNCDEF(decl, desc)                                                  \
+    {                                                                                 \
+        auto r = engine->RegisterFuncdef(decl);                                       \
+        if(r < 0)                                                                     \
+        {                                                                             \
+            Log::Error << "Failed to register funcdef '" << decl << "'" << Log::Endl; \
+        }                                                                             \
+        else                                                                          \
+        {                                                                             \
+            docs->PushFuncDef(decl, desc);                                            \
+        }                                                                             \
+    }
+
+// Registers a new type definition
+#define REGISTER_TYPEDEF(type, original)                                              \
+    {                                                                                 \
+        auto r = engine->RegisterTypedef(type, original);                             \
+        if(r < 0)                                                                     \
+        {                                                                             \
+            Log::Error << "Failed to register typedef '" << type << "'" << Log::Endl; \
+        }                                                                             \
+        else                                                                          \
+        {                                                                             \
+            docs->PushTypedef(type, original);                                        \
+        }                                                                             \
     }
 
 // Registers a new value type class (e.g. Vector3)
