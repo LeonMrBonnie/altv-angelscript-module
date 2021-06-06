@@ -237,7 +237,7 @@ namespace Helpers
                     for(auto kv : objectDeclarations)
                     {
                         if(kv.first != name) continue;
-                        stream << PAD_SPACE << PAD_SPACE << kv.second << ";\n";
+                        stream << PAD_SPACE << PAD_SPACE << CleanDeclaration(kv.second) << ";\n";
                     }
                     stream << "\n";
                     for(auto kv : objectConstructors)
@@ -265,6 +265,22 @@ namespace Helpers
             file.close();
             Log::Colored << "~y~Generated ~w~" << moduleName << " ~y~docs" << Log::Endl;
 #endif
+        }
+
+        static std::string CleanDeclaration(std::string& decl)
+        {
+            static std::vector<char> invalidChars = { '+' };
+
+            std::string output;
+            output.reserve(decl.size());
+            for(auto invalidChar : invalidChars)
+            {
+                for(size_t i = 0; i < decl.size(); i++)
+                {
+                    if(decl[i] != invalidChar) output += decl[i];
+                }
+            }
+            return output;
         }
     };
 }  // namespace Helpers
