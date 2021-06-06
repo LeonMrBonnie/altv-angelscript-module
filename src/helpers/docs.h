@@ -197,7 +197,7 @@ namespace Helpers
                 {
                     stream << "\n";
                     stream << PAD_SPACE << "// " << decl.second << "\n";
-                    stream << PAD_SPACE << decl.first << ";"
+                    stream << PAD_SPACE << CleanDeclaration(decl.first) << ";"
                            << "\n";
                 }
 
@@ -248,7 +248,7 @@ namespace Helpers
                     for(auto kv : objectMethods)
                     {
                         if(kv.first != name) continue;
-                        stream << PAD_SPACE << PAD_SPACE << kv.second << ";\n";
+                        stream << PAD_SPACE << PAD_SPACE << CleanDeclaration(kv.second) << ";\n";
                     }
                     stream << PAD_SPACE << "};\n";
                 }
