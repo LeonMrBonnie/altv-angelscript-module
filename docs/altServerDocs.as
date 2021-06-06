@@ -1,11 +1,15 @@
-// Generated on Fri May 28 22:57:24 2021
+// Generated on Sun Jun  6 16:33:41 2021
 
-namespace alt
+namespace altServer
 {
     // ********** Funcdefs **********
 
     // Callback used for timers
     funcdef void TimerCallback();
+
+    // ********** Typedefs **********
+
+    typedef uint32 Hash;
 
     // ********** Enums **********
 
@@ -87,7 +91,7 @@ namespace alt
     // ********** Functions **********
 
     // Hashes the given string using the joaat algorithm
-    uint Hash(const string&in value);
+    Hash ToHash(const string&in value);
 
     // Gets all players on the server
     array<Player@>@ GetAllPlayers();
@@ -99,13 +103,13 @@ namespace alt
     array<Entity@>@ GetAllEntities();
 
     // Gets the player with the specified ID
-    Player@ GetPlayerByID(uint16 id);
+    Player@+ GetPlayerByID(uint16 id);
 
     // Gets the vehicle with the specified ID
-    Vehicle@ GetVehicleByID(uint16 id);
+    Vehicle@+ GetVehicleByID(uint16 id);
 
     // Gets the entity with the specified ID
-    Entity@ GetEntityByID(uint16 id);
+    Entity@+ GetEntityByID(uint16 id);
 
     // Returns whether the specified resource exists and is started
     bool HasResource(const string&in name);
@@ -202,27 +206,16 @@ namespace alt
 
     // ********** Objects **********
 
-    // Three-dimensional vector
-    class Vector3
+    // R(ed), G(reen), B(lue), A(lpha) color
+    class RGBA
     {
-        float x;
-        float y;
-        float z;
+        uint8 r;
+        uint8 g;
+        uint8 b;
+        uint8 a;
 
-        Vector3(float x, float y, float z);
-        Vector3(int x, int y, int z);
-        float Length();
-        Vector3 Add(Vector3 vector);
-        Vector3 Add(float x, float y, float z);
-        Vector3 Add(float value);
-        Vector3 Sub(Vector3 vector);
-        Vector3 Sub(float x, float y, float z);
-        Vector3 Sub(float value);
-        Vector3 Mult(Vector3 vector);
-        Vector3 Mult(float x, float y, float z);
-        Vector3 Mult(float value);
-        float Distance(Vector3 vector);
-        string opImplConv() const;
+        RGBA(uint8 r, uint8 g, uint8 b, uint8 a);
+        RGBA toBGRA();
     };
 
     // Two-dimensional vector
@@ -247,16 +240,27 @@ namespace alt
         string opImplConv() const;
     };
 
-    // R(ed), G(reen), B(lue), A(lpha) color
-    class RGBA
+    // Three-dimensional vector
+    class Vector3
     {
-        uint8 r;
-        uint8 g;
-        uint8 b;
-        uint8 a;
+        float x;
+        float y;
+        float z;
 
-        RGBA(uint8 r, uint8 g, uint8 b, uint8 a);
-        RGBA toBGRA();
+        Vector3(float x, float y, float z);
+        Vector3(int x, int y, int z);
+        float Length();
+        Vector3 Add(Vector3 vector);
+        Vector3 Add(float x, float y, float z);
+        Vector3 Add(float value);
+        Vector3 Sub(Vector3 vector);
+        Vector3 Sub(float x, float y, float z);
+        Vector3 Sub(float value);
+        Vector3 Mult(Vector3 vector);
+        Vector3 Mult(float x, float y, float z);
+        Vector3 Mult(float value);
+        float Distance(Vector3 vector);
+        string opImplConv() const;
     };
 
     // A clothing component
@@ -293,16 +297,6 @@ namespace alt
         uint8 texture;
         uint dlc;
 
-    };
-
-    // Benchmarking utility
-    class Benchmark
-    {
-        bool ended;
-
-        Benchmark(const string&in name = "Unnamed_Benchmark", bool autoStart = true, bool showLog = true);
-        void Start();
-        double End();
     };
 
     // Base object superclass for all alt:V base objects
@@ -349,7 +343,7 @@ namespace alt
         Vector3 pos;
         int dimension;
         uint16 id;
-        uint model;
+        Hash model;
         Vector3 rot;
         bool visible;
 
@@ -384,7 +378,7 @@ namespace alt
         Vector3 pos;
         int dimension;
         uint16 id;
-        uint model;
+        Hash model;
         Vector3 rot;
         bool visible;
         string name;
@@ -474,7 +468,7 @@ namespace alt
         Vector3 pos;
         int dimension;
         uint16 id;
-        uint model;
+        Hash model;
         Vector3 rot;
         bool visible;
         Player@+ driver;
@@ -528,7 +522,8 @@ namespace alt
         Vehicle@+ attached;
         Vehicle@+ attachedTo;
 
-        Vehicle(uint model, Vector3 pos, Vector3 rot);
+        Vehicle(Hash model, Vector3 pos, Vector3 rot);
+        Vehicle(const string&in model, Vector3 pos, Vector3 rot);
         bool HasMeta(const string&in key);
         bool GetMeta(const string&in key, ?&out outValue);
         void SetMeta(const string&in key, ?&in value);
