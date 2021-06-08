@@ -732,6 +732,15 @@ static bool DoesTextureExistInArchetypeHash(uint32_t model, const std::string& t
 {
     return (alt::ICore::Instance().GetTextureFromDrawable(model, textureName) != nullptr);
 }
+
+static void RequestIpl(const std::string& ipl)
+{
+    alt::ICore::Instance().RequestIPL(ipl);
+}
+static void RemoveIpl(const std::string& ipl)
+{
+    alt::ICore::Instance().RemoveIPL(ipl);
+}
 #endif
 
 static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs) {
@@ -879,5 +888,8 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_GLOBAL_FUNC("bool DoesTextureExistInArchetype(const string&in model, const string&in texture)",
                          DoesTextureExistInArchetypeString,
                          "Checks if the given model with the given texture exists");
+
+    REGISTER_GLOBAL_FUNC("void RequestIpl(const string&in ipl)", RequestIpl, "Loads the given ipl");
+    REGISTER_GLOBAL_FUNC("void RemoveIpl(const string&in ipl)", RemoveIpl, "Unloads the given ipl");
 #endif
 });
