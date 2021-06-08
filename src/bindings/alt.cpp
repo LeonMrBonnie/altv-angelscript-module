@@ -723,6 +723,15 @@ static alt::IEntity* GetEntityByScriptId(int32_t scriptId)
 {
     return alt::ICore::Instance().GetEntityByScriptGuid(scriptId).Get();
 }
+
+static bool DoesTextureExistInArchetypeString(const std::string& model, const std::string& textureName)
+{
+    return (alt::ICore::Instance().GetTextureFromDrawable(alt::ICore::Instance().Hash(model), textureName) != nullptr);
+}
+static bool DoesTextureExistInArchetypeHash(uint32_t model, const std::string& textureName)
+{
+    return (alt::ICore::Instance().GetTextureFromDrawable(model, textureName) != nullptr);
+}
 #endif
 
 static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs) {
@@ -863,5 +872,12 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
 
     REGISTER_GLOBAL_FUNC(
       "Entity@+ GetEntityByScriptId(int scriptId)", GetEntityByScriptId, "Gets the entity with the specified script id, or null if not found");
+
+    REGISTER_GLOBAL_FUNC("bool DoesTextureExistInArchetype(uint model, const string&in texture)",
+                         DoesTextureExistInArchetypeHash,
+                         "Checks if the given model with the given texture exists");
+    REGISTER_GLOBAL_FUNC("bool DoesTextureExistInArchetype(const string&in model, const string&in texture)",
+                         DoesTextureExistInArchetypeString,
+                         "Checks if the given model with the given texture exists");
 #endif
 });
