@@ -5,7 +5,6 @@
 #include "helpers/angelscript.h"
 #include "bindings/data/vector3.h"
 #include "bindings/data/vector2.h"
-#include "bindings/data/rgba.h"
 #include "bindings/data/clothes.h"
 #include "bindings/data/props.h"
 #include "bindings/data/benchmark.h"

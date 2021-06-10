@@ -1,4 +1,12 @@
-#include "rgba.h"
+#include "Log.h"
+#include "../../helpers/module.h"
+
+using namespace Helpers;
+
+static void Construct(void* memory, uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+{
+    new(memory) alt::RGBA(r, g, b, a);
+}
 
 static DataExtension rgbaExtension([](asIScriptEngine* engine, DocsGenerator* docs) {
     REGISTER_VALUE_CLASS("RGBA", alt::RGBA, asOBJ_VALUE | asOBJ_POD, "R(ed), G(reen), B(lue), A(lpha) color");
