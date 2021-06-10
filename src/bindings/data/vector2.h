@@ -77,5 +77,11 @@ namespace Data
         {
             new(memory) Vector2(x, y);
         }
+
+        template<typename T>
+        static void ConstructFromList(void* memory, T* values)
+        {
+            new(memory) Vector2(values[0], values[1]);
+        }
     };
 }  // namespace Data
