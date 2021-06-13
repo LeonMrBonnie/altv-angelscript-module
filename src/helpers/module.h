@@ -85,9 +85,9 @@
     }
 
 // Registers a new initializer list constructor
-#define REGISTER_INIT_LIST_CONSTRUCTOR(name, decl, func)                                                                                   \
-    {                                                                                                                                      \
-        engine->RegisterObjectBehaviour(name, asBEHAVE_LIST_CONSTRUCT, "void f(const int&in) {" decl "}", asFUNCTION(func), asCALL_CDECL); \
+#define REGISTER_INIT_LIST_CONSTRUCTOR(name, decl, func)                                                                                            \
+    {                                                                                                                                               \
+        engine->RegisterObjectBehaviour(name, asBEHAVE_LIST_CONSTRUCT, "void f(const int&in) {" decl "}", asFUNCTION(func), asCALL_CDECL_OBJFIRST); \
     }
 
 // Registers a new property for the value type class
