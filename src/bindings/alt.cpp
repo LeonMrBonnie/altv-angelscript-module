@@ -741,6 +741,11 @@ static void RemoveIpl(const std::string& ipl)
 {
     alt::ICore::Instance().RemoveIPL(ipl);
 }
+
+static bool BeginScaleformMovieMethodMinimap(const std::string& method)
+{
+    return alt::ICore::Instance().BeginScaleformMovieMethodMinimap(method);
+}
 #endif
 
 static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs) {
@@ -891,5 +896,8 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
 
     REGISTER_GLOBAL_FUNC("void RequestIpl(const string&in ipl)", RequestIpl, "Loads the given ipl");
     REGISTER_GLOBAL_FUNC("void RemoveIpl(const string&in ipl)", RemoveIpl, "Unloads the given ipl");
+
+    REGISTER_GLOBAL_FUNC(
+      "bool BeginScaleformMovieMethodMinimap(const string&in method)", BeginScaleformMovieMethodMinimap, "Starts a movie method on the minimap");
 #endif
 });
