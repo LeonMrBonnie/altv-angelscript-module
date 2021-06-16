@@ -746,6 +746,15 @@ static bool BeginScaleformMovieMethodMinimap(const std::string& method)
 {
     return alt::ICore::Instance().BeginScaleformMovieMethodMinimap(method);
 }
+
+static void SetMsPerGameMinute(int32_t amount)
+{
+    alt::ICore::Instance().SetMsPerGameMinute(amount);
+}
+static int32_t GetMsPerGameMinute()
+{
+    return alt::ICore::Instance().GetMsPerGameMinute();
+}
 #endif
 
 static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs) {
@@ -899,5 +908,9 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
 
     REGISTER_GLOBAL_FUNC(
       "bool BeginScaleformMovieMethodMinimap(const string&in method)", BeginScaleformMovieMethodMinimap, "Starts a movie method on the minimap");
+
+    REGISTER_GLOBAL_FUNC(
+      "void SetMsPerGameMinute(int amount)", SetMsPerGameMinute, "Sets the time required in milliseconds for one game minute to pass");
+    REGISTER_GLOBAL_FUNC("int GetMsPerGameMinute()", GetMsPerGameMinute, "Gets the time required in milliseconds for one game minute to pass");
 #endif
 });
