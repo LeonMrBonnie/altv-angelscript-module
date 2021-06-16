@@ -786,6 +786,11 @@ static void SetCamFrozen(bool state)
 {
     alt::ICore::Instance().SetCamFrozen(state);
 }
+
+static alt::PermissionState GetPermissionState(alt::Permission permission)
+{
+    return alt::ICore::Instance().GetPermissionState(permission);
+}
 #endif
 
 static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs) {
@@ -949,5 +954,17 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_GLOBAL_FUNC("void SetWeatherSyncActive(bool state)", SetWeatherSyncActive, "Toggles whether the weather sync is enabled");
 
     REGISTER_GLOBAL_FUNC("void SetCamFrozen(bool state)", SetCamFrozen, "Toggles whether the cam is frozen");
+
+    REGISTER_ENUM("Permission", "A alt:V permission");
+    REGISTER_ENUM_VALUE("Permission", "None", alt::Permission::None);
+    REGISTER_ENUM_VALUE("Permission", "ScreenCapture", alt::Permission::ScreenCapture);
+    REGISTER_ENUM_VALUE("Permission", "WebRTC", alt::Permission::WebRTC);
+    REGISTER_ENUM_VALUE("Permission", "All", alt::Permission::All);
+    REGISTER_ENUM("PermissionState", "A alt:V permission state");
+    REGISTER_ENUM_VALUE("PermissionState", "Allowed", alt::PermissionState::Allowed);
+    REGISTER_ENUM_VALUE("PermissionState", "Denied", alt::PermissionState::Denied);
+    REGISTER_ENUM_VALUE("PermissionState", "Unspecified", alt::PermissionState::Unspecified);
+    REGISTER_ENUM_VALUE("PermissionState", "Failed", alt::PermissionState::Failed);
+    REGISTER_GLOBAL_FUNC("PermissionState GetPermissionState(Permission permission)", GetPermissionState, "Gets the state of the given permission");
 #endif
 });
