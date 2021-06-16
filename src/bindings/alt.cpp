@@ -781,6 +781,11 @@ static void SetWeatherSyncActive(bool state)
 {
     alt::ICore::Instance().SetWeatherSyncActive(state);
 }
+
+static void SetCamFrozen(bool state)
+{
+    alt::ICore::Instance().SetCamFrozen(state);
+}
 #endif
 
 static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs) {
@@ -942,5 +947,7 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_GLOBAL_FUNC(
       "void SetWeatherCycle(array<uint8>@ weathers, array<uint8>@ multipliers)", SetWeatherCycle, "Sets the current weather cycle");
     REGISTER_GLOBAL_FUNC("void SetWeatherSyncActive(bool state)", SetWeatherSyncActive, "Toggles whether the weather sync is enabled");
+
+    REGISTER_GLOBAL_FUNC("void SetCamFrozen(bool state)", SetCamFrozen, "Toggles whether the cam is frozen");
 #endif
 });
