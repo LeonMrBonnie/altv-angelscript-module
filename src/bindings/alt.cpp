@@ -755,6 +755,32 @@ static int32_t GetMsPerGameMinute()
 {
     return alt::ICore::Instance().GetMsPerGameMinute();
 }
+
+static void SetWeatherCycle(CScriptArray* weathers, CScriptArray* multipliers)
+{
+    if(weathers->GetElementTypeId() != asTYPEID_UINT8 || multipliers->GetElementTypeId() != asTYPEID_UINT8)
+    {
+        THROW_ERROR("SetWeatherCycle: Expected two uint8 arrays");
+        return;
+    }
+
+    alt::Array<uint8_t> weatherArr, multiplierArr;
+    for(asUINT i = 0; i < weathers->GetSize(); i++)
+    {
+        weatherArr.Push(*(uint8_t*)weathers->At(i));
+    }
+    for(asUINT i = 0; i < multipliers->GetSize(); i++)
+    {
+        multiplierArr.Push(*(uint8_t*)multipliers->At(i));
+    }
+
+    alt::ICore::Instance().SetWeatherCycle(weatherArr, multiplierArr);
+}
+
+static void SetWeatherSyncActive(bool state)
+{
+    alt::ICore::Instance().SetWeatherSyncActive(state);
+}
 #endif
 
 static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs) {
@@ -912,5 +938,9 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_GLOBAL_FUNC(
       "void SetMsPerGameMinute(int amount)", SetMsPerGameMinute, "Sets the time required in milliseconds for one game minute to pass");
     REGISTER_GLOBAL_FUNC("int GetMsPerGameMinute()", GetMsPerGameMinute, "Gets the time required in milliseconds for one game minute to pass");
+
+    REGISTER_GLOBAL_FUNC(
+      "void SetWeatherCycle(array<uint8>@ weathers, array<uint8>@ multipliers)", SetWeatherCycle, "Sets the current weather cycle");
+    REGISTER_GLOBAL_FUNC("void SetWeatherSyncActive(bool state)", SetWeatherSyncActive, "Toggles whether the weather sync is enabled");
 #endif
 });
