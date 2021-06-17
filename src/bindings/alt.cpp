@@ -808,13 +808,13 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_GLOBAL_FUNC("Vehicle@+ GetVehicleByID(uint16 id)", (GetByID<alt::IVehicle>), "Gets the vehicle with the specified ID");
     REGISTER_GLOBAL_FUNC("Entity@+ GetEntityByID(uint16 id)", (GetByID<alt::IEntity>), "Gets the entity with the specified ID");
 #ifdef SERVER_MODULE
-    REGISTER_GLOBAL_PROPERTY("int", "defaultDimension", GetDefaultDimension);
-    REGISTER_GLOBAL_PROPERTY("int", "globalDimension", GetGlobalDimension);
+    REGISTER_GLOBAL_PROPERTY_READ_ONLY("int", "defaultDimension", GetDefaultDimension);
+    REGISTER_GLOBAL_PROPERTY_READ_ONLY("int", "globalDimension", GetGlobalDimension);
 #endif
-    REGISTER_GLOBAL_PROPERTY("string", "version", GetVersion);
-    REGISTER_GLOBAL_PROPERTY("string", "branch", GetBranch);
-    REGISTER_GLOBAL_PROPERTY("uint", "sdkVersion", GetSDKVersion);
-    REGISTER_GLOBAL_PROPERTY("bool", "debugMode", IsDebugMode);
+    REGISTER_GLOBAL_PROPERTY_READ_ONLY("string", "version", GetVersion);
+    REGISTER_GLOBAL_PROPERTY_READ_ONLY("string", "branch", GetBranch);
+    REGISTER_GLOBAL_PROPERTY_READ_ONLY("uint", "sdkVersion", GetSDKVersion);
+    REGISTER_GLOBAL_PROPERTY_READ_ONLY("bool", "debugMode", IsDebugMode);
 
     // Resource
     REGISTER_GLOBAL_FUNC("bool HasResource(const string&in name)", HasResource, "Returns whether the specified resource exists and is started");
@@ -825,8 +825,8 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_GLOBAL_FUNC("void RestartResource(const string&in name)", RestartResource, "Restarts the specified resource");
 #endif
     REGISTER_GLOBAL_FUNC("dictionary@ GetResourceExports(const string&in name)", GetResourceExports, "Gets the exports of the specified resource");
-    REGISTER_GLOBAL_PROPERTY("string", "resourceMain", GetResourceMain);
-    REGISTER_GLOBAL_PROPERTY("string", "resourceName", GetResourceName);
+    REGISTER_GLOBAL_PROPERTY_READ_ONLY("string", "resourceMain", GetResourceMain);
+    REGISTER_GLOBAL_PROPERTY_READ_ONLY("string", "resourceName", GetResourceName);
 
 // Server
 #ifdef SERVER_MODULE
@@ -899,12 +899,12 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
 
     REGISTER_VARIADIC_FUNC("void", "EmitServer", "const string&in event", 32, EmitServer, "Emits an event to the server (Max 32 args)");
 
-    REGISTER_GLOBAL_PROPERTY("bool", "sandboxMode", IsSandboxMode);
+    REGISTER_GLOBAL_PROPERTY_READ_ONLY("bool", "sandboxMode", IsSandboxMode);
 
     REGISTER_GLOBAL_FUNC("KeyState GetKeyState(uint key)", GetKeyState, "Gets the state of the specified key");
 
     REGISTER_GLOBAL_FUNC("void SetGameControlsEnabled(bool state)", SetGameControlsEnabled, "Toggles whether the game receives control inputs");
-    REGISTER_GLOBAL_PROPERTY("bool", "gameControlsEnabled", AreGameControlsEnabled);
+    REGISTER_GLOBAL_PROPERTY_READ_ONLY("bool", "gameControlsEnabled", AreGameControlsEnabled);
 
     REGISTER_GLOBAL_FUNC("void AddGxtText(const string&in gxt, const string&in text)", AddGxtTextString, "Adds a gxt text");
     REGISTER_GLOBAL_FUNC("void AddGxtText(Hash hash, const string&in text)", AddGxtTextHash, "Adds a gxt text");
@@ -914,7 +914,7 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_GLOBAL_FUNC("void GetGxtText(Hash hash)", GetGxtTextHash, "Gets a gxt text value");
 
     REGISTER_GLOBAL_FUNC("bool ShowCursor(bool state)", ToggleCursor, "Shows or hides the cursor, returns whether the operation succeeded or not");
-    REGISTER_GLOBAL_PROPERTY("bool", "cursorShown", IsCursorEnabled);
+    REGISTER_GLOBAL_PROPERTY_READ_ONLY("bool", "cursorShown", IsCursorEnabled);
 
     REGISTER_GLOBAL_FUNC("bool SetConfigFlag(const string&in flag, bool state)",
                          SetConfigFlag,
@@ -923,16 +923,16 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_GLOBAL_FUNC("bool DoesConfigFlagExist(const string&in flag)", DoesConfigFlagExist, "Returns whether the given config flag exists");
 
     REGISTER_GLOBAL_FUNC("void SetVoiceInputMuted(bool state)", SetVoiceInputMuted, "Mutes/Unmutes the voice input in the alt:V voice chat");
-    REGISTER_GLOBAL_PROPERTY("bool", "voiceInputMuted", IsVoiceInputMuted);
-    REGISTER_GLOBAL_PROPERTY("bool", "voiceActivationEnabled", IsVoiceActivationEnabled);
+    REGISTER_GLOBAL_PROPERTY_READ_ONLY("bool", "voiceInputMuted", IsVoiceInputMuted);
+    REGISTER_GLOBAL_PROPERTY_READ_ONLY("bool", "voiceActivationEnabled", IsVoiceActivationEnabled);
     REGISTER_GLOBAL_FUNC("void SetVoiceControlsEnabled(bool state)", ToggleVoiceControls, "Toggles whether the voice controls are enabled or not");
-    REGISTER_GLOBAL_PROPERTY("uint", "voiceActivationKey", GetVoiceActivationKey);
+    REGISTER_GLOBAL_PROPERTY_READ_ONLY("uint", "voiceActivationKey", GetVoiceActivationKey);
 
-    REGISTER_GLOBAL_PROPERTY("string", "licenseHash", GetLicenseHash);
-    REGISTER_GLOBAL_PROPERTY("string", "locale", GetLocale);
-    REGISTER_GLOBAL_PROPERTY("bool", "streamerMode", IsStreamerModeEnabled);
-    REGISTER_GLOBAL_PROPERTY("bool", "menuOpen", IsMenuOpen);
-    REGISTER_GLOBAL_PROPERTY("bool", "consoleOpen", IsConsoleOpen);
+    REGISTER_GLOBAL_PROPERTY_READ_ONLY("string", "licenseHash", GetLicenseHash);
+    REGISTER_GLOBAL_PROPERTY_READ_ONLY("string", "locale", GetLocale);
+    REGISTER_GLOBAL_PROPERTY_READ_ONLY("bool", "streamerMode", IsStreamerModeEnabled);
+    REGISTER_GLOBAL_PROPERTY_READ_ONLY("bool", "menuOpen", IsMenuOpen);
+    REGISTER_GLOBAL_PROPERTY_READ_ONLY("bool", "consoleOpen", IsConsoleOpen);
 
     REGISTER_GLOBAL_FUNC(
       "Entity@+ GetEntityByScriptId(int scriptId)", GetEntityByScriptId, "Gets the entity with the specified script id, or null if not found");
@@ -972,6 +972,6 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_ENUM_VALUE("PermissionState", "Failed", alt::PermissionState::Failed);
     REGISTER_GLOBAL_FUNC("PermissionState GetPermissionState(Permission permission)", GetPermissionState, "Gets the state of the given permission");
 
-    REGISTER_GLOBAL_PROPERTY("bool", "isGameFocused", IsGameFocused);
+    REGISTER_GLOBAL_PROPERTY_READ_ONLY("bool", "isGameFocused", IsGameFocused);
 #endif
 });

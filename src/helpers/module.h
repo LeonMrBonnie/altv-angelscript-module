@@ -125,10 +125,17 @@
     }
 
 // Registers a global property (e.g. 'alt::resourceName')
-#define REGISTER_GLOBAL_PROPERTY(type, prop, wrapperFn)                                                       \
-    {                                                                                                         \
-        engine->RegisterGlobalFunction(type " get_" prop "() property", asFUNCTION(wrapperFn), asCALL_CDECL); \
-        docs->PushVariable(type, prop);                                                                       \
+#define REGISTER_GLOBAL_PROPERTY_READ_ONLY(type, prop, getFn)                                             \
+    {                                                                                                     \
+        engine->RegisterGlobalFunction(type " get_" prop "() property", asFUNCTION(getFn), asCALL_CDECL); \
+        docs->PushVariable(type, prop);                                                                   \
+    }
+// Registers a global property (e.g. 'alt::resourceName')
+#define REGISTER_GLOBAL_PROPERTY(type, prop, getFn, setFn)                                                       \
+    {                                                                                                            \
+        engine->RegisterGlobalFunction(type " get_" prop "() property", asFUNCTION(getFn), asCALL_CDECL);        \
+        engine->RegisterGlobalFunction("void set_" prop "(" type ") property", asFUNCTION(setFn), asCALL_CDECL); \
+        docs->PushVariable(type, prop);                                                                          \
     }
 
 // Registers a new global enum

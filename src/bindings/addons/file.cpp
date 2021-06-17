@@ -30,6 +30,6 @@ static ModuleExtension fileExtension("file", [](asIScriptEngine* engine, DocsGen
     REGISTER_GLOBAL_FUNC("string ReadFile(const string&in path)", ReadFile, "Reads the specified file contents");
     REGISTER_GLOBAL_FUNC("bool FileExists(const string&in path)", FileExists, "Checks if the given file exists");
 #ifdef SERVER_MODULE
-    REGISTER_GLOBAL_PROPERTY("string", "rootDir", GetRootDir);
+    REGISTER_GLOBAL_PROPERTY_READ_ONLY("string", "rootDir", GetRootDir);
 #endif
 });
