@@ -791,6 +791,11 @@ static alt::PermissionState GetPermissionState(alt::Permission permission)
 {
     return alt::ICore::Instance().GetPermissionState(permission);
 }
+
+static bool IsGameFocused()
+{
+    return alt::ICore::Instance().IsGameFocused();
+}
 #endif
 
 static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs) {
@@ -966,5 +971,7 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_ENUM_VALUE("PermissionState", "Unspecified", alt::PermissionState::Unspecified);
     REGISTER_ENUM_VALUE("PermissionState", "Failed", alt::PermissionState::Failed);
     REGISTER_GLOBAL_FUNC("PermissionState GetPermissionState(Permission permission)", GetPermissionState, "Gets the state of the given permission");
+
+    REGISTER_GLOBAL_PROPERTY("bool", "isGameFocused", IsGameFocused);
 #endif
 });
