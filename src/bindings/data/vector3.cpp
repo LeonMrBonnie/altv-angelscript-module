@@ -6,7 +6,7 @@ static DataExtension vector3Extension([](asIScriptEngine* engine, DocsGenerator*
     REGISTER_CONSTRUCTOR("Vector3", "float x, float y, float z", Vector3::Construct<float>);
     REGISTER_CONSTRUCTOR("Vector3", "int x, int y, int z", Vector3::Construct<int>);
     REGISTER_INIT_LIST_CONSTRUCTOR("Vector3", "float, float, float", Vector3::ConstructFromList<float>);
-    REGISTER_INIT_LIST_CONSTRUCTOR("Vector3", "int, int, int", Vector3::ConstructFromList<int>);
+    // REGISTER_INIT_LIST_CONSTRUCTOR("Vector3", "int, int, int", Vector3::ConstructFromList<int>);
     REGISTER_PROPERTY("Vector3", "float x", Vector3, x);
     REGISTER_PROPERTY("Vector3", "float y", Vector3, y);
     REGISTER_PROPERTY("Vector3", "float z", Vector3, z);
