@@ -876,10 +876,6 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
 #endif
 
 #ifdef CLIENT_MODULE
-    REGISTER_ENUM("KeyState", "Keypress state used for keypress event");
-    REGISTER_ENUM_VALUE("KeyState", "UP", alt::CKeyboardEvent::KeyState::UP);
-    REGISTER_ENUM_VALUE("KeyState", "DOWN", alt::CKeyboardEvent::KeyState::DOWN);
-
     REGISTER_GLOBAL_FUNC("DiscordData GetDiscordData()", GetDiscordData, "Gets the current discord state");
 
     REGISTER_GLOBAL_FUNC("void SetStat(const string&in stat, ?&in value)", SetStat, "Sets the specified stat to the specified value");

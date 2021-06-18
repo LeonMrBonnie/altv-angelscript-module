@@ -1,6 +1,7 @@
 #include "helpers/events.h"
 #include "angelscript/addon/scriptarray/scriptarray.h"
 #include "../runtime.h"
+#include "../bindings/data/keyState.h"
 
 using namespace Helpers;
 
@@ -77,13 +78,14 @@ REGISTER_EVENT_HANDLER(alt::CEvent::Type::DISCONNECT_EVENT,
 REGISTER_EVENT_HANDLER(alt::CEvent::Type::KEYBOARD_EVENT,
                        KeyPress,
                        "void",
-                       "uint&in key, KeyState&in state",
+                       "uint&in key, KeyState state",
                        [](AngelScriptResource* resource, const alt::CEvent* event, asIScriptContext* context) {
                            auto ev  = static_cast<const alt::CKeyboardEvent*>(event);
                            auto key = ev->GetKeyCode();
                            context->SetArgAddress(0, &key);
-                           auto state = ev->GetKeyState();
-                           context->SetArgAddress(1, &state);
+                           auto           state = ev->GetKeyState();
+                           Data::KeyState keyState({ ev->GetKeyState() == alt::CKeyboardEvent::KeyState::DOWN, false });
+                           context->SetArgObject(1, &keyState);
                            return context->Execute();
                        });
 
