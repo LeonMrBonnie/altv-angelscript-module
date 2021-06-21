@@ -269,7 +269,7 @@ static void Emit(asIScriptGeneric* gen)
 static void EmitToAllClients(asIScriptGeneric* gen)
 {
 #ifdef DEBUG_MODE
-    Helpers::Benchmark benchmark("Emit");
+    Helpers::Benchmark benchmark("EmitToAllClients");
 #endif
 
     GET_RESOURCE();
