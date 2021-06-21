@@ -266,6 +266,35 @@ static void Emit(asIScriptGeneric* gen)
     alt::ICore::Instance().TriggerLocalEvent(event, args);
 }
 
+static void EmitToAllClients(asIScriptGeneric* gen)
+{
+#ifdef DEBUG_MODE
+    Helpers::Benchmark benchmark("Emit");
+#endif
+
+    GET_RESOURCE();
+    void*           ref    = gen->GetArgAddress(0);
+    int             typeId = 0;
+    std::string     event  = *static_cast<std::string*>(ref);
+    alt::MValueArgs args;
+
+    for(int i = 1; i < gen->GetArgCount(); i++)
+    {
+        ref    = gen->GetArgAddress(i);
+        typeId = gen->GetArgTypeId(i);
+        if(typeId & asTYPEID_OBJHANDLE)
+        {
+            // We're receiving a reference to the handle, so we need to dereference it
+            ref = *(void**)ref;
+            resource->GetRuntime()->GetEngine()->AddRefScriptObject(ref, resource->GetRuntime()->GetEngine()->GetTypeInfoById(typeId));
+        }
+        if(typeId == asTYPEID_VOID) continue;
+        auto mvalue = Helpers::ValueToMValue(typeId, ref);
+        args.Push(mvalue);
+    }
+    alt::ICore::Instance().TriggerClientEventForAll(event, args);
+}
+
 template<class T>
 static T* GetByID(uint16_t id)
 {
@@ -858,6 +887,9 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
       "void OnClient(const string&in event, const string&in handlerName)", OnClient, "Registers an event handler for a remote custom event");
 #endif
     REGISTER_VARIADIC_FUNC("void", "Emit", "const string&in event", 32, Emit, "Emits a local event (Max 32 args)");
+#ifdef SERVER_MODULE
+    REGISTER_VARIADIC_FUNC("void", "EmitToAllClients", "const string&in event", 32, EmitToAllClients, "Emits a event to all clients (Max 32 args)");
+#endif
 
     // Metadata
     REGISTER_GLOBAL_FUNC("bool HasMeta(const string&in key)", HasMeta, "Returns whether the specified meta key exists");
