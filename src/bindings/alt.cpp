@@ -825,6 +825,11 @@ static bool IsGameFocused()
 {
     return alt::ICore::Instance().IsGameFocused();
 }
+
+static void SetAngularVelocity(uint32_t scriptId, Data::Vector3& velocity)
+{
+    alt::ICore::Instance().SetAngularVelocity(scriptId, { velocity.x, velocity.y, velocity.z, 0 });
+}
 #endif
 
 static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs) {
@@ -1001,5 +1006,8 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_GLOBAL_FUNC("PermissionState GetPermissionState(Permission permission)", GetPermissionState, "Gets the state of the given permission");
 
     REGISTER_GLOBAL_PROPERTY_READ_ONLY("bool", "isGameFocused", IsGameFocused);
+
+    REGISTER_GLOBAL_FUNC(
+      "void SetAngularVelocity(ScriptID entity, const Vector3&in velocity)", SetAngularVelocity, "Sets the angular velocity of the specified entity");
 #endif
 });
