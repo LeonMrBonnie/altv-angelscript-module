@@ -830,6 +830,13 @@ static void SetAngularVelocity(uint32_t scriptId, Data::Vector3& velocity)
 {
     alt::ICore::Instance().SetAngularVelocity(scriptId, { velocity.x, velocity.y, velocity.z, 0 });
 }
+
+static void LoadModel(uint32_t hash, bool async = false)
+{
+    if(async) alt::ICore::Instance().LoadModelAsync(hash);
+    else
+        alt::ICore::Instance().LoadModel(hash);
+}
 #endif
 
 static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs) {
@@ -1009,5 +1016,7 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
 
     REGISTER_GLOBAL_FUNC(
       "void SetAngularVelocity(ScriptID entity, const Vector3&in velocity)", SetAngularVelocity, "Sets the angular velocity of the specified entity");
+
+    REGISTER_GLOBAL_FUNC("void LoadModel(Hash hash, bool async = false)", LoadModel, "Loads the given model into memory");
 #endif
 });
