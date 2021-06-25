@@ -266,35 +266,6 @@ static void Emit(asIScriptGeneric* gen)
     alt::ICore::Instance().TriggerLocalEvent(event, args);
 }
 
-static void EmitToAllClients(asIScriptGeneric* gen)
-{
-#ifdef DEBUG_MODE
-    Helpers::Benchmark benchmark("EmitToAllClients");
-#endif
-
-    GET_RESOURCE();
-    void*           ref    = gen->GetArgAddress(0);
-    int             typeId = 0;
-    std::string     event  = *static_cast<std::string*>(ref);
-    alt::MValueArgs args;
-
-    for(int i = 1; i < gen->GetArgCount(); i++)
-    {
-        ref    = gen->GetArgAddress(i);
-        typeId = gen->GetArgTypeId(i);
-        if(typeId & asTYPEID_OBJHANDLE)
-        {
-            // We're receiving a reference to the handle, so we need to dereference it
-            ref = *(void**)ref;
-            resource->GetRuntime()->GetEngine()->AddRefScriptObject(ref, resource->GetRuntime()->GetEngine()->GetTypeInfoById(typeId));
-        }
-        if(typeId == asTYPEID_VOID) continue;
-        auto mvalue = Helpers::ValueToMValue(typeId, ref);
-        args.Push(mvalue);
-    }
-    alt::ICore::Instance().TriggerClientEventForAll(event, args);
-}
-
 template<class T>
 static T* GetByID(uint16_t id)
 {
@@ -363,6 +334,35 @@ static bool GetSyncedMeta(const std::string& key, void* ref, int typeId)
 }
 
 #ifdef SERVER_MODULE
+static void EmitToAllClients(asIScriptGeneric* gen)
+{
+    #ifdef DEBUG_MODE
+    Helpers::Benchmark benchmark("EmitToAllClients");
+    #endif
+
+    GET_RESOURCE();
+    void*           ref    = gen->GetArgAddress(0);
+    int             typeId = 0;
+    std::string     event  = *static_cast<std::string*>(ref);
+    alt::MValueArgs args;
+
+    for(int i = 1; i < gen->GetArgCount(); i++)
+    {
+        ref    = gen->GetArgAddress(i);
+        typeId = gen->GetArgTypeId(i);
+        if(typeId & asTYPEID_OBJHANDLE)
+        {
+            // We're receiving a reference to the handle, so we need to dereference it
+            ref = *(void**)ref;
+            resource->GetRuntime()->GetEngine()->AddRefScriptObject(ref, resource->GetRuntime()->GetEngine()->GetTypeInfoById(typeId));
+        }
+        if(typeId == asTYPEID_VOID) continue;
+        auto mvalue = Helpers::ValueToMValue(typeId, ref);
+        args.Push(mvalue);
+    }
+    alt::ICore::Instance().TriggerClientEventForAll(event, args);
+}
+
 static void SetSyncedMeta(const std::string& key, void* ref, int typeId)
 {
     auto mvalue = Helpers::ValueToMValue(typeId, ref);
