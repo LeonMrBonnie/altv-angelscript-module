@@ -271,7 +271,7 @@ static ModuleExtension playerExtension("alt", [](asIScriptEngine* engine, DocsGe
 #endif
 
 #ifdef CLIENT_MODULE
-    REGISTER_GLOBAL_FUNC("Player@+ GetLocalPlayer()", GetLocalPlayer, "Gets the local player instance");
+    REGISTER_GLOBAL_PROPERTY_READ_ONLY("Player@+", "localPlayer", GetLocalPlayer);
 
     REGISTER_PROPERTY_WRAPPER_GET("Player", "bool", "isTalking", (GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::IsTalking, bool>));
     REGISTER_PROPERTY_WRAPPER_GET("Player", "float", "micLevel", (GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::GetMicLevel, float>));
