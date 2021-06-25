@@ -837,6 +837,15 @@ static void LoadModel(uint32_t hash, bool async = false)
     else
         alt::ICore::Instance().LoadModel(hash);
 }
+
+static bool LoadYtyp(const std::string& path)
+{
+    return alt::ICore::Instance().LoadYtyp(path);
+}
+static bool UnloadYtyp(const std::string& path)
+{
+    return alt::ICore::Instance().UnloadYtyp(path);
+}
 #endif
 
 static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs) {
@@ -1018,5 +1027,8 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
       "void SetAngularVelocity(ScriptID entity, const Vector3&in velocity)", SetAngularVelocity, "Sets the angular velocity of the specified entity");
 
     REGISTER_GLOBAL_FUNC("void LoadModel(Hash hash, bool async = false)", LoadModel, "Loads the given model into memory");
+
+    REGISTER_GLOBAL_FUNC("bool LoadYtyp(const string&in path)", LoadYtyp, "Loads the YTYP at the given path into memory");
+    REGISTER_GLOBAL_FUNC("bool UnloadYtyp(const string&in path)", UnloadYtyp, "Unloads the YTYP at the given path out of memory");
 #endif
 });
