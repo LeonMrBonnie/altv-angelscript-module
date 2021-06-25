@@ -846,6 +846,11 @@ static bool UnloadYtyp(const std::string& path)
 {
     return alt::ICore::Instance().UnloadYtyp(path);
 }
+
+static std::string GetHeadshotBase64(uint8_t id)
+{
+    return alt::ICore::Instance().HeadshotToBase64(id).ToString();
+}
 #endif
 
 static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs) {
@@ -1030,5 +1035,7 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
 
     REGISTER_GLOBAL_FUNC("bool LoadYtyp(const string&in path)", LoadYtyp, "Loads the YTYP at the given path into memory");
     REGISTER_GLOBAL_FUNC("bool UnloadYtyp(const string&in path)", UnloadYtyp, "Unloads the YTYP at the given path out of memory");
+
+    REGISTER_GLOBAL_FUNC("string GetHeadshotBase64(uint8 id)", GetHeadshotBase64, "Gets the base64 encoded image of the given headshot");
 #endif
 });
