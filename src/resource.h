@@ -92,10 +92,7 @@ public:
     alt::String ReadFile(alt::String path);
 
     // Registers a new script callback for the specified event
-    void RegisterEventHandler(alt::CEvent::Type event, asIScriptFunction* handler)
-    {
-        eventHandlers.insert({ event, handler });
-    }
+    void RegisterEventHandler(alt::CEvent::Type event, asIScriptFunction* handler);
     // Gets all script event handlers of the specified type
     std::vector<asIScriptFunction*> GetEventHandlers(const alt::CEvent::Type event)
     {

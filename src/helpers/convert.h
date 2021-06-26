@@ -340,4 +340,23 @@ namespace Helpers
 
         return random_string;
     }
+
+    // Checks if all primitive type args of the function are marked as &in ref values,
+    // otherwise it might cause a crash
+    static inline bool CheckEventFunctionParams(asIScriptFunction* func)
+    {
+        asUINT paramCount = func->GetParamCount();
+        for(asUINT i = 0; i < paramCount; i++)
+        {
+            int     typeId = 0;
+            asDWORD flags  = 0;
+            func->GetParam(i, &typeId, &flags);
+            if(!IsTypePrimitive(typeId)) continue;
+            if(flags == asETypeModifiers::asTM_INREF) continue;
+            Log::Error << "Parameter " << i << " of event handler function '" << func->GetDeclaration()
+                       << "' is a primitive and has to be a '&in' ref value" << Log::Endl;
+            return false;
+        }
+        return true;
+    }
 }  // namespace Helpers

@@ -143,6 +143,12 @@ alt::String AngelScriptResource::ReadFile(alt::String path)
     return src;
 }
 
+void AngelScriptResource::RegisterEventHandler(alt::CEvent::Type event, asIScriptFunction* handler)
+{
+    if(!Helpers::CheckEventFunctionParams(handler)) return;
+    eventHandlers.insert({ event, handler });
+}
+
 bool AngelScriptResource::Stop()
 {
     // Gets Stop function and if exists calls it
@@ -660,6 +666,7 @@ bool AngelScriptResource::RegisterMetadata(CScriptBuilder& builder, asIScriptCon
                     Event* event = Event::GetByMetadata(methodMeta);
                     if(event != nullptr)
                     {
+                        if(!Helpers::CheckEventFunctionParams(method)) continue;
                         // Store the event on the method
                         method->SetUserData(event);
                         continue;
@@ -670,6 +677,7 @@ bool AngelScriptResource::RegisterMetadata(CScriptBuilder& builder, asIScriptCon
                     auto result = std::regex_search(methodMeta.cbegin(), methodMeta.cend(), results, customEventRemoteRegex);
                     if(result)
                     {
+                        if(!Helpers::CheckEventFunctionParams(method)) continue;
                         auto eventName = results[1].str();
                         // Store the custom event name on the method
                         method->SetUserData(new std::string(eventName), 2);
@@ -679,6 +687,7 @@ bool AngelScriptResource::RegisterMetadata(CScriptBuilder& builder, asIScriptCon
                     result = std::regex_search(methodMeta.cbegin(), methodMeta.cend(), results, customEventLocalRegex);
                     if(result)
                     {
+                        if(!Helpers::CheckEventFunctionParams(method)) continue;
                         auto eventName = results[1].str();
                         // Store the custom event name on the method
                         method->SetUserData(new std::string(eventName), 1);
