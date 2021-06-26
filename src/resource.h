@@ -36,6 +36,9 @@ class AngelScriptResource : public alt::IResource::Impl
     std::unordered_multimap<std::string, asIScriptFunction*> customLocalEventHandlers;
     std::unordered_multimap<std::string, asIScriptFunction*> customRemoteEventHandlers;
 
+    // Functions that should be evaled in next tick
+    std::vector<asIScriptFunction*> evalFunctions;
+
 public:
     AngelScriptResource(AngelScriptRuntime* runtime, alt::IResource* resource) : runtime(runtime), resource(resource){};
     ~AngelScriptResource() = default;
@@ -147,6 +150,8 @@ public:
     bool                  HasObjectData(alt::IBaseObject* object, const std::string& key);
     std::pair<int, void*> GetObjectData(alt::IBaseObject* object, const std::string& key);
     void                  DeleteObjectData(alt::IBaseObject* object, const std::string& key);
+
+    bool Eval(const std::string& code);
 
     // Yoinked from v8 helpers
     int64_t GetTime()

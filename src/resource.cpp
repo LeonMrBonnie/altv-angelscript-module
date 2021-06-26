@@ -510,6 +510,19 @@ void AngelScriptResource::DeleteObjectData(alt::IBaseObject* object, const std::
     objectData.at(object).erase(key);
 }
 
+bool AngelScriptResource::Eval(const std::string& code)
+{
+    std::stringstream evalCode;
+    evalCode << "void exec() {" << code << " }";
+
+    asIScriptFunction* func = nullptr;
+    int                r    = module->CompileFunction("eval", evalCode.str().c_str(), 0, 0, &func);
+    CHECK_AS_RETURN("Compile eval code", r, false);
+
+    evalFunctions.push_back(func);
+    return true;
+}
+
 void AngelScriptResource::ShowDebugInfo()
 {
     Log::Colored << "*************** ~y~" << resource->GetName() << " ~w~***************" << Log::Endl;
@@ -532,6 +545,19 @@ void AngelScriptResource::ShowDebugInfo()
 
 void AngelScriptResource::OnTick()
 {
+    // Execute eval functions
+    for(auto func : evalFunctions)
+    {
+        int r = r = context->Prepare(func);
+        CHECK_AS_RETURN("Context prepare", r, );
+        r = context->Execute();
+        CHECK_AS_RETURN("Context execute", r, );
+        r = context->Unprepare();
+        CHECK_AS_RETURN("Context unprepare", r, );
+        func->Release();
+    }
+    evalFunctions.clear();
+
     // Remove all invalid timers
     for(auto& id : invalidTimers) timers.erase(id);
     invalidTimers.clear();
