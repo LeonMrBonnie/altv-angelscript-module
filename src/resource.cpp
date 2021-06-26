@@ -268,6 +268,11 @@ bool AngelScriptResource::OnEvent(const alt::CEvent* ev)
         CHECK_FUNCTION_RETURN(r, true);
         if(r == asEXECUTION_FINISHED && shouldReturn)
         {
+            if(callback->GetReturnTypeId() != asTYPEID_BOOL)
+            {
+                Log::Error << "Event handler '" << callback->GetDeclaration() << "' should return a bool" << Log::Endl;
+                return true;
+            }
             auto result = context->GetReturnByte();
             context->Unprepare();
             return result == 1 ? true : false;
@@ -305,6 +310,11 @@ bool AngelScriptResource::OnEvent(const alt::CEvent* ev)
                 CHECK_FUNCTION_RETURN(r, true);
                 if(r == asEXECUTION_FINISHED && shouldReturn)
                 {
+                    if(eventFunc->GetReturnTypeId() != asTYPEID_BOOL)
+                    {
+                        Log::Error << "Event handler '" << eventFunc->GetDeclaration() << "' should return a bool" << Log::Endl;
+                        return true;
+                    }
                     auto result = context->GetReturnByte();
                     context->Unprepare();
                     return result == 1 ? true : false;
