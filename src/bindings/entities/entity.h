@@ -129,5 +129,9 @@ namespace Helpers
                                 "void DeleteStreamSyncedMeta(const string&in key)",
                                 (GenericWrapper<T, alt::IEntity, &alt::IEntity::DeleteStreamSyncedMetaData, void, std::string&>));
 #endif
+
+#ifdef CLIENT_MODULE
+        REGISTER_PROPERTY_WRAPPER_GET(type, "ScriptID", "scriptID", (GenericWrapper<T, alt::IEntity, &alt::IEntity::GetScriptGuid, int32_t>));
+#endif
     }
 }  // namespace Helpers
