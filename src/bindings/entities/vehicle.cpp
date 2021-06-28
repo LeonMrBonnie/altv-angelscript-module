@@ -67,6 +67,14 @@ static alt::IVehicle* GetAttachedTo(alt::IVehicle* vehicle)
 }
 #endif
 
+#ifdef CLIENT_MODULE
+static Data::Vector3 GetSpeedVector(alt::IVehicle* vehicle)
+{
+    auto speedVector = vehicle->GetSpeedVector();
+    return Data::Vector3(speedVector[0], speedVector[1], speedVector[2]);
+}
+#endif
+
 static ModuleExtension playerExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs) {
     RegisterAsEntity<alt::IVehicle>(engine, docs, "Vehicle");
 
@@ -396,5 +404,32 @@ static ModuleExtension playerExtension("alt", [](asIScriptEngine* engine, DocsGe
                             "void SetBumperDamageLevel(uint8 bumper, uint8 level)",
                             (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::SetBumperDamageLevel, void, uint8_t, uint8_t>));
     REGISTER_METHOD_WRAPPER("Vehicle", "void Repair()", (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::SetFixed, void>));
+#endif
+
+#ifdef CLIENT_MODULE
+    REGISTER_PROPERTY_WRAPPER_GET(
+      "Vehicle", "float", "wheelSpeed", (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::GetWheelSpeed, float>));
+
+    REGISTER_PROPERTY_WRAPPER_GET(
+      "Vehicle", "uint16", "gear", (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::GetCurrentGear, uint16_t>));
+    REGISTER_PROPERTY_WRAPPER_SET(
+      "Vehicle", "uint16", "gear", (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::SetCurrentGear, void, uint16_t>));
+    REGISTER_PROPERTY_WRAPPER_GET(
+      "Vehicle", "uint16", "maxGear", (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::GetMaxGear, uint16_t>));
+    REGISTER_PROPERTY_WRAPPER_SET(
+      "Vehicle", "uint16", "maxGear", (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::SetMaxGear, void, uint16_t>));
+
+    REGISTER_PROPERTY_WRAPPER_GET("Vehicle", "float", "rpm", (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::GetCurrentRPM, float>));
+    REGISTER_PROPERTY_WRAPPER_GET("Vehicle", "Vector3", "speedVector", GetSpeedVector);
+
+    REGISTER_PROPERTY_WRAPPER_GET(
+      "Vehicle", "uint8", "lightsIndicator", (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::GetLightsIndicator, uint8_t>));
+    REGISTER_PROPERTY_WRAPPER_SET(
+      "Vehicle", "uint8", "lightsIndicator", (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::SetLightsIndicator, void, uint8_t>));
+
+    REGISTER_METHOD_WRAPPER("Vehicle", "void ResetHandling()", (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::ResetHandling>));
+    REGISTER_METHOD_WRAPPER("Vehicle", "void ReplaceHandling()", (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::ReplaceHandling>));
+    REGISTER_PROPERTY_WRAPPER_GET(
+      "Vehicle", "bool", "handlingModified", (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::IsHandlingModified, bool>));
 #endif
 });
