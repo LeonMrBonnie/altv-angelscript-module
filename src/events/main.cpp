@@ -27,6 +27,17 @@ REGISTER_EVENT_HANDLER(alt::CEvent::Type::RESOURCE_STOP,
                            return context->Execute();
                        });
 
+REGISTER_EVENT_HANDLER(alt::CEvent::Type::RESOURCE_ERROR,
+                       ResourceError,
+                       "void",
+                       "const string&in resource",
+                       [](AngelScriptResource* resource, const alt::CEvent* event, asIScriptContext* context) {
+                           auto ev = static_cast<const alt::CResourceStopEvent*>(event);
+
+                           context->SetArgObject(0, (void*)ev->GetResource()->GetName().CStr());
+                           return context->Execute();
+                       });
+
 REGISTER_EVENT_HANDLER(alt::CEvent::Type::CONSOLE_COMMAND_EVENT,
                        ConsoleCommand,
                        "void",
