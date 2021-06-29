@@ -178,3 +178,17 @@ void AngelScriptRuntime::DestroyImpl(alt::IResource::Impl* impl)
         delete resource;
     }
 }
+
+void AngelScriptRuntime::OnTick()
+{
+    asUINT curSize, totalDestroyed, totalDetected, newObjs, totalNewDestroyed;
+    engine->GetGCStatistics(&curSize, &totalDestroyed, &totalDetected, &newObjs, &totalNewDestroyed);
+    if(curSize > 100 && newObjs > 10)
+    {
+        Log::Warning << "A lot of objects detected by the garbage collector" << Log::Endl;
+    }
+    asUINT steps = 1;
+    if(newObjs != 0) steps = (asUINT)std::ceil(newObjs % 10);
+
+    engine->GarbageCollect(asGC_ONE_STEP, steps);
+}

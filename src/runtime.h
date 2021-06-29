@@ -22,6 +22,7 @@ public:
     AngelScriptRuntime();
     alt::IResource::Impl* CreateImpl(alt::IResource* resource) override;
     void                  DestroyImpl(alt::IResource::Impl* impl) override;
+    void                  OnTick() override;
 
     asIScriptEngine* GetEngine()
     {
