@@ -109,6 +109,14 @@ public:
         if(!resources.count(resource)) return nullptr;
         return resources.at(resource);
     }
+    AngelScriptResource* GetResourceByModule(asIScriptModule* module)
+    {
+        for(auto [_, resource] : resources)
+        {
+            if(resource->GetModule() == module) return resource;
+        }
+        return nullptr;
+    }
 
     void ShowDebugInfo();
 

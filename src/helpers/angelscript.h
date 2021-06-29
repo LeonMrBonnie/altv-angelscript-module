@@ -287,6 +287,14 @@ namespace Helpers
         }
     }
 
+    static void CircularRefDetectedHandler(asITypeInfo* type, const void*, void*)
+    {
+        auto resource = AngelScriptRuntime::Instance().GetResourceByModule(type->GetModule());
+        Log::Warning << "!!! Circular ref detected !!!" << Log::Endl;
+        Log::Warning << "Type: " << type->GetName() << Log::Endl;
+        Log::Warning << "Resource: " << resource->GetIResource()->GetName() << Log::Endl;
+    }
+
     static const char* GetContextStateName(asEContextState state)
     {
         switch(state)

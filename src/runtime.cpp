@@ -36,6 +36,8 @@ AngelScriptRuntime::AngelScriptRuntime()
     // Optimization
     engine->SetEngineProperty(asEP_BUILD_WITHOUT_LINE_CUES, true);
 
+    if(alt::ICore::Instance().IsDebug()) engine->SetCircularRefDetectedCallback(CircularRefDetectedHandler);
+
     RegisterScriptInterfaces(engine);
 }
 
