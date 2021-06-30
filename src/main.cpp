@@ -102,6 +102,7 @@ EXPORT void CreateScriptRuntime(alt::ICore* core)
     // Create instance of runtime and register
     auto& runtime = AngelScriptRuntime::Instance();
     core->RegisterScriptRuntime(MODULE_TYPE, &runtime);
+    Log::Colored << "Loaded AngelScript client module. Version ~y~" MODULE_VERSION << Log::Endl;
 
     // Register command
     core->SubscribeCommand("angelscript-module", CommandHandler);
