@@ -4,6 +4,8 @@
 using namespace Helpers;
 
 #ifdef CLIENT_MODULE
+// todo: figure out why these are broken
+/*
 REGISTER_EVENT_HANDLER(alt::CEvent::Type::SYNCED_META_CHANGE,
                        SyncedMetaChange,
                        "void",
@@ -65,4 +67,5 @@ REGISTER_EVENT_HANDLER(alt::CEvent::Type::GLOBAL_META_CHANGE,
                            context->SetArgVarType(2, std::get<1>(oldVal), std::get<0>(oldVal));
                            return context->Execute();
                        });
+*/
 #endif
