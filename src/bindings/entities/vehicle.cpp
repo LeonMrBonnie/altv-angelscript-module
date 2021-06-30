@@ -22,16 +22,6 @@ static alt::IVehicle* VehicleFactory(uint32_t model, Vector3& pos, Vector3& rot)
     vehicle->AddRef();
     return vehicle.Get();
 }
-static alt::IVehicle* VehicleFactoryString(const std::string& modelStr, Vector3& pos, Vector3& rot)
-{
-    GET_RESOURCE();
-    auto model   = alt::ICore::Instance().Hash(modelStr);
-    auto vehicle = alt::ICore::Instance().CreateVehicle(model, { pos.x, pos.y, pos.z }, { rot.x, rot.y, rot.z });
-    AS_ASSERT(!vehicle.IsEmpty(), "Invalid model hash", nullptr);
-
-    vehicle->AddRef();
-    return vehicle.Get();
-}
 #endif
 
 static alt::IPlayer* GetDriver(alt::IVehicle* vehicle)
@@ -80,7 +70,6 @@ static ModuleExtension playerExtension("alt", [](asIScriptEngine* engine, DocsGe
 
 #ifdef SERVER_MODULE
     REGISTER_FACTORY("Vehicle", "Hash model, Vector3&in pos, Vector3&in rot", VehicleFactory);
-    REGISTER_FACTORY("Vehicle", "const string&in model, Vector3&in pos, Vector3&in rot", VehicleFactoryString);
 #endif
 
     // Implicit conversion to string
