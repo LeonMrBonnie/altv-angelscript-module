@@ -79,8 +79,8 @@ static ModuleExtension playerExtension("alt", [](asIScriptEngine* engine, DocsGe
     RegisterAsEntity<alt::IVehicle>(engine, docs, "Vehicle");
 
 #ifdef SERVER_MODULE
-    REGISTER_FACTORY("Vehicle", "Hash model, Vector3 pos, Vector3 rot", VehicleFactory);
-    REGISTER_FACTORY("Vehicle", "const string&in model, Vector3 pos, Vector3 rot", VehicleFactoryString);
+    REGISTER_FACTORY("Vehicle", "Hash model, Vector3&in pos, Vector3&in rot", VehicleFactory);
+    REGISTER_FACTORY("Vehicle", "const string&in model, Vector3&in pos, Vector3&in rot", VehicleFactoryString);
 #endif
 
     // Implicit conversion to string
