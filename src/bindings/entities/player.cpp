@@ -178,10 +178,10 @@ static ModuleExtension playerExtension("alt", [](asIScriptEngine* engine, DocsGe
     REGISTER_PROPERTY_WRAPPER_GET("Player", "Vector3", "headRot", GetHeadRotation);
 
     REGISTER_PROPERTY_WRAPPER_GET("Player", "bool", "inVehicle", (GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::IsInVehicle, bool>));
-    REGISTER_PROPERTY_WRAPPER_GET("Player", "Vehicle@", "vehicle", GetVehicle);
+    REGISTER_PROPERTY_WRAPPER_GET("Player", "Vehicle@+", "vehicle", GetVehicle);
     REGISTER_PROPERTY_WRAPPER_GET("Player", "uint8", "seat", (GenericWrapper<alt::IPlayer, alt::IPlayer, &alt::IPlayer::GetSeat, uint8_t>));
 
-    REGISTER_PROPERTY_WRAPPER_GET("Player", "Entity@", "entityAimingAt", GetEntityAimingAt);
+    REGISTER_PROPERTY_WRAPPER_GET("Player", "Entity@+", "entityAimingAt", GetEntityAimingAt);
     REGISTER_PROPERTY_WRAPPER_GET("Player", "Vector3", "entityAimOffset", GetEntityAimOffset);
 
     REGISTER_PROPERTY_WRAPPER_GET(
