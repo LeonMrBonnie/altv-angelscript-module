@@ -88,6 +88,7 @@ void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine)
     ModuleExtension::RegisterAll("http", engine);
     ModuleExtension::RegisterAll("json", engine);
     ModuleExtension::RegisterAll("file", engine);
+    ModuleExtension::RegisterAll("natives", engine);
 
     // Set default namespace back to alt namespace
     engine->SetDefaultNamespace("alt");
