@@ -186,6 +186,12 @@ bool AngelScriptResource::Stop()
     }
     customRemoteEventHandlers.clear();
 
+    for(auto func : importedFunctions)
+    {
+        func->Release();
+    }
+    importedFunctions.clear();
+
     if(scriptClasses.size() != 0)
     {
         for(auto scriptClass : scriptClasses)
@@ -767,14 +773,43 @@ void AngelScriptResource::RegisterImports()
         // The resource is not a angelscript resource
         else
         {
-            Log::Warning << "Importing a function from a non-AngelScript resource is currently not possible" << Log::Endl;
             // todo: add import of functions from non angelscript resources
             /*
+            static std::regex importFuncRegex("(.*?)\\s+.*\\((.*?), (.*?)\\)");
+
+            std::string declaration(decl);
+            std::smatch results;
+            auto        result = std::regex_search(declaration.cbegin(), declaration.cend(), results, importFuncRegex);
+            AS_ASSERT(result, "Invalid import function declaration", );
+
+            std::string              returnType   = results[1].str();
+            std::string              functionName = results[2].str();
+            std::vector<std::string> argTypes;
+            for(int i = 3; i < results.size(); i++)
+            {
+                argTypes.push_back(results[i].str());
+            }
+
             for(auto it = exports->Begin(); it; it = exports->Next())
             {
                 auto name = it->GetKey();
-                auto func = it->GetValue().As<alt::MValueFunctionConst>();
-            }*/
+                if(name != functionName) continue;
+                auto val = it->GetValue();
+                if(val->GetType() != alt::IMValue::Type::FUNCTION) continue;
+
+                auto               func = val.As<alt::MValueFunctionConst>();
+                std::stringstream  code;
+                asIScriptFunction* outFunc;
+
+                code << decl << " {";
+                code << "}";
+
+                int r = module->CompileFunction(source, code.str().c_str(), 0, 0, &outFunc);
+                CHECK_AS_RETURN("Import function compilation", r, );
+                importedFunctions.push_back(outFunc);
+                module->BindImportedFunction(i, outFunc);
+            }
+            */
         }
     }
 }

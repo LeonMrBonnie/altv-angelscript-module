@@ -39,6 +39,9 @@ class AngelScriptResource : public alt::IResource::Impl
     // Functions that should be evaled in next tick
     std::vector<asIScriptFunction*> evalFunctions;
 
+    // Keep track of all imported functions, to release them on resource stop
+    std::vector<asIScriptFunction*> importedFunctions;
+
 public:
     AngelScriptResource(AngelScriptRuntime* runtime, alt::IResource* resource) : runtime(runtime), resource(resource){};
     ~AngelScriptResource() = default;
