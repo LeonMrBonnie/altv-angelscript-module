@@ -15,12 +15,8 @@ namespace Data
         float z;
 
         Vector3(float x, float y, float z) : x(x), y(y), z(z) {}
-        Vector3(int x, int y, int z) : x(x), y(y), z(z){};
-
-        float Length()
-        {
-            return sqrt(x * x + y * y + z * z);
-        }
+        Vector3(double x, double y, double z) : x(x), y(y), z(z) {}
+        Vector3(int x, int y, int z) : x(x), y(y), z(z) {}
 
         Vector3 AddVector(Vector3& other)
         {
@@ -64,6 +60,20 @@ namespace Data
         float Distance(Vector3& other)
         {
             return (float)sqrt(std::pow(x - other.x, 2) + std::pow(y - other.y, 2) + std::pow(z - other.z, 2));
+        }
+
+        float Length()
+        {
+            return sqrt(x * x + y * y + z * z);
+        }
+
+        Vector3 ToRadians()
+        {
+            return Vector3((x * (alt::PI / 180)), (y * (alt::PI / 180)), (z * (alt::PI / 180)));
+        }
+        Vector3 ToDegrees()
+        {
+            return Vector3(std::roundf(x * (180 / alt::PI)), std::roundf(y * (180 / alt::PI)), std::roundf(z * (180 / alt::PI)));
         }
 
         std::string ToString()
