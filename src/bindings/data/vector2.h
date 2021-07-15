@@ -14,12 +14,8 @@ namespace Data
         float y;
 
         Vector2(float x, float y) : x(x), y(y) {}
+        Vector2(double x, double y) : x(x), y(y) {}
         Vector2(int x, int y) : x(x), y(y) {}
-
-        float Length()
-        {
-            return sqrt(x * x + y * y);
-        }
 
         Vector2 AddVector(Vector2& other)
         {
@@ -63,6 +59,20 @@ namespace Data
         float Distance(Vector2& other)
         {
             return (float)sqrt(std::pow(x - other.x, 2) + std::pow(y - other.y, 2));
+        }
+
+        float Length()
+        {
+            return sqrt(x * x + y * y);
+        }
+
+        Vector2 ToRadians()
+        {
+            return Vector2((x * (alt::PI / 180)), (y * (alt::PI / 180)));
+        }
+        Vector2 ToDegrees()
+        {
+            return Vector2(std::roundf(x * (180 / alt::PI)), std::roundf(y * (180 / alt::PI)));
         }
 
         std::string ToString()

@@ -10,7 +10,6 @@ static DataExtension vector3Extension([](asIScriptEngine* engine, DocsGenerator*
     REGISTER_PROPERTY("Vector3", "float x", Vector3, x);
     REGISTER_PROPERTY("Vector3", "float y", Vector3, y);
     REGISTER_PROPERTY("Vector3", "float z", Vector3, z);
-    REGISTER_METHOD("Vector3", "float Length()", Vector3, Length);
     REGISTER_METHOD("Vector3", "Vector3 Add(Vector3 vector)", Vector3, AddVector);
     REGISTER_METHOD("Vector3", "Vector3 Add(float x, float y, float z)", Vector3, AddValues);
     REGISTER_METHOD("Vector3", "Vector3 Add(float value)", Vector3, AddValue);
@@ -21,6 +20,10 @@ static DataExtension vector3Extension([](asIScriptEngine* engine, DocsGenerator*
     REGISTER_METHOD("Vector3", "Vector3 Mult(float x, float y, float z)", Vector3, MultValues);
     REGISTER_METHOD("Vector3", "Vector3 Mult(float value)", Vector3, MultValue);
     REGISTER_METHOD("Vector3", "float Distance(Vector3 vector)", Vector3, Distance);
+    REGISTER_METHOD("Vector3", "float Length()", Vector3, Length);
+    REGISTER_METHOD("Vector3", "Vector3 ToRadians()", Vector3, ToRadians);
+    REGISTER_METHOD("Vector3", "Vector3 ToDegrees()", Vector3, ToDegrees);
+
     // Implicit conversion to string
     REGISTER_METHOD("Vector3", "string opImplConv() const", Vector3, ToString);
 });
