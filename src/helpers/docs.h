@@ -259,8 +259,28 @@ namespace Helpers
                    << "\n";
 
             // Write the docs to file
+            std::string fileName;
+    #ifdef SERVER_MODULE
+            fileName = moduleName + "Docs.as";
+    #endif
+    #ifdef CLIENT_MODULE
+            char*   appDataFolder;
+            size_t  length;
+            errno_t err = _dupenv_s(&appDataFolder, &length, "APPDATA");
+            if(err)
+            {
+                Log::Error << "Failed to get appdata path to write docs" << Log::Endl;
+                return;
+            }
+            fileName = appDataFolder;
+            fileName += "\\";
+            fileName += moduleName;
+            fileName += "Docs.as";
+            Log::Info << fileName << Log::Endl;
+            free(appDataFolder);
+    #endif
             std::ofstream file;
-            file.open(moduleName + "Docs.as");
+            file.open(fileName);
             file << stream.str();
             file.close();
             Log::Colored << "~y~Generated ~w~" << moduleName << " ~y~docs" << Log::Endl;
