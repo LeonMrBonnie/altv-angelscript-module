@@ -2,7 +2,11 @@
 
 using namespace Helpers;
 
+#ifdef CLIENT_MODULE
+
 static DataExtension scriptIdExtension([](asIScriptEngine* engine, DocsGenerator* docs) {
-    // Common joaat hash
+    // ScriptIDs used in natives
     REGISTER_TYPEDEF("ScriptID", "int32");
 });
+
+#endif
