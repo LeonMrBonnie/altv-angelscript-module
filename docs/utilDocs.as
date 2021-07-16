@@ -1,4 +1,4 @@
-// Generated on Thu Mar 25 15:14:10 2021
+// Generated on Fri Jul 16 02:40:48 2021
 
 namespace util
 {
@@ -10,4 +10,18 @@ namespace util
     // Prints the current callstack for debugging
     void ShowCallstack(uint maxLevels = 0);
 
+    // Evals the given code
+    bool Eval(const string&in code);
+
+    // ********** Objects **********
+
+    // Benchmarking utility
+    class Benchmark
+    {
+        bool ended;
+
+        Benchmark(const string&in name = "Unnamed_Benchmark", bool autoStart = true, bool showLog = true);
+        void Start();
+        double End();
+    };
 }
