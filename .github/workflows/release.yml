@@ -16,6 +16,13 @@ jobs:
     outputs:
       url: ${{ steps.create_release.outputs.upload_url }}
     steps:
+    - name: Extract version
+      id: version
+      shell: bash
+      run: |
+        TAG=${GITHUB_REF/refs\/tags\//}
+        echo ::set-output name=BRANCH::${TAG/\/*}
+        echo ::set-output name=VERSION::${TAG/*\/}
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
@@ -23,9 +30,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-        body: |
-          Release ${{ github.ref }}
+        release_name: Release ${{ steps.version.outputs.VERSION }}
         draft: false
         prerelease: false
 
@@ -60,7 +65,9 @@ jobs:
       id: version
       shell: bash
       run: |
-        echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+        TAG=${GITHUB_REF/refs\/tags\//}
+        echo ::set-output name=BRANCH::${TAG/\/*}
+        echo ::set-output name=VERSION::${TAG/*\/}
 
     - name: Build server (Windows)
       if: matrix.OS_TYPE == 'Windows'
