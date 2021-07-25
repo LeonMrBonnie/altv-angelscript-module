@@ -131,17 +131,9 @@ static void InvokeNative(asIScriptGeneric* gen)
     static auto ctx = alt::ICore::Instance().CreateNativesContext();
     GET_RESOURCE();
     auto nativeName = *static_cast<std::string*>(gen->GetArgAddress(0));
-    if(nativeMap.count(nativeName) == 0)
-    {
-        THROW_ERROR("Invalid native specified");
-        return;
-    }
+    AS_ASSERT(nativeMap.count(nativeName) != 0, "Invalid native specified", );
     auto native = nativeMap.at(nativeName);
-    if(!native->IsValid())
-    {
-        THROW_ERROR("Invalid native specified");
-        return;
-    }
+    AS_ASSERT(native->IsValid(), "Invalid native specified", );
 
     ctx->Reset();
 

@@ -18,11 +18,7 @@ static void ShowCallstack(uint32_t maxLevels = 0)
 static bool Eval(const std::string& code)
 {
     GET_RESOURCE();
-    if(alt::ICore::Instance().IsDebug() == false)
-    {
-        THROW_ERROR("Eval is only available in debug mode");
-        return false;
-    }
+    AS_ASSERT(alt::ICore::Instance().IsDebug(), "Eval is only available in debug mode", false);
     return resource->Eval(code);
 }
 

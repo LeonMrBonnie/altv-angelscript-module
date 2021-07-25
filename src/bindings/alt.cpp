@@ -787,11 +787,7 @@ static int32_t GetMsPerGameMinute()
 
 static void SetWeatherCycle(CScriptArray* weathers, CScriptArray* multipliers)
 {
-    if(weathers->GetElementTypeId() != asTYPEID_UINT8 || multipliers->GetElementTypeId() != asTYPEID_UINT8)
-    {
-        THROW_ERROR("SetWeatherCycle: Expected two uint8 arrays");
-        return;
-    }
+    AS_ASSERT(weathers->GetElementTypeId() == asTYPEID_UINT8 && multipliers->GetElementTypeId() == asTYPEID_UINT8, "Expected two uint8 arrays", );
 
     alt::Array<uint8_t> weatherArr, multiplierArr;
     for(asUINT i = 0; i < weathers->GetSize(); i++)
