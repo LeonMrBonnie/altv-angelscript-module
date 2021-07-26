@@ -17,6 +17,7 @@
 #include "angelscript/addon/scriptmath/scriptmath.h"
 #include "angelscript/addon/scriptany/scriptany.h"
 #include "angelscript/addon/datetime/datetime.h"
+#include "angelscript/addon/scripthandle/scripthandle.h"
 #include "angelscript-jit-compiler/as_jit.h"
 
 AngelScriptRuntime::AngelScriptRuntime()
@@ -59,6 +60,7 @@ void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine)
     RegisterScriptAny(engine);
     RegisterScriptDateTime(engine);
     RegisterExceptionRoutines(engine);
+    RegisterScriptHandle(engine);
 
     // Register data
     Helpers::ModuleExtension::RegisterAllData(engine, &docs);
