@@ -218,6 +218,9 @@ bool AngelScriptResource::Stop()
     }
     timers.clear();
 
+    // todo: unregister dll import functions somehow
+    dllImportFunctions.clear();
+
     return true;
 }
 

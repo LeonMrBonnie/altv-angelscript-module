@@ -1,15 +1,17 @@
 #pragma once
 
+#include <regex>
+
 #include "cpp-sdk/SDK.h"
 #include "Log.h"
-#include "angelscript/include/angelscript.h"
 #include "./module.h"
+#include "./dllImport.h"
 #include "runtime.h"
 #include "bindings/data/vector3.h"
 #include "bindings/data/vector2.h"
 #include "angelscript/addon/scriptdictionary/scriptdictionary.h"
 #include "angelscript/addon/scriptarray/scriptarray.h"
-#include <regex>
+#include "angelscript/include/angelscript.h"
 
 #define CHECK_FUNCTION_RETURN(r, ret)                                                           \
     if(r == asEXECUTION_EXCEPTION)                                                              \
@@ -260,6 +262,7 @@ namespace Helpers
     static int PragmaHandler(const std::string& pragmaText, CScriptBuilder& builder, void* data)
     {
         auto resource = static_cast<AngelScriptResource*>(data);
+        if(DllImport::DllImportPragmaHandler(pragmaText, resource)) return 0;
         return 0;
     }
 
@@ -335,7 +338,7 @@ namespace Helpers
     };
     static FunctionInfo GetFunctionInfoFromDecl(const std::string& decl)
     {
-        static std::regex funcInfoRegex("(.*?)\\s+.*\\((.*?), (.*?)\\)");
+        static std::regex funcInfoRegex("(.*?) (.*?)\\((.*?)\\)");
 
         FunctionInfo info;
         std::smatch  results;

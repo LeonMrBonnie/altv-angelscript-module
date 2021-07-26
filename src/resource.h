@@ -42,6 +42,9 @@ class AngelScriptResource : public alt::IResource::Impl
     // Keep track of all imported functions, to release them on resource stop
     std::vector<asIScriptFunction*> importedFunctions;
 
+    // Keep track of all dll import functions, we need to remove them on resource stop
+    std::vector<asIScriptFunction*> dllImportFunctions;
+
 public:
     AngelScriptResource(AngelScriptRuntime* runtime, alt::IResource* resource) : runtime(runtime), resource(resource){};
     ~AngelScriptResource() = default;
@@ -72,6 +75,11 @@ public:
     asIScriptModule* GetModule()
     {
         return module;
+    }
+
+    void AddDllImportFunction(asIScriptFunction* func)
+    {
+        dllImportFunctions.push_back(func);
     }
 
     bool DoesObjectExist(alt::IBaseObject* obj)

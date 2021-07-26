@@ -1,0 +1,87 @@
+#include "dllImport.h"
+#include "resource.h"
+#include "./convert.h"
+#include "./angelscript.h"
+
+#ifdef SERVER_MODULE
+
+    #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
+        #include "windows.h"
+        #define _getlib(name)                LoadLibraryA(name)
+        #define _getfunc(module, name, type) (type) GetProcAddress(module, name);
+        #define _seperator                   "\\"
+    /*
+    #else
+        #include <dlfcn.h>
+        #define _getlib(name)                dlopen(name, RTLD_NOW);
+        #define _getfunc(module, name, type) (type) dlsym(module, name);
+        #define _seperator                   "/"
+    */
+    #endif
+
+    #include <algorithm>
+    #include <cctype>
+    #include <locale>
+
+static inline void CleanString(std::string& str)
+{
+    str.erase(std::remove(str.begin(), str.end(), '"'), str.end());
+    str.erase(std::remove(str.begin(), str.end(), '\''), str.end());
+    str.erase(str.begin(), std::find_if(str.begin(), str.end(), [](unsigned char ch) { return !std::isspace(ch); }));
+    str.erase(std::find_if(str.rbegin(), str.rend(), [](unsigned char ch) { return !std::isspace(ch); }).base(), str.end());
+}
+
+bool DllImport::DllImportPragmaHandler(const std::string& pragmaStr, AngelScriptResource* resource)
+{
+    static std::regex dllImportRegex("dllImport\\((.*)\\)");
+    std::smatch       results;
+    bool              result = std::regex_search(pragmaStr.cbegin(), pragmaStr.cend(), results, dllImportRegex);
+    if(!result) return false;
+    auto parts = Helpers::SplitString(results[1].str(), ",", 2);
+    for(auto& part : parts)
+    {
+        CleanString(part);
+    }
+
+    std::string dllName  = parts[0];
+    std::string funcDecl = parts[1];
+
+    std::string dllPath = resource->GetIResource()->GetPath().ToString();
+    dllPath += _seperator;
+    dllPath += dllName;
+
+    auto dll = _getlib(dllPath.c_str());
+    if(dll == nullptr)
+    {
+        Log::Error << "Failed to load dll '" << dllName << "'" << Log::Endl;
+        return true;
+    }
+
+    auto funcInfo = Helpers::GetFunctionInfoFromDecl(funcDecl);
+    Log::Warning << __FUNCTION__ << " " << funcInfo.returnTypeName << Log::Endl;
+    Log::Warning << __FUNCTION__ << " " << funcInfo.functionName << Log::Endl;
+    Log::Warning << __FUNCTION__ << " " << funcInfo.argTypes.size() << Log::Endl;
+    auto dllFunc = _getfunc(dll, funcInfo.functionName.c_str(), void*);
+    if(dllFunc == nullptr)
+    {
+        Log::Error << "Failed to find dll function '" << funcInfo.functionName << "' in dll '" << dllName << "'" << Log::Endl;
+        return true;
+    }
+
+    int createdFuncId = resource->GetRuntime()->GetEngine()->RegisterGlobalFunction(funcDecl.c_str(), asFUNCTION(dllFunc), asCALL_CDECL);
+    if(createdFuncId < 0)
+    {
+        Log::Error << "Failed to create global dll function '" << funcInfo.functionName << "' Error: " << createdFuncId << Log::Endl;
+        return true;
+    }
+    asIScriptFunction* createdFunc = resource->GetRuntime()->GetEngine()->GetGlobalFunctionByIndex(createdFuncId);
+    resource->AddDllImportFunction(createdFunc);
+
+    return true;
+}
+#else
+bool DllImport::DllImportPragmaHandler(const std::string& pragmaStr, AngelScriptResource* resource)
+{
+    return false;
+}
+#endif
