@@ -37,14 +37,15 @@ bool DllImport::DllImportPragmaHandler(const std::string& pragmaStr, AngelScript
     std::smatch       results;
     bool              result = std::regex_search(pragmaStr.cbegin(), pragmaStr.cend(), results, dllImportRegex);
     if(!result) return false;
-    auto parts = Helpers::SplitString(results[1].str(), ",", 2);
+    auto parts = Helpers::SplitString(results[1].str(), ",", 3);
     for(auto& part : parts)
     {
         CleanString(part);
     }
 
-    std::string dllName  = parts[0];
-    std::string funcDecl = parts[1];
+    std::string dllName       = parts[0];
+    std::string funcNamespace = parts[1];
+    std::string funcDecl      = parts[2];
 
     std::string dllPath = resource->GetIResource()->GetPath().ToString();
     dllPath += _seperator;
@@ -65,13 +66,14 @@ bool DllImport::DllImportPragmaHandler(const std::string& pragmaStr, AngelScript
         return true;
     }
 
+    resource->GetRuntime()->GetEngine()->SetDefaultNamespace(funcNamespace.c_str());
     int createdFuncId = resource->GetRuntime()->GetEngine()->RegisterGlobalFunction(funcDecl.c_str(), asFUNCTION(dllFunc), asCALL_CDECL);
     if(createdFuncId < 0)
     {
         Log::Error << "Failed to create global dll function '" << funcInfo.functionName << "' Error: " << createdFuncId << Log::Endl;
         return true;
     }
-    asIScriptFunction* createdFunc = resource->GetRuntime()->GetEngine()->GetGlobalFunctionByIndex(createdFuncId);
+    asIScriptFunction* createdFunc = resource->GetRuntime()->GetEngine()->GetFunctionById(createdFuncId);
     resource->AddDllImportFunction(createdFunc);
 
     return true;

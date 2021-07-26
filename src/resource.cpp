@@ -228,6 +228,14 @@ bool AngelScriptResource::Stop()
     }
     timers.clear();
 
+    for(auto func : dllImportFunctions)
+    {
+        func->Release();
+    }
+    dllImportFunctions.clear();
+
+    // todo: fix cleaning up the dll import functions
+    /*
     // Remove the config group to clear dll import functions from global namespace
     int result = runtime->GetEngine()->RemoveConfigGroup(resource->GetName().CStr());
     if(result == asCONFIG_GROUP_IS_IN_USE)
@@ -242,7 +250,7 @@ bool AngelScriptResource::Stop()
             Log::Error << "Make sure you don't use dll import functions in other resources other than the one that registered it!" << Log::Endl;
         }
     }
-
+    */
     return true;
 }
 
