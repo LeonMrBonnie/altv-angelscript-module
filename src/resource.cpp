@@ -775,20 +775,8 @@ void AngelScriptResource::RegisterImports()
         {
             // todo: add import of functions from non angelscript resources
             /*
-            static std::regex importFuncRegex("(.*?)\\s+.*\\((.*?), (.*?)\\)");
-
-            std::string declaration(decl);
-            std::smatch results;
-            auto        result = std::regex_search(declaration.cbegin(), declaration.cend(), results, importFuncRegex);
-            AS_ASSERT(result, "Invalid import function declaration", );
-
-            std::string              returnType   = results[1].str();
-            std::string              functionName = results[2].str();
-            std::vector<std::string> argTypes;
-            for(int i = 3; i < results.size(); i++)
-            {
-                argTypes.push_back(results[i].str());
-            }
+            auto funcInfo = Helpers::GetFunctionInfoFromDecl(decl);
+            AS_ASSERT(funcInfo.valid, "Invalid function declaration specified", );
 
             for(auto it = exports->Begin(); it; it = exports->Next())
             {

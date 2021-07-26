@@ -9,6 +9,7 @@
 #include "bindings/data/vector2.h"
 #include "angelscript/addon/scriptdictionary/scriptdictionary.h"
 #include "angelscript/addon/scriptarray/scriptarray.h"
+#include <regex>
 
 #define CHECK_FUNCTION_RETURN(r, ret)                                                           \
     if(r == asEXECUTION_EXCEPTION)                                                              \
@@ -323,5 +324,32 @@ namespace Helpers
             totalProperties += typeClass->GetPropertyCount();
         }
         return { totalMethods, totalProperties };
+    }
+
+    struct FunctionInfo
+    {
+        bool                     valid = false;
+        std::string              returnTypeName;
+        std::string              functionName;
+        std::vector<std::string> argTypes;
+    };
+    static FunctionInfo GetFunctionInfoFromDecl(const std::string& decl)
+    {
+        static std::regex funcInfoRegex("(.*?)\\s+.*\\((.*?), (.*?)\\)");
+
+        FunctionInfo info;
+        std::smatch  results;
+        auto         result = std::regex_search(decl.cbegin(), decl.cend(), results, funcInfoRegex);
+        if(!result) return info;
+
+        info.valid          = true;
+        info.returnTypeName = results[1].str();
+        info.functionName   = results[2].str();
+        std::vector<std::string> argTypes;
+        for(int i = 3; i < results.size(); i++)
+        {
+            argTypes.push_back(results[i].str());
+        }
+        return info;
     }
 }  // namespace Helpers
