@@ -263,6 +263,8 @@ namespace Helpers
     {
         auto resource = static_cast<AngelScriptResource*>(data);
         if(DllImport::DllImportPragmaHandler(pragmaText, resource)) return 0;
+
+        Log::Warning << "Unknown pragma directive used: '" << pragmaText << "'" << Log::Endl;
         return 0;
     }
 
