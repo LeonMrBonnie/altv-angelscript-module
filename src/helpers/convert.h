@@ -311,14 +311,17 @@ namespace Helpers
         }
     };
 
-    static std::vector<std::string> SplitString(const std::string& input, const std::string& delimiter)
+    static std::vector<std::string> SplitString(const std::string& input, const std::string& delimiter, size_t max = 0)
     {
         std::vector<std::string> parts;
         size_t                   last = 0, next = 0;
+        size_t                   idx = 0;
         while((next = input.find(delimiter, last)) != std::string::npos)
         {
             parts.push_back(input.substr(last, next - last));
             last = next + 1;
+            idx++;
+            if(max != 0 && max - 1 == idx) break;
         }
         parts.push_back(input.substr(last));
         return parts;
