@@ -58,10 +58,7 @@ bool DllImport::DllImportPragmaHandler(const std::string& pragmaStr, AngelScript
     }
 
     auto funcInfo = Helpers::GetFunctionInfoFromDecl(funcDecl);
-    Log::Warning << __FUNCTION__ << " " << funcInfo.returnTypeName << Log::Endl;
-    Log::Warning << __FUNCTION__ << " " << funcInfo.functionName << Log::Endl;
-    Log::Warning << __FUNCTION__ << " " << funcInfo.argTypes.size() << Log::Endl;
-    auto dllFunc = _getfunc(dll, funcInfo.functionName.c_str(), void*);
+    auto dllFunc  = _getfunc(dll, funcInfo.functionName.c_str(), void*);
     if(dllFunc == nullptr)
     {
         Log::Error << "Failed to find dll function '" << funcInfo.functionName << "' in dll '" << dllName << "'" << Log::Endl;

@@ -39,6 +39,8 @@ bool AngelScriptResource::Start()
         return false;
     }
 
+    runtime->GetEngine()->BeginConfigGroup(resource->GetName().CStr());
+
     // Compile file
     CScriptBuilder builder;
 
@@ -59,6 +61,7 @@ bool AngelScriptResource::Start()
         if(byteStream.HasErrored())
         {
             Log::Error << "Failed to open bytecode file" << Log::Endl;
+            runtime->GetEngine()->EndConfigGroup();
             return false;
         }
         r = module->LoadByteCode(&byteStream);
@@ -89,7 +92,7 @@ bool AngelScriptResource::Start()
         byteStream.Close();
         CHECK_AS_RETURN("Save bytecode", r, false);
         Log::Colored << "~g~Successfully saved the compiled bytecode to the file ~w~" << fileName + ".asb" << Log::Endl;
-
+        runtime->GetEngine()->EndConfigGroup();
         return true;
     }
 #endif
@@ -103,7 +106,11 @@ bool AngelScriptResource::Start()
 
     // Register Metadata
     bool result = RegisterMetadata(builder, context);
-    if(!result) return false;
+    if(!result)
+    {
+        runtime->GetEngine()->EndConfigGroup();
+        return false;
+    }
 
     if(scriptClasses.size() != 0) return true;
 
@@ -115,6 +122,7 @@ bool AngelScriptResource::Start()
         Log::Error << "The main entrypoint ('void Start()') was not found" << Log::Endl;
         module->Discard();
         context->Release();
+        runtime->GetEngine()->EndConfigGroup();
         return false;
     }
     r = context->Prepare(func);
@@ -124,6 +132,8 @@ bool AngelScriptResource::Start()
     r = context->Execute();
     CHECK_FUNCTION_RETURN(r, false);
     context->Unprepare();
+
+    runtime->GetEngine()->EndConfigGroup();
 
     return true;
 }
@@ -218,8 +228,20 @@ bool AngelScriptResource::Stop()
     }
     timers.clear();
 
-    // todo: unregister dll import functions somehow
-    dllImportFunctions.clear();
+    // Remove the config group to clear dll import functions from global namespace
+    int result = runtime->GetEngine()->RemoveConfigGroup(resource->GetName().CStr());
+    if(result == asCONFIG_GROUP_IS_IN_USE)
+    {
+        // Try to do one full cycle of the garbage collector
+        runtime->GetEngine()->GarbageCollect(asGC_FULL_CYCLE);
+        result = runtime->GetEngine()->RemoveConfigGroup(resource->GetName().CStr());
+        if(result == asCONFIG_GROUP_IS_IN_USE)
+        {
+            // A dll function is still used after doing a garbage collector cycle, so it is used elsewhere
+            Log::Error << "The dll import functions could not be cleaned up because they are still used somewhere" << Log::Endl;
+            Log::Error << "Make sure you don't use dll import functions in other resources other than the one that registered it!" << Log::Endl;
+        }
+    }
 
     return true;
 }
