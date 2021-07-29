@@ -339,7 +339,11 @@ bool AngelScriptResource::OnEvent(const alt::CEvent* ev)
                 eventFuncs.push_back(func);
             }
             // Invoke event handlers for the script class
-            if(eventFuncs.size() != 0) event->InvokeEventHandlers(this, ev, eventFuncs, scriptClass);
+            if(eventFuncs.size() != 0)
+            {
+                bool result = event->InvokeEventHandlers(this, ev, eventFuncs, scriptClass);
+                if(!shouldContinue && result) shouldContinue = true;
+            }
         }
     }
 
