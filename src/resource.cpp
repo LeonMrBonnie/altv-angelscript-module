@@ -678,6 +678,7 @@ bool AngelScriptResource::RegisterMetadata(CScriptBuilder& builder, asIScriptCon
                 // Get metadata for the method
                 std::vector<std::string> methodMetas = builder.GetMetadataForTypeMethod(type->GetTypeId(), method);
 
+                // todo: store this data on the resource instead of on the class method
                 for(auto methodMeta : methodMetas)
                 {
                     // Get the event associated with the metadata
