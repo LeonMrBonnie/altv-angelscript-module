@@ -31,13 +31,9 @@ static inline void CleanString(std::string& str)
     str.erase(std::find_if(str.rbegin(), str.rend(), [](unsigned char ch) { return !std::isspace(ch); }).base(), str.end());
 }
 
-bool DllImport::DllImportPragmaHandler(const std::string& pragmaStr, AngelScriptResource* resource)
+static void DoDllImport(std::string& pragma, AngelScriptResource* resource)
 {
-    static std::regex dllImportRegex("dllImport\\((.*)\\)");
-    std::smatch       results;
-    bool              result = std::regex_search(pragmaStr.cbegin(), pragmaStr.cend(), results, dllImportRegex);
-    if(!result) return false;
-    auto parts = Helpers::SplitString(results[1].str(), ",", 3);
+    auto parts = Helpers::SplitString(pragma, ",", 3);
     for(auto& part : parts)
     {
         CleanString(part);
@@ -55,7 +51,7 @@ bool DllImport::DllImportPragmaHandler(const std::string& pragmaStr, AngelScript
     if(dll == nullptr)
     {
         Log::Error << "Failed to load dll '" << dllName << "'" << Log::Endl;
-        return true;
+        return;
     }
 
     auto funcInfo = Helpers::GetFunctionInfoFromDecl(funcDecl);
@@ -63,7 +59,7 @@ bool DllImport::DllImportPragmaHandler(const std::string& pragmaStr, AngelScript
     if(dllFunc == nullptr)
     {
         Log::Error << "Failed to find dll function '" << funcInfo.functionName << "' in dll '" << dllName << "'" << Log::Endl;
-        return true;
+        return;
     }
 
     resource->GetRuntime()->GetEngine()->SetDefaultNamespace(funcNamespace.c_str());
@@ -71,10 +67,21 @@ bool DllImport::DllImportPragmaHandler(const std::string& pragmaStr, AngelScript
     if(createdFuncId < 0)
     {
         Log::Error << "Failed to create global dll function '" << funcInfo.functionName << "' Error: " << createdFuncId << Log::Endl;
-        return true;
+        return;
     }
     asIScriptFunction* createdFunc = resource->GetRuntime()->GetEngine()->GetFunctionById(createdFuncId);
     resource->AddDllImportFunction(createdFunc);
+}
+
+bool DllImport::DllImportPragmaHandler(const std::string& pragmaStr, AngelScriptResource* resource)
+{
+    std::smatch results;
+
+    if(std::regex_search(pragmaStr.cbegin(), pragmaStr.cend(), results, std::regex("dllImport\\((.*)\\)")))
+    {
+        DoDllImport(results[1].str(), resource);
+        return true;
+    }
 
     return true;
 }
