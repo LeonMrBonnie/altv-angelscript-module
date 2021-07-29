@@ -254,31 +254,48 @@ bool AngelScriptResource::Stop()
     return true;
 }
 
+static inline bool IsEventRemoteScriptEvent(alt::CEvent::Type type)
+{
+#ifdef SERVER_MODULE
+    if(type == alt::CEvent::Type::CLIENT_SCRIPT_EVENT) return true;
+#endif
+#ifdef CLIENT_MODULE
+    if(type == alt::CEvent::Type::SERVER_SCRIPT_EVENT) return true;
+#endif
+    return false;
+}
+
+static inline bool IsEventLocalScriptEvent(alt::CEvent::Type type)
+{
+#ifdef SERVER_MODULE
+    if(type == alt::CEvent::Type::SERVER_SCRIPT_EVENT) return true;
+#endif
+#ifdef CLIENT_MODULE
+    if(type == alt::CEvent::Type::CLIENT_SCRIPT_EVENT) return true;
+#endif
+    return false;
+}
+
 bool AngelScriptResource::OnEvent(const alt::CEvent* ev)
 {
 #ifdef DEBUG_MODE
     Helpers::Benchmark benchmark("OnEvent_" + resource->GetName().ToString() + "_" + std::string(std::to_string((uint16_t)ev->GetType())));
 #endif
 
-    if(ev->GetType() == alt::CEvent::Type::SERVER_SCRIPT_EVENT)
+    // Custom script events
+    if(IsEventLocalScriptEvent(ev->GetType()))
     {
-#ifdef SERVER_MODULE
         HandleCustomEvent(ev, true);
-#else
-        HandleCustomEvent(ev, false);
-#endif
         return true;
     }
-    else if(ev->GetType() == alt::CEvent::Type::CLIENT_SCRIPT_EVENT)
+    else if(IsEventRemoteScriptEvent(ev->GetType()))
     {
-#ifdef SERVER_MODULE
         HandleCustomEvent(ev, false);
-#else
-        HandleCustomEvent(ev, true);
-#endif
         return true;
     }
+
 #ifdef CLIENT_MODULE
+    // Entity events
     else if(ev->GetType() == alt::CEvent::Type::WEB_VIEW_EVENT)
     {
         HandleWebviewEvent(static_cast<const alt::CWebViewEvent*>(ev));
@@ -290,6 +307,7 @@ bool AngelScriptResource::OnEvent(const alt::CEvent* ev)
         return true;
     }
 #endif
+
     // Get the handler for the specified event
     auto event = Helpers::Event::GetEvent(ev->GetType());
     if(event == nullptr)
@@ -297,33 +315,10 @@ bool AngelScriptResource::OnEvent(const alt::CEvent* ev)
         Log::Error << "Unhandled event type " << std::to_string((uint16_t)ev->GetType()) << Log::Endl;
         return true;
     }
-    // Get all script callbacks for the event
-    auto callbacks  = GetEventHandlers(ev->GetType());
-    auto returnType = event->GetReturnType();
-    // If the return type of the event is bool, it should return a value
-    bool shouldReturn = strcmp(returnType, "bool") == 0;
 
-    // Loop over all script callbacks and call them with the args
-    for(auto callback : callbacks)
-    {
-        auto r = context->Prepare(callback);
-        CHECK_AS_RETURN("Prepare event handler", r, true);
-        // Set the event args and execute callback
-        r = event->Execute(this, ev);
-        CHECK_FUNCTION_RETURN(r, true);
-        if(r == asEXECUTION_FINISHED && shouldReturn)
-        {
-            if(callback->GetReturnTypeId() != asTYPEID_BOOL)
-            {
-                Log::Error << "Event handler '" << callback->GetDeclaration() << "' should return a bool" << Log::Endl;
-                return true;
-            }
-            auto result = context->GetReturnByte();
-            context->Unprepare();
-            return result == 1 ? true : false;
-        }
-        context->Unprepare();
-    }
+    // Invoke global event handlers
+    auto callbacks      = GetEventHandlers(ev->GetType());
+    bool shouldContinue = event->InvokeEventHandlers(this, ev, callbacks);
 
     // Check if any script class exists
     if(scriptClasses.size() != 0)
@@ -331,8 +326,8 @@ bool AngelScriptResource::OnEvent(const alt::CEvent* ev)
         for(auto scriptClass : scriptClasses)
         {
             // Get the method of the script class for the event if it exists
-            auto               type      = scriptClass->GetObjectType();
-            asIScriptFunction* eventFunc = nullptr;
+            asITypeInfo*                    type = scriptClass->GetObjectType();
+            std::vector<asIScriptFunction*> eventFuncs;
             for(asUINT i = 0; i < type->GetMethodCount(); i++)
             {
                 auto func = type->GetMethodByIndex(i, true);
@@ -341,37 +336,17 @@ bool AngelScriptResource::OnEvent(const alt::CEvent* ev)
 
                 Event* eventData = static_cast<Event*>(data);
                 if(eventData->GetType() != ev->GetType()) continue;
-
-                eventFunc = func;
-                break;
+                eventFuncs.push_back(func);
             }
-            if(eventFunc != nullptr)
-            {
-                int r = context->Prepare(eventFunc);
-                CHECK_AS_RETURN("Prepare script class event method", r, true);
-                r = context->SetObject(scriptClass);
-                CHECK_AS_RETURN("Set script class event method object", r, true);
-                r = event->Execute(this, ev);
-                CHECK_FUNCTION_RETURN(r, true);
-                if(r == asEXECUTION_FINISHED && shouldReturn)
-                {
-                    if(eventFunc->GetReturnTypeId() != asTYPEID_BOOL)
-                    {
-                        Log::Error << "Event handler '" << eventFunc->GetDeclaration() << "' should return a bool" << Log::Endl;
-                        return true;
-                    }
-                    auto result = context->GetReturnByte();
-                    context->Unprepare();
-                    return result == 1 ? true : false;
-                }
-                context->Unprepare();
-            }
+            // Invoke event handlers for the script class
+            if(eventFuncs.size() != 0) event->InvokeEventHandlers(this, ev, eventFuncs, scriptClass);
         }
     }
 
-    return true;
+    return shouldContinue;
 }
 
+// todo: rework this shit code
 void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local)
 {
 #ifdef DEBUG_MODE
