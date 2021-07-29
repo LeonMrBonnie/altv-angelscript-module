@@ -83,7 +83,7 @@ bool DllImport::DllImportPragmaHandler(const std::string& pragmaStr, AngelScript
         return true;
     }
 
-    return true;
+    return false;
 }
 #else
 bool DllImport::DllImportPragmaHandler(const std::string& pragmaStr, AngelScriptResource* resource)
