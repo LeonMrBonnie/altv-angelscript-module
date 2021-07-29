@@ -195,8 +195,6 @@ void AngelScriptRuntime::OnTick()
     {
         Log::Warning << "A lot of objects detected by the garbage collector" << Log::Endl;
     }
-    asUINT steps = 1;
-    if(newObjs != 0) steps = (asUINT)std::ceil(newObjs % 10);
 
-    engine->GarbageCollect(asGC_ONE_STEP, steps);
+    engine->GarbageCollect(asGC_ONE_STEP, 1);
 }
