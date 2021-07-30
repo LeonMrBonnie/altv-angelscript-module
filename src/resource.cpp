@@ -3,10 +3,11 @@
 #include "runtime.h"
 #include "helpers/module.h"
 #include "helpers/events.h"
-#include "angelscript/addon/scriptany/scriptany.h"
 #include "helpers/convert.h"
 #include "helpers/benchmark.h"
 #include "helpers/angelscript.h"
+#include "helpers/dllImport.h"
+#include "angelscript/addon/scriptany/scriptany.h"
 #include <regex>
 #include <string>
 
@@ -233,6 +234,12 @@ bool AngelScriptResource::Stop()
         func->Release();
     }
     dllImportFunctions.clear();
+
+    for(auto dll : importedDlls)
+    {
+        DllImport::FreeDll(dll);
+    }
+    importedDlls.clear();
 
     // todo: fix cleaning up the dll import functions
     /*

@@ -9,4 +9,6 @@ class AngelScriptResource;
 namespace DllImport
 {
     bool DllImportPragmaHandler(const std::string& pragmaStr, AngelScriptResource* resource);
+
+    void FreeDll(void* dll);
 }  // namespace DllImport

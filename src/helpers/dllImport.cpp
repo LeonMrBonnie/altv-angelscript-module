@@ -9,12 +9,14 @@
         #include "windows.h"
         #define _getlib(name)                LoadLibraryA(name)
         #define _getfunc(module, name, type) (type) GetProcAddress(module, name);
+        #define _unloadlib(lib)              FreeLibrary((HMODULE)lib)
         #define _seperator                   "\\"
     /*
     #else
         #include <dlfcn.h>
         #define _getlib(name)                dlopen(name, RTLD_NOW);
         #define _getfunc(module, name, type) (type) dlsym(module, name);
+        #define _unloadlib(lib)              dlclose(lib)
         #define _seperator                   "/"
     */
     #endif
@@ -70,7 +72,7 @@ static void DoDllImport(std::string& pragma, AngelScriptResource* resource)
         return;
     }
     asIScriptFunction* createdFunc = resource->GetRuntime()->GetEngine()->GetFunctionById(createdFuncId);
-    resource->AddDllImportFunction(createdFunc);
+    resource->AddDllImportFunction(createdFunc, dll);
 }
 
 bool DllImport::DllImportPragmaHandler(const std::string& pragmaStr, AngelScriptResource* resource)
@@ -85,9 +87,16 @@ bool DllImport::DllImportPragmaHandler(const std::string& pragmaStr, AngelScript
 
     return false;
 }
-#else
+
+void DllImport::FreeDll(void* dll)
+{
+    _unloadlib(dll);
+}
+#endif
+#ifdef CLIENT_MODULE
 bool DllImport::DllImportPragmaHandler(const std::string& pragmaStr, AngelScriptResource* resource)
 {
     return false;
 }
+void DllImport::FreeDll(void* dll) {}
 #endif
