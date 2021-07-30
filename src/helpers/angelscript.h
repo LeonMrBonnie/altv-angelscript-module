@@ -5,7 +5,7 @@
 #include "cpp-sdk/SDK.h"
 #include "Log.h"
 #include "./module.h"
-#include "./dllImport.h"
+#include "./libImport.h"
 #include "runtime.h"
 #include "bindings/data/vector3.h"
 #include "bindings/data/vector2.h"
@@ -262,7 +262,7 @@ namespace Helpers
     static int PragmaHandler(const std::string& pragmaText, CScriptBuilder& builder, void* data)
     {
         auto resource = static_cast<AngelScriptResource*>(data);
-        if(DllImport::DllImportPragmaHandler(pragmaText, resource)) return 0;
+        if(LibraryImport::LibraryImportPragmaHandler(pragmaText, resource)) return 0;
 
         Log::Warning << "Unknown pragma directive used: '" << pragmaText << "'" << Log::Endl;
         return 0;

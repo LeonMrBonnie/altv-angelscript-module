@@ -6,7 +6,7 @@
 #include "helpers/convert.h"
 #include "helpers/benchmark.h"
 #include "helpers/angelscript.h"
-#include "helpers/dllImport.h"
+#include "helpers/libImport.h"
 #include "angelscript/addon/scriptany/scriptany.h"
 #include <regex>
 #include <string>
@@ -229,22 +229,22 @@ bool AngelScriptResource::Stop()
     }
     timers.clear();
 
-    for(auto func : dllImportFunctions)
+    for(auto func : libraryImportFunctions)
     {
         func->Release();
     }
-    dllImportFunctions.clear();
+    libraryImportFunctions.clear();
 
-    for(auto dll : importedDlls)
+    for(auto dll : importedLibraries)
     {
-        DllImport::FreeDll(dll);
+        LibraryImport::FreeLibrary(dll);
     }
-    importedDlls.clear();
+    importedLibraries.clear();
 
-    // todo: fix cleaning up the dll import functions
-    /*
-    // Remove the config group to clear dll import functions from global namespace
+    // todo: fix cleaning up the library import functions
+    // Remove the config group to clear library import functions from global namespace
     int result = runtime->GetEngine()->RemoveConfigGroup(resource->GetName().CStr());
+    /*
     if(result == asCONFIG_GROUP_IS_IN_USE)
     {
         // Try to do one full cycle of the garbage collector
