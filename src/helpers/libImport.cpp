@@ -71,6 +71,7 @@ static void DoDllImport(std::string& pragma, AngelScriptResource* resource)
     std::string funcDecl      = parts[2];
 
     auto lib = ImportLibrary(libName, resource);
+    if(!lib) return;
 
     auto funcInfo = Helpers::GetFunctionInfoFromDecl(funcDecl);
     auto dllFunc  = _getfunc(lib, funcInfo.functionName.c_str(), void*);
@@ -107,6 +108,7 @@ static void DoBeginStruct(std::string& pragma, AngelScriptResource* resource)
     }
 
     auto lib = ImportLibrary(libName, resource);
+    if(!lib) return;
     // todo: finish this
 }
 
