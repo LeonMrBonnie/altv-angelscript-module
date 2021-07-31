@@ -29,8 +29,6 @@ if(UNIX)
 	set(ANGELSCRIPT_LIB ${PROJECT_SOURCE_DIR}/deps/angelscript/lib/libangelscript.a)
 else()
 	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/build/win64/${COMPILE_FOLDER})
-	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MD /Zi")
-	set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /DEBUG /OPT:REF /OPT:ICF")
 	set(JIT_COMPILER_FILE ${PROJECT_SOURCE_DIR}/deps/angelscript-jit-compiler/virtual_asm_windows.cpp)
 	set(ANGELSCRIPT_LIB ${PROJECT_SOURCE_DIR}/deps/angelscript/lib/angelscript.lib)
 	set(CRYPTOPP_LIB ${PROJECT_SOURCE_DIR}/deps/cryptopp/cryptlib.lib)
@@ -50,6 +48,17 @@ add_library(${PROJECT_MODULE_NAME} SHARED
 	${PROJECT_SOURCE_DIR}/deps/angelscript-jit-compiler/virtual_asm_x64.cpp
 	${JIT_COMPILER_FILE}
 )
+
+set_target_properties(${PROJECT_MODULE_NAME} PROPERTIES 
+	COMPILE_FLAGS 
+		"/W1 /nologo /EHsc"
+	COMPILE_FLAGS_DEBUG
+		"/MDd /Od /Ob0 /Zi"
+	COMPILE_FLAGS_RELEASE
+		"/MD /O2 /Ob2"
+)
+
+target_link_options(${PROJECT_MODULE_NAME} PRIVATE "/DEBUG")
 
 target_link_libraries(${PROJECT_MODULE_NAME} PRIVATE
   ${ANGELSCRIPT_LIB}
