@@ -77,6 +77,13 @@ namespace Helpers
         }
         return -1;
     }
+    static uint32_t GetTypeSize(int typeId)
+    {
+        auto engine   = AngelScriptRuntime::Instance().GetEngine();
+        auto typeInfo = engine->GetTypeInfoById(typeId);
+        if(typeInfo) return typeInfo->GetSize();
+        return engine->GetSizeOfPrimitiveType(typeId);
+    }
 
     static std::string GetVarData(asIScriptContext* context, int stackLevel, int varIdx)
     {
