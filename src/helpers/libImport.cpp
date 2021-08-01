@@ -70,15 +70,29 @@ static void DoLibImport(std::string& pragma, AngelScriptResource* resource)
     std::string libName       = parts[0];
     std::string funcNamespace = parts[1];
     std::string funcDecl      = parts[2];
+    if(libName.size() == 0)
+    {
+        Log::Error << "Error in libImport pragma: Invalid library name" << Log::Endl;
+        return;
+    }
 
     auto lib = ImportLibrary(libName, resource);
-    if(!lib) return;
+    if(!lib)
+    {
+        Log::Error << "Error in libImport pragma: Library not found" << Log::Endl;
+        return;
+    }
 
     auto funcInfo = Helpers::GetFunctionInfoFromDecl(funcDecl);
-    auto dllFunc  = _getfunc(lib, funcInfo.functionName.c_str(), void*);
+    if(!funcInfo.valid)
+    {
+        Log::Error << "Error in libImport pragma: Invalid function declaration" << Log::Endl;
+        return;
+    }
+    auto dllFunc = _getfunc(lib, funcInfo.functionName.c_str(), void*);
     if(dllFunc == nullptr)
     {
-        Log::Error << "Failed to find export '" << funcInfo.functionName << "' in lib '" << libName << "'" << Log::Endl;
+        Log::Error << "Error in libImport pragma: Failed to find export '" << funcInfo.functionName << "' in lib '" << libName << "'" << Log::Endl;
         return;
     }
 
@@ -86,7 +100,8 @@ static void DoLibImport(std::string& pragma, AngelScriptResource* resource)
     int createdFuncId = resource->GetRuntime()->GetEngine()->RegisterGlobalFunction(funcDecl.c_str(), asFUNCTION(dllFunc), asCALL_CDECL);
     if(createdFuncId < 0)
     {
-        Log::Error << "Failed to create global lib function '" << funcInfo.functionName << "' Error: " << createdFuncId << Log::Endl;
+        Log::Error << "Error in libImport pragma: Failed to create global lib function '" << funcInfo.functionName << "' Error: " << createdFuncId
+                   << Log::Endl;
         return;
     }
     asIScriptFunction* createdFunc = resource->GetRuntime()->GetEngine()->GetFunctionById(createdFuncId);
@@ -94,18 +109,18 @@ static void DoLibImport(std::string& pragma, AngelScriptResource* resource)
 
     #ifdef DEBUG_MODE
     Log::Warning << __FUNCTION__ << " "
-                 << "Created lib function: '" << funcInfo.functionName << "' from lib '" << libName << "'" << Log::Endl;
+                 << "Imported lib function '" << funcInfo.functionName << "' from lib '" << libName << "'" << Log::Endl;
     #endif
 }
 
 struct ScriptStruct
 {
-    ScriptStruct(std::string name, int size) : name(name), size(size) {}
+    ScriptStruct(std::string name, uint32_t size) : name(name), size(size) {}
 
     std::string name;
-    int         size;
-    int         curOffset  = 0;
-    bool        isFinished = false;
+    uint32_t    size;
+    // Current byte offset
+    uint32_t curOffset = 0;
 };
 // Key = Name
 static std::unordered_map<std::string, ScriptStruct> scriptStructs;
@@ -118,7 +133,6 @@ static void DoDeclareStruct(std::string& pragma, AngelScriptResource* resource)
     std::string structNamespace = parts[1];
     std::string structName      = parts[2];
     int         size            = std::stoi(parts[3]);
-
     if(size < 1)
     {
         Log::Error << "Error in declareStruct pragma: Invalid size specified (must be more than 0)" << Log::Endl;
@@ -129,9 +143,6 @@ static void DoDeclareStruct(std::string& pragma, AngelScriptResource* resource)
         Log::Error << "Error in declareStruct pragma: Struct already exists" << Log::Endl;
         return;
     }
-
-    auto lib = ImportLibrary(libName, resource);
-    if(!lib) return;
 
     resource->GetRuntime()->GetEngine()->SetDefaultNamespace(structNamespace.c_str());
     int result = resource->GetRuntime()->GetEngine()->RegisterObjectType(structName.c_str(), size, asOBJ_VALUE);
@@ -145,7 +156,6 @@ static void DoDeclareStruct(std::string& pragma, AngelScriptResource* resource)
         case asALREADY_REGISTERED:
         {
             Log::Error << "Error in declareStruct pragma: Struct with that name already registered" << Log::Endl;
-            Log::Error << "This should never happen! Forward this to module developer" << Log::Endl;
             return;
         }
         case asNAME_TAKEN:
@@ -159,7 +169,98 @@ static void DoDeclareStruct(std::string& pragma, AngelScriptResource* resource)
 
     #ifdef DEBUG_MODE
     Log::Warning << __FUNCTION__ << " "
-                 << "Created struct: '" << structName << "' with size " << size << " from lib '" << libName << "'" << Log::Endl;
+                 << "Created struct '" << structName << "' with size " << size << " from lib '" << libName << "'" << Log::Endl;
+    #endif
+}
+
+static void DoStructProperty(std::string& pragma)
+{
+    GET_PRAGMA_PARTS(pragma, 3, "Error in structProperty pragma: Needs 3 arguments (struct name, property name, type)");
+
+    std::string structName   = parts[0];
+    std::string propertyName = parts[1];
+    std::string type         = parts[2];
+    if(scriptStructs.count(structName) == 0)
+    {
+        Log::Error << "Error in structProperty pragma: Struct does not exist (" << structName << ")" << Log::Endl;
+        return;
+    }
+    if(propertyName.size() == 0)
+    {
+        Log::Error << "Error in structProperty pragma: Invalid property name (" << propertyName << ")" << Log::Endl;
+        return;
+    }
+    int typeId = Helpers::GetTypeIdFromName(type);
+    if(typeId == -1)
+    {
+        Log::Error << "Error in structProperty pragma: Invalid type name (" << type << ")" << Log::Endl;
+        return;
+    }
+    auto size         = Helpers::GetTypeSize(typeId);
+    auto scriptStruct = scriptStructs.at(structName);
+    if(scriptStruct.curOffset + size > scriptStruct.size)
+    {
+        Log::Error << "Error in structProperty pragma: Struct size is too small for type (Size: " << scriptStruct.size << ", Type Size: " << size
+                   << ")" << Log::Endl;
+        return;
+    }
+
+    auto decl   = type + " " + propertyName;
+    int  result = AngelScriptRuntime::Instance().GetEngine()->RegisterObjectProperty(structName.c_str(), decl.c_str(), scriptStruct.curOffset);
+    switch(result)
+    {
+        case asWRONG_CONFIG_GROUP:
+        {
+            Log::Error << "Error in structProperty pragma: Struct is not available in this resource" << Log::Endl;
+            return;
+        }
+        case asINVALID_OBJECT:
+        {
+            Log::Error << "Error in structProperty pragma: Struct is not a struct" << Log::Endl;
+            return;
+        }
+        case asINVALID_TYPE:
+        {
+            Log::Error << "Error in structProperty pragma: Struct is invalid" << Log::Endl;
+            return;
+        }
+        case asINVALID_DECLARATION:
+        {
+            Log::Error << "Error in structProperty pragma: Invalid type or property name" << Log::Endl;
+            return;
+        }
+        case asNAME_TAKEN:
+        {
+            Log::Error << "Error in structProperty pragma: Property name is already taken" << Log::Endl;
+            return;
+        }
+    }
+
+    #ifdef DEBUG_MODE
+    Log::Warning << __FUNCTION__ << " "
+                 << "Created struct property '" << propertyName << "' with size " << Helpers::GetTypeSize(typeId) << " at offset "
+                 << scriptStruct.curOffset << " to struct '" << structName << "'" << Log::Endl;
+    #endif
+
+    scriptStruct.curOffset += Helpers::GetTypeSize(typeId);
+}
+
+static void DoEndStruct(std::string& pragma)
+{
+    GET_PRAGMA_PARTS(pragma, 1, "Error in endStruct pragma: Needs 1 argument (struct name)");
+
+    std::string structName = parts[0];
+    if(scriptStructs.count(structName) == 0)
+    {
+        Log::Error << "Error in endStruct pragma: Struct does not exist (" << structName << ")" << Log::Endl;
+        return;
+    }
+
+    scriptStructs.erase(structName);
+
+    #ifdef DEBUG_MODE
+    Log::Warning << __FUNCTION__ << " "
+                 << "Ended struct '" << structName << "'" << Log::Endl;
     #endif
 }
 
@@ -179,13 +280,23 @@ bool LibraryImport::LibraryImportPragmaHandler(const std::string& pragmaStr, Ang
         DoDeclareStruct(results[1].str(), resource);
         return true;
     }
+    if(std::regex_search(pragmaStr.cbegin(), pragmaStr.cend(), results, std::regex("structProperty\\((.*)\\)")))
+    {
+        DoStructProperty(results[1].str());
+        return true;
+    }
+    if(std::regex_search(pragmaStr.cbegin(), pragmaStr.cend(), results, std::regex("endStruct\\((.*)\\)")))
+    {
+        DoEndStruct(results[1].str());
+        return true;
+    }
 
     return false;
 }
 
-void LibraryImport::FreeLibrary(void* dll)
+void LibraryImport::FreeLibrary(void* library)
 {
-    _unloadlib(dll);
+    _unloadlib(library);
 }
 #endif
 #ifdef CLIENT_MODULE
