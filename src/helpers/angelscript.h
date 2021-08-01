@@ -1,6 +1,7 @@
 #pragma once
 
 #include <regex>
+#include <map>
 
 #include "cpp-sdk/SDK.h"
 #include "Log.h"
@@ -29,6 +30,12 @@
         return result;                      \
     }
 
+static std::unordered_map<int, std::string> typeNameMap = {
+    { asTYPEID_VOID, "void" },     { asTYPEID_BOOL, "bool" },     { asTYPEID_INT8, "int8" },   { asTYPEID_INT16, "int16" },
+    { asTYPEID_INT32, "int32" },   { asTYPEID_INT64, "int64" },   { asTYPEID_UINT8, "uint8" }, { asTYPEID_UINT16, "uint16" },
+    { asTYPEID_UINT32, "uint32" }, { asTYPEID_UINT64, "uint64" }, { asTYPEID_FLOAT, "float" }, { asTYPEID_DOUBLE, "double" }
+};
+
 namespace Helpers
 {
     static void CopyAngelscriptValue(asIScriptEngine* engine, void* src, int srcType, void* dest, int destType)
@@ -53,27 +60,24 @@ namespace Helpers
 
     static std::string GetTypeName(int typeId)
     {
+        if(typeNameMap.count(typeId) != 0) return typeNameMap.at(typeId);
         auto&        runtime  = AngelScriptRuntime::Instance();
         asITypeInfo* typeInfo = runtime.GetEngine()->GetTypeInfoById(typeId);
         if(typeInfo != nullptr) return typeInfo->GetName();
-        else
-            switch(typeId)
-            {
-                case asTYPEID_VOID: return "void";
-                case asTYPEID_BOOL: return "bool";
-                case asTYPEID_INT8: return "int8";
-                case asTYPEID_INT16: return "int16";
-                case asTYPEID_INT32: return "int32";
-                case asTYPEID_INT64: return "int64";
-                case asTYPEID_UINT8: return "uint8";
-                case asTYPEID_UINT16: return "uint16";
-                case asTYPEID_UINT32: return "uint32";
-                case asTYPEID_UINT64: return "uint64";
-                case asTYPEID_FLOAT: return "float";
-                case asTYPEID_DOUBLE: return "double";
-            }
         return "unknown";
     }
+    // Returns -1 if typeId was not found
+    static int GetTypeIdFromName(std::string& name)
+    {
+        auto typeInfo = AngelScriptRuntime::Instance().GetEngine()->GetTypeInfoByName(name.c_str());
+        if(typeInfo) return typeInfo->GetTypeId();
+        for(auto pair : typeNameMap)
+        {
+            if(pair.second == name) return pair.first;
+        }
+        return -1;
+    }
+
     static std::string GetVarData(asIScriptContext* context, int stackLevel, int varIdx)
     {
         auto&       runtime     = AngelScriptRuntime::Instance();
