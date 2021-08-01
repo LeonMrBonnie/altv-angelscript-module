@@ -24,6 +24,7 @@
     #include <algorithm>
     #include <cctype>
     #include <locale>
+    #include <map>
 
 // ********** Helpers **********
 
@@ -62,7 +63,7 @@ static inline void* ImportLibrary(std::string& name, AngelScriptResource* resour
 
 // ********** Pragma Handlers **********
 
-static void DoDllImport(std::string& pragma, AngelScriptResource* resource)
+static void DoLibImport(std::string& pragma, AngelScriptResource* resource)
 {
     GET_PRAGMA_PARTS(pragma, 3, "Error in libImport pragma: Needs 3 arguments (library, namespace, function declaration)");
 
@@ -90,11 +91,28 @@ static void DoDllImport(std::string& pragma, AngelScriptResource* resource)
     }
     asIScriptFunction* createdFunc = resource->GetRuntime()->GetEngine()->GetFunctionById(createdFuncId);
     resource->AddLibraryImportFunction(createdFunc, lib);
+
+    #ifdef DEBUG_MODE
+    Log::Warning << __FUNCTION__ << " "
+                 << "Created lib function: '" << funcInfo.functionName << "' from lib '" << libName << "'" << Log::Endl;
+    #endif
 }
 
-static void DoBeginStruct(std::string& pragma, AngelScriptResource* resource)
+struct ScriptStruct
 {
-    GET_PRAGMA_PARTS(pragma, 4, "Error in beginStruct pragma: Needs 4 arguments (dll, namespace, name, size)");
+    ScriptStruct(std::string name, int size) : name(name), size(size) {}
+
+    std::string name;
+    int         size;
+    int         curOffset  = 0;
+    bool        isFinished = false;
+};
+// Key = Name
+static std::unordered_map<std::string, ScriptStruct> scriptStructs;
+
+static void DoDeclareStruct(std::string& pragma, AngelScriptResource* resource)
+{
+    GET_PRAGMA_PARTS(pragma, 4, "Error in declareStruct pragma: Needs 4 arguments (dll, namespace, name, size)");
 
     std::string libName         = parts[0];
     std::string structNamespace = parts[1];
@@ -103,13 +121,46 @@ static void DoBeginStruct(std::string& pragma, AngelScriptResource* resource)
 
     if(size < 1)
     {
-        Log::Error << "Error in beginStruct pragma: Invalid size specified (must be more than 0)" << Log::Endl;
+        Log::Error << "Error in declareStruct pragma: Invalid size specified (must be more than 0)" << Log::Endl;
+        return;
+    }
+    if(scriptStructs.count(structName) != 0)
+    {
+        Log::Error << "Error in declareStruct pragma: Struct already exists" << Log::Endl;
         return;
     }
 
     auto lib = ImportLibrary(libName, resource);
     if(!lib) return;
-    // todo: finish this
+
+    resource->GetRuntime()->GetEngine()->SetDefaultNamespace(structNamespace.c_str());
+    int result = resource->GetRuntime()->GetEngine()->RegisterObjectType(structName.c_str(), size, asOBJ_VALUE);
+    switch(result)
+    {
+        case asINVALID_NAME:
+        {
+            Log::Error << "Error in declareStruct pragma: Invalid name" << Log::Endl;
+            return;
+        }
+        case asALREADY_REGISTERED:
+        {
+            Log::Error << "Error in declareStruct pragma: Struct with that name already registered" << Log::Endl;
+            Log::Error << "This should never happen! Forward this to module developer" << Log::Endl;
+            return;
+        }
+        case asNAME_TAKEN:
+        {
+            Log::Error << "Error in declareStruct pragma: Name already taken" << Log::Endl;
+            return;
+        }
+    }
+
+    scriptStructs.insert({ structName, ScriptStruct(structName, size) });
+
+    #ifdef DEBUG_MODE
+    Log::Warning << __FUNCTION__ << " "
+                 << "Created struct: '" << structName << "' with size " << size << " from lib '" << libName << "'" << Log::Endl;
+    #endif
 }
 
 // ********** Functionality **********
@@ -120,12 +171,12 @@ bool LibraryImport::LibraryImportPragmaHandler(const std::string& pragmaStr, Ang
 
     if(std::regex_search(pragmaStr.cbegin(), pragmaStr.cend(), results, std::regex("libImport\\((.*)\\)")))
     {
-        DoDllImport(results[1].str(), resource);
+        DoLibImport(results[1].str(), resource);
         return true;
     }
-    if(std::regex_search(pragmaStr.cbegin(), pragmaStr.cend(), results, std::regex("beginStruct\\((.*)\\)")))
+    if(std::regex_search(pragmaStr.cbegin(), pragmaStr.cend(), results, std::regex("declareStruct\\((.*)\\)")))
     {
-        DoBeginStruct(results[1].str(), resource);
+        DoDeclareStruct(results[1].str(), resource);
         return true;
     }
 
