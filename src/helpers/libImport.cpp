@@ -266,26 +266,27 @@ static void DoEndStruct(std::string& pragma)
 
 // ********** Functionality **********
 
+    #define PRAGMA_CASE(name) std::regex_search(pragmaStr.cbegin(), pragmaStr.cend(), results, std::regex(name "\\((.*)\\)"))
 bool LibraryImport::LibraryImportPragmaHandler(const std::string& pragmaStr, AngelScriptResource* resource)
 {
     std::smatch results;
 
-    if(std::regex_search(pragmaStr.cbegin(), pragmaStr.cend(), results, std::regex("libImport\\((.*)\\)")))
+    if(PRAGMA_CASE("libImport"))
     {
         DoLibImport(results[1].str(), resource);
         return true;
     }
-    if(std::regex_search(pragmaStr.cbegin(), pragmaStr.cend(), results, std::regex("declareStruct\\((.*)\\)")))
+    if(PRAGMA_CASE("declareStruct"))
     {
         DoDeclareStruct(results[1].str(), resource);
         return true;
     }
-    if(std::regex_search(pragmaStr.cbegin(), pragmaStr.cend(), results, std::regex("structProperty\\((.*)\\)")))
+    if(PRAGMA_CASE("structProperty"))
     {
         DoStructProperty(results[1].str());
         return true;
     }
-    if(std::regex_search(pragmaStr.cbegin(), pragmaStr.cend(), results, std::regex("endStruct\\((.*)\\)")))
+    if(PRAGMA_CASE("endStruct"))
     {
         DoEndStruct(results[1].str());
         return true;
