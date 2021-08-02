@@ -125,7 +125,7 @@ struct ScriptStruct
 // Key = Name
 static std::unordered_map<std::string, ScriptStruct> scriptStructs;
 
-static void DoDeclareStruct(std::string& pragma, AngelScriptResource* resource)
+static void DoDeclareStruct(std::string& pragma)
 {
     GET_PRAGMA_PARTS(pragma, 4, "Error in declareStruct pragma: Needs 4 arguments (dll, namespace, name, size)");
 
@@ -144,8 +144,8 @@ static void DoDeclareStruct(std::string& pragma, AngelScriptResource* resource)
         return;
     }
 
-    resource->GetRuntime()->GetEngine()->SetDefaultNamespace(structNamespace.c_str());
-    int result = resource->GetRuntime()->GetEngine()->RegisterObjectType(structName.c_str(), size, asOBJ_VALUE);
+    AngelScriptRuntime::Instance().GetEngine()->SetDefaultNamespace(structNamespace.c_str());
+    int result = AngelScriptRuntime::Instance().GetEngine()->RegisterObjectType(structName.c_str(), size, asOBJ_VALUE);
     switch(result)
     {
         case asINVALID_NAME:
@@ -278,7 +278,7 @@ bool LibraryImport::LibraryImportPragmaHandler(const std::string& pragmaStr, Ang
     }
     if(PRAGMA_CASE("declareStruct"))
     {
-        DoDeclareStruct(results[1].str(), resource);
+        DoDeclareStruct(results[1].str());
         return true;
     }
     if(PRAGMA_CASE("structProperty"))
