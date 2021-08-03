@@ -115,10 +115,9 @@ static void DoLibImport(std::string& pragma, AngelScriptResource* resource)
 
 struct ScriptStruct
 {
-    ScriptStruct(std::string name, uint32_t size) : name(name), size(size) {}
+    ScriptStruct(uint32_t size) : size(size) {}
 
-    std::string name;
-    uint32_t    size;
+    uint32_t size;
     // Current byte offset
     uint32_t curOffset = 0;
 };
@@ -165,7 +164,7 @@ static void DoDeclareStruct(std::string& pragma)
         }
     }
 
-    scriptStructs.insert({ structName, ScriptStruct(structName, size) });
+    scriptStructs.insert({ structName, ScriptStruct(size) });
 
     #ifdef DEBUG_MODE
     Log::Warning << __FUNCTION__ << " "
