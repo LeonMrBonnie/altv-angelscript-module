@@ -189,6 +189,11 @@ static void DoStructProperty(std::string& pragma)
         Log::Error << "Error in structProperty pragma: Invalid property name (" << propertyName << ")" << Log::Endl;
         return;
     }
+    if(type == structName)
+    {
+        Log::Error << "Error in structProperty pragma: Recursive property (" << propertyName << ")" << Log::Endl;
+        return;
+    }
     int typeId = Helpers::GetTypeIdFromName(type);
     if(typeId == -1)
     {
