@@ -59,33 +59,33 @@ public:
     }
 
     // Gets the alt:V IResource instance
-    alt::IResource* GetIResource()
+    alt::IResource* GetIResource() const
     {
         return resource;
     }
     // Gets the module runtime that instantiated this resource
-    AngelScriptRuntime* GetRuntime()
+    AngelScriptRuntime* GetRuntime() const
     {
         return runtime;
     }
     // Gets the AngelScript context of this resource
-    asIScriptContext* GetContext()
+    asIScriptContext* GetContext() const
     {
         return context;
     }
     // Gets the AngelScript module of this resource
-    asIScriptModule* GetModule()
+    asIScriptModule* GetModule() const
     {
         return module;
     }
 
-    void AddLibraryImportFunction(asIScriptFunction* func, void* dll)
+    void AddLibraryImportFunction(asIScriptFunction* func, void* lib)
     {
         libraryImportFunctions.push_back(func);
-        importedLibraries.push_back(dll);
+        importedLibraries.push_back(lib);
     }
 
-    bool DoesObjectExist(alt::IBaseObject* obj)
+    bool DoesObjectExist(alt::IBaseObject* obj) const
     {
         auto range = objects.equal_range(obj->GetType());
         for(auto it = range.first; it != range.second; it++)
@@ -103,12 +103,12 @@ public:
     // Registers the resource exports
     void RegisterExports(CScriptBuilder& builder);
 
-    alt::String ReadFile(alt::String path);
+    alt::String ReadFile(alt::String path) const;
 
     // Registers a new script callback for the specified event
     void RegisterEventHandler(alt::CEvent::Type event, asIScriptFunction* handler);
     // Gets all script event handlers of the specified type
-    std::vector<asIScriptFunction*> GetEventHandlers(const alt::CEvent::Type event)
+    std::vector<asIScriptFunction*> GetEventHandlers(const alt::CEvent::Type event) const
     {
         std::vector<asIScriptFunction*> events;
         auto                            range = eventHandlers.equal_range(event);
@@ -165,14 +165,14 @@ public:
     bool Eval(const std::string& code);
 
     // Yoinked from v8 helpers
-    int64_t GetTime()
+    int64_t GetTime() const
     {
         return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
     }
 
     // Shows some debug info about the resource
     // Only used by the debug console command
-    void ShowDebugInfo();
+    void ShowDebugInfo() const;
 
     bool Start();
     bool Stop();

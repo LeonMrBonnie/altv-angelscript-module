@@ -139,7 +139,7 @@ bool AngelScriptResource::Start()
     return true;
 }
 
-alt::String AngelScriptResource::ReadFile(alt::String path)
+alt::String AngelScriptResource::ReadFile(alt::String path) const
 {
     auto pkg = resource->GetPackage();
     // Check if file exists
@@ -564,7 +564,7 @@ bool AngelScriptResource::Eval(const std::string& code)
     return true;
 }
 
-void AngelScriptResource::ShowDebugInfo()
+void AngelScriptResource::ShowDebugInfo() const
 {
     Log::Colored << "*************** ~y~" << resource->GetName() << " ~w~***************" << Log::Endl;
     Log::Colored << "Script classes: ~g~" << scriptClasses.size() << Log::Endl;

@@ -8,7 +8,7 @@ class AngelScriptResource;
 
 namespace LibraryImport
 {
-    bool LibraryImportPragmaHandler(const std::string& pragmaStr, AngelScriptResource* resource);
+    bool LibraryImportPragmaHandler(const std::string& pragmaStr, const AngelScriptResource* resource);
 
     void FreeLibrary(void* library);
 }  // namespace LibraryImport

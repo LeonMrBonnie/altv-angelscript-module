@@ -48,7 +48,7 @@ static inline void CleanString(std::string& str)
     str.erase(std::find_if(str.rbegin(), str.rend(), [](unsigned char ch) { return !std::isspace(ch); }).base(), str.end());
 }
 
-static inline void* ImportLibrary(std::string& name, AngelScriptResource* resource)
+static inline void* ImportLibrary(std::string& name, const AngelScriptResource* resource)
 {
     std::string libPath = resource->GetIResource()->GetPath().ToString();
     libPath += _seperator;
@@ -63,7 +63,7 @@ static inline void* ImportLibrary(std::string& name, AngelScriptResource* resour
 
 // ********** Pragma Handlers **********
 
-static void DoLibImport(std::string& pragma, AngelScriptResource* resource)
+static void DoLibImport(std::string& pragma, const AngelScriptResource* resource)
 {
     GET_PRAGMA_PARTS(pragma, 3, "Error in libImport pragma: Needs 3 arguments (library, namespace, function declaration)");
 
@@ -105,7 +105,7 @@ static void DoLibImport(std::string& pragma, AngelScriptResource* resource)
         return;
     }
     asIScriptFunction* createdFunc = resource->GetRuntime()->GetEngine()->GetFunctionById(createdFuncId);
-    resource->AddLibraryImportFunction(createdFunc, lib);
+    const_cast<AngelScriptResource*>(resource)->AddLibraryImportFunction(createdFunc, lib);
 
     #ifdef DEBUG_MODE
     Log::Warning << __FUNCTION__ << " "
@@ -271,7 +271,7 @@ static void DoEndStruct(std::string& pragma)
 // ********** Functionality **********
 
     #define PRAGMA_CASE(name) std::regex_search(pragmaStr.cbegin(), pragmaStr.cend(), results, std::regex(name "\\((.*)\\)"))
-bool LibraryImport::LibraryImportPragmaHandler(const std::string& pragmaStr, AngelScriptResource* resource)
+bool LibraryImport::LibraryImportPragmaHandler(const std::string& pragmaStr, const AngelScriptResource* resource)
 {
     std::smatch results;
 
@@ -305,7 +305,7 @@ void LibraryImport::FreeLibrary(void* library)
 }
 #endif
 #ifdef CLIENT_MODULE
-bool LibraryImport::LibraryImportPragmaHandler(const std::string& pragmaStr, AngelScriptResource* resource)
+bool LibraryImport::LibraryImportPragmaHandler(const std::string& pragmaStr, const AngelScriptResource* resource)
 {
     return false;
 }
