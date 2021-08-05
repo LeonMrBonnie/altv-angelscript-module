@@ -126,7 +126,7 @@ static std::unordered_map<std::string, ScriptStruct> scriptStructs;
 
 static void DoDeclareStruct(std::string& pragma)
 {
-    GET_PRAGMA_PARTS(pragma, 4, "Error in declareStruct pragma: Needs 4 arguments (dll, namespace, name, size)");
+    GET_PRAGMA_PARTS(pragma, 4, "Error in declareStruct pragma: Needs 4 arguments (library, namespace, name, size)");
 
     std::string libName         = parts[0];
     std::string structNamespace = parts[1];
@@ -309,5 +309,5 @@ bool LibraryImport::LibraryImportPragmaHandler(const std::string& pragmaStr, Ang
 {
     return false;
 }
-void LibraryImport::FreeLibrary(void* dll) {}
+void LibraryImport::FreeLibrary(void*) {}
 #endif
