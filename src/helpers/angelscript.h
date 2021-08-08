@@ -276,7 +276,7 @@ namespace Helpers
         if(LibraryImport::LibraryImportPragmaHandler(pragmaText, resource)) return 0;
 
         Log::Warning << "Unknown pragma directive used: '" << pragmaText << "'" << Log::Endl;
-        return 0;
+        return -1;
     }
 
     // Handles infos, warnings, errors etc. by AngelScript
