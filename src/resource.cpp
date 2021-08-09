@@ -614,7 +614,7 @@ void AngelScriptResource::OnTick()
 void AngelScriptResource::OnCreateBaseObject(alt::Ref<alt::IBaseObject> object)
 {
     objects.insert({ object->GetType(), object });
-    objectData.insert({ object, std::map<std::string, std::pair<int, void*>>() });
+    objectData.insert({ object, std::unordered_map<std::string, std::pair<int, void*>>() });
 }
 
 void AngelScriptResource::OnRemoveBaseObject(alt::Ref<alt::IBaseObject> object)

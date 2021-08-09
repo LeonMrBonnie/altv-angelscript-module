@@ -13,7 +13,7 @@ class AngelScriptRuntime;
 class AngelScriptResource : public alt::IResource::Impl
 {
     using ObjectsMap    = std::unordered_multimap<alt::IBaseObject::Type, alt::Ref<alt::IBaseObject>>;
-    using ObjectDataMap = std::unordered_map<alt::Ref<alt::IBaseObject>, std::map<std::string, std::pair<int, void*>>>;
+    using ObjectDataMap = std::unordered_map<alt::Ref<alt::IBaseObject>, std::unordered_map<std::string, std::pair<int, void*>>>;
 
     AngelScriptRuntime* runtime;
     alt::IResource*     resource;
