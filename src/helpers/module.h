@@ -6,7 +6,6 @@
 #include "angelscript/addon/scriptbuilder/scriptbuilder.h"
 #include "../resource.h"
 #include "./docs.h"
-#include <algorithm>
 
 // Registers a new global function (e.g. 'alt::Log')
 #define REGISTER_GLOBAL_FUNC(decl, func, desc)                                                \
