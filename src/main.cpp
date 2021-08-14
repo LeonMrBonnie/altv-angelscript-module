@@ -4,7 +4,9 @@
 #include "./helpers/angelscript.h"
 #include "angelscript/include/angelscript.h"
 
+#ifdef DEBUG_MEMORY
 extern bool Helpers::showAllocationMessages = false;
+#endif
 
 #define DEBUG_USAGE_MSG Log::Colored << "~y~Usage: ~w~as-module [general/resource] [resourceName?]" << Log::Endl
 void CommandHandler(alt::Array<alt::StringView> args, void* userData)
