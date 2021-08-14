@@ -10,14 +10,6 @@
 #include "bindings/data/benchmark.h"
 #include "bindings/data/discord.h"
 #include "bindings/data/keyState.h"
-#include "angelscript/addon/scriptstdstring/scriptstdstring.h"
-#include "angelscript/addon/scripthelper/scripthelper.h"
-#include "angelscript/addon/scriptarray/scriptarray.h"
-#include "angelscript/addon/scriptdictionary/scriptdictionary.h"
-#include "angelscript/addon/scriptmath/scriptmath.h"
-#include "angelscript/addon/scriptany/scriptany.h"
-#include "angelscript/addon/datetime/datetime.h"
-#include "angelscript/addon/scripthandle/scripthandle.h"
 #include "angelscript-jit-compiler/as_jit.h"
 
 AngelScriptRuntime::AngelScriptRuntime()
@@ -53,16 +45,8 @@ void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine)
     Helpers::DocsGenerator docs("altClient");
 #endif
 
-    // Register add-ons
-    RegisterScriptArray(engine, true);
-    RegisterStdString(engine);
-    RegisterStdStringUtils(engine);
-    RegisterScriptDictionary(engine);
-    RegisterScriptMath(engine);
-    RegisterScriptAny(engine);
-    RegisterScriptDateTime(engine);
-    RegisterExceptionRoutines(engine);
-    RegisterScriptHandle(engine);
+    // Register standard library
+    ModuleExtension::RegisterAll("", engine);
 
     // Register data
     Helpers::ModuleExtension::RegisterAllData(engine, &docs);

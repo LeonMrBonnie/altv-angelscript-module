@@ -106,6 +106,7 @@ namespace Helpers
         void Generate()
         {
 #ifdef AS_GENERATE_DOCUMENTATION
+            if(moduleName == "") return;
             std::stringstream stream;
 
             // Add generation date to top of file
