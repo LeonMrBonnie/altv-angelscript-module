@@ -14,7 +14,8 @@
                 "SERVER_MODULE",
                 "CLIENT_MODULE",
                 "AS_GENERATE_DOCUMENTATION",
-                "DEBUG_MODE"
+                "DEBUG_MODE",
+                "DEBUG_MEMORY"
             ],
             "windowsSdkVersion": "10.0.18362.0",
             "cStandard": "c17",
