@@ -24,6 +24,8 @@ AngelScriptRuntime::AngelScriptRuntime()
 {
     using namespace Helpers;
 
+    asSetGlobalMemoryFunctions(MemoryAlloc, MemoryFree);
+
     // Create a new AngelScript engine
     engine = asCreateScriptEngine();
     engine->SetMessageCallback(asFUNCTION(Helpers::MessageHandler), 0, asCALL_CDECL);

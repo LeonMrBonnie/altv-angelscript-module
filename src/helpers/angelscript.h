@@ -368,4 +368,41 @@ namespace Helpers
         }
         return info;
     }
+
+#ifdef DEBUG_MEMORY
+    static std::unordered_map<void*, size_t> allocations = {};
+    extern bool                              showAllocationMessages;
+
+    static inline std::string PointerToHex(void* ptr)
+    {
+        std::stringstream stream;
+        stream << "0x" << std::hex << (uintptr_t)ptr;
+        return stream.str();
+    }
+#endif
+
+    static void* MemoryAlloc(size_t size)
+    {
+        void* ptr = std::malloc(size);
+#ifdef DEBUG_MEMORY
+        if(showAllocationMessages)
+            Log::Colored << "~lc~[DEBUG] "
+                         << "~ly~Allocated ~lk~" << size << " ~lc~bytes (Ptr: ~lk~" << PointerToHex(ptr) << "~lc~)" << Log::Endl;
+        allocations.insert({ ptr, size });
+#endif
+        return ptr;
+    }
+    static void MemoryFree(void* ptr)
+    {
+#ifdef DEBUG_MEMORY
+        if(showAllocationMessages)
+        {
+            auto size = allocations.at(ptr);
+            Log::Colored << "~lc~[DEBUG] "
+                         << "~lg~Freed ~lk~" << size << " ~lc~bytes (Ptr: ~lk~" << PointerToHex(ptr) << "~lc~)" << Log::Endl;
+        }
+        allocations.erase(ptr);
+#endif
+        std::free(ptr);
+    }
 }  // namespace Helpers

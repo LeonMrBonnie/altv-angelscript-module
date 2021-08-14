@@ -1,7 +1,10 @@
 #include "main.h"
 #include "Log.h"
 #include "./helpers/benchmark.h"
+#include "./helpers/angelscript.h"
 #include "angelscript/include/angelscript.h"
+
+extern bool Helpers::showAllocationMessages = false;
 
 #define DEBUG_USAGE_MSG Log::Colored << "~y~Usage: ~w~as-module [general/resource] [resourceName?]" << Log::Endl
 void CommandHandler(alt::Array<alt::StringView> args, void* userData)
@@ -66,6 +69,27 @@ void CommandHandler(alt::Array<alt::StringView> args, void* userData)
             }
             resource->ShowDebugInfo();
         }
+    }
+#ifdef DEBUG_MEMORY
+    else if(args[0] == "--allocations")
+    {
+        std::string state;
+        if(Helpers::showAllocationMessages)
+        {
+            Helpers::showAllocationMessages = false;
+            state                           = "~lr~Disabled";
+        }
+        else
+        {
+            Helpers::showAllocationMessages = true;
+            state                           = "~lg~Enabled";
+        }
+        Log::Colored << state << "~w~ memory allocation messages" << Log::Endl;
+    }
+#endif
+    else
+    {
+        Log::Warning << "Option '" << args[0] << "' does not exist" << Log::Endl;
     }
 }
 
