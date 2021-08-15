@@ -148,12 +148,16 @@ namespace Helpers
             // Float
             case asTYPEID_FLOAT:
             {
-                result = std::to_string(*(float*)val);
+                std::ostringstream stream;
+                stream << *(float*)val;
+                result = stream.str();
                 break;
             }
             case asTYPEID_DOUBLE:
             {
-                result = std::to_string(*(double*)val);
+                std::ostringstream stream;
+                stream << *(double*)val;
+                result = stream.str();
                 break;
             }
             // Not primitive
