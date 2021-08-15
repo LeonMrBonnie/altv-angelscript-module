@@ -53,10 +53,23 @@ static void Format(asIScriptGeneric* gen)
     gen->SetReturnObject(result);
 }
 
+static std::string ToString(void* ref, int typeId)
+{
+    GET_RESOURCE();
+    if(typeId & asTYPEID_OBJHANDLE)
+    {
+        // We're receiving a reference to the handle, so we need to dereference it
+        ref = *(void**)ref;
+        resource->GetRuntime()->GetEngine()->AddRefScriptObject(ref, resource->GetRuntime()->GetEngine()->GetTypeInfoById(typeId));
+    }
+    return GetValueData(ref, typeId);
+}
+
 static ModuleExtension utilExtension("util", [](asIScriptEngine* engine, DocsGenerator* docs) {
     REGISTER_GLOBAL_FUNC("uint64 GetTimestamp()", GetTimestamp, "Gets the current timestamp");
     REGISTER_GLOBAL_FUNC("void ShowCallstack(uint maxLevels = 0)", ShowCallstack, "Prints the current callstack for debugging");
     REGISTER_GLOBAL_FUNC("bool Eval(const string&in code)", Eval, "Evals the given code");
 
     REGISTER_VARIADIC_FUNC("string", "Format", "const string&in fmtText", 32, Format, "Formats a string");
+    REGISTER_GLOBAL_FUNC("string ToString(?&in value)", ToString, "Returns string representation of any value");
 });
