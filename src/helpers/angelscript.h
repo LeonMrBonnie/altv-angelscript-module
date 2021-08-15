@@ -84,82 +84,76 @@ namespace Helpers
         if(typeInfo) return typeInfo->GetSize();
         return engine->GetSizeOfPrimitiveType(typeId);
     }
-
-    static std::string GetVarData(asIScriptContext* context, int stackLevel, int varIdx)
+    static std::string GetValueData(void* val, int typeId)
     {
-        auto&       runtime     = AngelScriptRuntime::Instance();
-        const char* name        = context->GetVarName(varIdx, stackLevel);
-        void*       val         = context->GetAddressOfVar(varIdx, stackLevel);
-        int         valTypeId   = context->GetVarTypeId(varIdx, stackLevel);
-        std::string valTypeName = GetTypeName(valTypeId);
-        std::string valString;
-        if(val == nullptr) valTypeId = asTYPEID_VOID;
-
-        switch(valTypeId)
+        if(val == nullptr) typeId = asTYPEID_VOID;
+        AngelScriptRuntime& runtime = AngelScriptRuntime::Instance();
+        std::string         result;
+        switch(typeId)
         {
             // Unknown / Void
             case asTYPEID_VOID:
             {
-                valString = "<void>";
+                result = "<void>";
                 break;
             }
             // Bool
             case asTYPEID_BOOL:
             {
-                valString = std::to_string(*(bool*)val);
+                result = std::to_string(*(bool*)val);
                 break;
             }
             // Int
             case asTYPEID_INT8:
             {
-                valString = std::to_string(*(int8_t*)val);
+                result = std::to_string(*(int8_t*)val);
                 break;
             }
             case asTYPEID_INT16:
             {
-                valString = std::to_string(*(int16_t*)val);
+                result = std::to_string(*(int16_t*)val);
                 break;
             }
             case asTYPEID_INT32:
             {
-                valString = std::to_string(*(int32_t*)val);
+                result = std::to_string(*(int32_t*)val);
                 break;
             }
             case asTYPEID_INT64:
             {
-                valString = std::to_string(*(int64_t*)val);
+                result = std::to_string(*(int64_t*)val);
                 break;
             }
             // Uint
             case asTYPEID_UINT8:
             {
-                valString = std::to_string(*(uint8_t*)val);
+                result = std::to_string(*(uint8_t*)val);
                 break;
             }
             case asTYPEID_UINT16:
             {
-                valString = std::to_string(*(uint16_t*)val);
+                result = std::to_string(*(uint16_t*)val);
                 break;
             }
             case asTYPEID_UINT32:
             {
-                valString = std::to_string(*(uint32_t*)val);
+                result = std::to_string(*(uint32_t*)val);
                 break;
             }
             case asTYPEID_UINT64:
             {
-                valString = std::to_string(*(uint64_t*)val);
+                result = std::to_string(*(uint64_t*)val);
                 break;
             }
             // Float
             case asTYPEID_FLOAT:
             {
-                valString = std::to_string(*(float*)val);
+                result = std::to_string(*(float*)val);
                 break;
             }
             case asTYPEID_DOUBLE:
             {
-                valString = std::to_string(*(double*)val);
+                result = std::to_string(*(double*)val);
                 break;
             }
             // Not primitive
@@ -167,60 +161,71 @@ namespace Helpers
             {
                 // Because these type ids are not constant and can change with every update, we have to check
                 // them in an if chain here, instead of directly in the switch expression
-                if(valTypeId == runtime.GetStringTypeId())
+                if(typeId == runtime.GetStringTypeId())
                 {
-                    valString = *(std::string*)val;
+                    result = *(std::string*)val;
                 }
-                else if(valTypeId == runtime.GetVector3TypeId())
+                else if(typeId == runtime.GetVector3TypeId())
                 {
                     auto              vector = *static_cast<Data::Vector3*>(val);
                     std::stringstream stream;
                     stream << "Vector3{ x: " << vector.x << ", y: " << vector.y << ", z: " << vector.z << " }";
-                    valString = stream.str();
+                    result = stream.str();
                 }
-                else if(valTypeId == runtime.GetVector2TypeId())
+                else if(typeId == runtime.GetVector2TypeId())
                 {
                     auto              vector = *static_cast<Data::Vector2*>(val);
                     std::stringstream stream;
                     stream << "Vector2{ x: " << vector.x << ", y: " << vector.y << " }";
-                    valString = stream.str();
+                    result = stream.str();
                 }
-                else if(valTypeId == runtime.GetRGBATypeId())
+                else if(typeId == runtime.GetRGBATypeId())
                 {
                     auto              rgba = *static_cast<alt::RGBA*>(val);
                     std::stringstream stream;
                     stream << "RGBA{ r: " << rgba.r << ", g: " << rgba.g << ", b: " << rgba.b << ", a: " << rgba.a << " }";
-                    valString = stream.str();
+                    result = stream.str();
                 }
-                else if(valTypeId == runtime.GetBaseObjectTypeId() || valTypeId == runtime.GetWorldObjectTypeId() ||
-                        valTypeId == runtime.GetEntityTypeId() || valTypeId == runtime.GetPlayerTypeId() || valTypeId == runtime.GetVehicleTypeId())
+                else if(typeId == runtime.GetBaseObjectTypeId() || typeId == runtime.GetWorldObjectTypeId() || typeId == runtime.GetEntityTypeId() ||
+                        typeId == runtime.GetPlayerTypeId() || typeId == runtime.GetVehicleTypeId())
                 {
                     auto              obj = static_cast<alt::IBaseObject*>(val);
                     std::stringstream stream;
                     stream << "BaseObject{ type: " << (uint16_t)obj->GetType() << " }";
-                    valString = stream.str();
+                    result = stream.str();
                 }
-                else if(valTypeId == runtime.GetDictTypeId())
+                else if(typeId == runtime.GetDictTypeId())
                 {
                     auto              dict = static_cast<CScriptDictionary*>(val);
                     std::stringstream stream;
                     stream << "Dictionary{ size: " << dict->GetSize() << " }";
-                    valString = stream.str();
+                    result = stream.str();
                 }
-                else if(valTypeName == "array")
+                else if(GetTypeName(typeId) == "array")
                 {
                     auto              array = static_cast<CScriptArray*>(val);
                     std::stringstream stream;
                     stream << "Array{ size: " << array->GetSize() << ", type: " << GetTypeName(array->GetElementTypeId()) << " }";
-                    valString = stream.str();
+                    result = stream.str();
                 }
                 else
                 {
-                    valString = "<N/A>";
+                    result = "<N/A>";
                 }
                 break;
             }
         }
+        return result;
+    }
+
+    static inline std::string GetCallstackVarData(asIScriptContext* context, int stackLevel, int varIdx)
+    {
+        auto&       runtime     = AngelScriptRuntime::Instance();
+        const char* name        = context->GetVarName(varIdx, stackLevel);
+        void*       val         = context->GetAddressOfVar(varIdx, stackLevel);
+        int         valTypeId   = context->GetVarTypeId(varIdx, stackLevel);
+        std::string valTypeName = GetTypeName(valTypeId);
+        std::string valString   = GetValueData(val, valTypeId);
 
         std::stringstream str;
         str << "[~y~" << valTypeName << "~w~] " << name << ": ~b~" << valString;
@@ -245,7 +250,7 @@ namespace Helpers
             Log::Colored << "~b~Vars:" << Log::Endl;
             for(int n = 0; n < context->GetVarCount(i); n++)
             {
-                Log::Colored << "~b~-~w~ " << GetVarData(context, i, n) << Log::Endl;
+                Log::Colored << "~b~-~w~ " << GetCallstackVarData(context, i, n) << Log::Endl;
             }
         }
     }
