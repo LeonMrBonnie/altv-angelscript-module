@@ -44,42 +44,42 @@ public:
     }
     int GetBaseObjectTypeId()
     {
-        static int baseObjectType = engine->GetTypeIdByDecl("BaseObject@");
+        static int baseObjectType = engine->GetTypeIdByDecl("alt::BaseObject@");
         return baseObjectType;
     }
     int GetWorldObjectTypeId()
     {
-        static int worldObjectType = engine->GetTypeIdByDecl("WorldObject@");
+        static int worldObjectType = engine->GetTypeIdByDecl("alt::WorldObject@");
         return worldObjectType;
     }
     int GetEntityTypeId()
     {
-        static int entityType = engine->GetTypeIdByDecl("Entity@");
+        static int entityType = engine->GetTypeIdByDecl("alt::Entity@");
         return entityType;
     }
     int GetPlayerTypeId()
     {
-        static int playerType = engine->GetTypeIdByDecl("Player@");
+        static int playerType = engine->GetTypeIdByDecl("alt::Player@");
         return playerType;
     }
     int GetVehicleTypeId()
     {
-        static int vehicleType = engine->GetTypeIdByDecl("Vehicle@");
+        static int vehicleType = engine->GetTypeIdByDecl("alt::Vehicle@");
         return vehicleType;
     }
     int GetVector3TypeId()
     {
-        static int vector3Type = engine->GetTypeIdByDecl("Vector3");
+        static int vector3Type = engine->GetTypeIdByDecl("alt::Vector3");
         return vector3Type;
     }
     int GetVector2TypeId()
     {
-        static int vector2Type = engine->GetTypeIdByDecl("Vector2");
+        static int vector2Type = engine->GetTypeIdByDecl("alt::Vector2");
         return vector2Type;
     }
     int GetRGBATypeId()
     {
-        static int rgbaType = engine->GetTypeIdByDecl("RGBA");
+        static int rgbaType = engine->GetTypeIdByDecl("alt::RGBA");
         return rgbaType;
     }
     int GetDictTypeId()
