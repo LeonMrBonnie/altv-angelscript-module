@@ -28,11 +28,33 @@ static void* ArrayShift(CScriptArray* array)
 {
     void* item = array->At(0);
     if(item == NULL) return NULL;
-    auto  size = Helpers::GetTypeSize(array->GetElementTypeId());
-    void* copy = asAllocMem(size);
-    memcpy(copy, item, size);
-    array->RemoveAt(0);
-    return copy;
+
+    int  type     = array->GetElementTypeId();
+    auto engine   = AngelScriptRuntime::Instance().GetEngine();
+    auto typeInfo = engine->GetTypeInfoById(type);
+
+    // Item is an object handle
+    if(type & asTYPEID_OBJHANDLE)
+    {
+        void* result = nullptr;
+        engine->RefCastObject(item, typeInfo, typeInfo, &result);
+        AS_ASSERT(result, "Failed to ref cast object", nullptr);
+        return result;
+    }
+    // Item is a script object
+    else if(type & asTYPEID_SCRIPTOBJECT)
+    {
+        return engine->CreateScriptObjectCopy(item, typeInfo);
+    }
+    // Item is a primitive
+    else
+    {
+        auto  size = Helpers::GetTypeSize(type);
+        void* copy = asAllocMem(size);
+        memcpy(copy, item, size);
+        array->RemoveAt(0);
+        return copy;
+    }
 }
 
 static ModuleExtension stdExtension("", [](asIScriptEngine* engine, DocsGenerator* docs) {
