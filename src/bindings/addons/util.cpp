@@ -46,7 +46,7 @@ static void Format(asIScriptGeneric* gen)
             resource->GetRuntime()->GetEngine()->AddRefScriptObject(ref, resource->GetRuntime()->GetEngine()->GetTypeInfoById(typeId));
         }
         if(typeId == asTYPEID_VOID) continue;
-        std::string value = GetValueData(ref, typeId);
+        std::string value = ValueToString(ref, typeId);
         if(!replace(fmt, "{}", value)) break;
     }
     std::string* result = new std::string(fmt);
@@ -62,7 +62,7 @@ static std::string ToString(void* ref, int typeId)
         ref = *(void**)ref;
         resource->GetRuntime()->GetEngine()->AddRefScriptObject(ref, resource->GetRuntime()->GetEngine()->GetTypeInfoById(typeId));
     }
-    return GetValueData(ref, typeId);
+    return ValueToString(ref, typeId);
 }
 
 static ModuleExtension utilExtension("util", [](asIScriptEngine* engine, DocsGenerator* docs) {

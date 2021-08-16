@@ -84,7 +84,7 @@ namespace Helpers
         if(typeInfo) return typeInfo->GetSize();
         return engine->GetSizeOfPrimitiveType(typeId);
     }
-    static std::string GetValueData(void* val, int typeId)
+    static std::string ValueToString(void* val, int typeId)
     {
         if(val == nullptr) typeId = asTYPEID_VOID;
         AngelScriptRuntime& runtime = AngelScriptRuntime::Instance();
@@ -229,7 +229,7 @@ namespace Helpers
         void*       val         = context->GetAddressOfVar(varIdx, stackLevel);
         int         valTypeId   = context->GetVarTypeId(varIdx, stackLevel);
         std::string valTypeName = GetTypeName(valTypeId);
-        std::string valString   = GetValueData(val, valTypeId);
+        std::string valString   = ValueToString(val, valTypeId);
 
         std::stringstream str;
         str << "[~y~" << valTypeName << "~w~] " << name << ": ~b~" << valString;
