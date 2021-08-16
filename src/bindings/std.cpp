@@ -57,6 +57,31 @@ static void* ArrayShift(CScriptArray* array)
     }
 }
 
+static void* ArrayFind(CScriptArray* array, asIScriptFunction* callback)
+{
+    AS_ASSERT(callback, "Invalid callback specified", NULL);
+    asUINT size = array->GetSize();
+
+    auto context = asGetActiveContext();
+    for(asUINT i = 0; i < size; i++)
+    {
+        // clang-format off
+        int r = context->Prepare(callback);
+        if(r < 0) { THROW_ERROR("Failed to prepare find callback"); context->Unprepare(); break; }
+        r = context->SetArgDWord(0, i);
+        if(r < 0) { THROW_ERROR("Failed to set find callback index parameter"); context->Unprepare(); break; }
+        r = context->Execute();
+        if(r < 0) { THROW_ERROR("Failed to execute find callback"); context->Unprepare(); break; }
+        bool result = (bool)context->GetReturnByte();
+        context->Unprepare();
+        if(result) return array->At(i);
+        // clang-format on
+    }
+
+    callback->Release();
+    return NULL;
+}
+
 static ModuleExtension stdExtension("", [](asIScriptEngine* engine, DocsGenerator* docs) {
     // *** Array
     RegisterScriptArray(engine, true);
@@ -66,6 +91,9 @@ static ModuleExtension stdExtension("", [](asIScriptEngine* engine, DocsGenerato
     REGISTER_METHOD_WRAPPER("array<T>", "T& pop()", ArrayPop);
     // Returns first item and removes it from array
     REGISTER_METHOD_WRAPPER("array<T>", "T& shift()", ArrayShift);
+    // Finds an element in the array
+    REGISTER_FUNCDEF("bool FindCallback(int index)", "Callback used for array find");
+    REGISTER_METHOD_WRAPPER("array<T>", "T& find(FindCallback@ callback)", ArrayFind);
 
     // *** String
     RegisterStdString(engine);
