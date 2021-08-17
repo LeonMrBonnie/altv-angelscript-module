@@ -82,6 +82,40 @@ static void* ArrayFind(CScriptArray* array, asIScriptFunction* callback)
     return NULL;
 }
 
+static void StringStreamDefaultConstructor(void* memory)
+{
+    new(memory) std::stringstream();
+}
+
+static void StringStreamConstructor(void* memory, const std::string& value)
+{
+    Log::Info << "Memory: " << memory << " Value: " << value << Log::Endl;
+    new(memory) std::stringstream(value);
+}
+
+static std::string StringStreamToString(std::stringstream* stream)
+{
+    return stream->str();
+}
+
+static std::stringstream* StringStreamPipeIn(std::stringstream* stream, const std::string& value)
+{
+    *stream << value;
+    return stream;
+}
+
+static std::stringstream* StringStreamPipeInVarArg(std::stringstream* stream, void* val, int typeId)
+{
+    *stream << Helpers::ValueToString(val, typeId);
+    return stream;
+}
+
+static std::stringstream* StringStreamPipeOut(std::stringstream* stream, std::string& value)
+{
+    value = stream->str();
+    return stream;
+}
+
 static ModuleExtension stdExtension("", [](asIScriptEngine* engine, DocsGenerator* docs) {
     // *** Array
     RegisterScriptArray(engine, true);
@@ -98,6 +132,15 @@ static ModuleExtension stdExtension("", [](asIScriptEngine* engine, DocsGenerato
     // *** String
     RegisterStdString(engine);
     RegisterStdStringUtils(engine);
+    REGISTER_VALUE_CLASS("stringstream", std::stringstream, asOBJ_VALUE | asOBJ_POD, "A string stream");
+    REGISTER_CONSTRUCTOR("stringstream", "", StringStreamDefaultConstructor);
+    REGISTER_CONSTRUCTOR("stringstream", "const string&in str", StringStreamConstructor);
+    REGISTER_METHOD_WRAPPER("stringstream", "string str() const", StringStreamToString);
+    REGISTER_METHOD_WRAPPER("stringstream", "string opImplConv() const", StringStreamToString);
+    REGISTER_METHOD_WRAPPER("stringstream", "string opConv() const", StringStreamToString);
+    REGISTER_METHOD_WRAPPER("stringstream", "stringstream& opShl(const string&in) const", StringStreamPipeIn);
+    REGISTER_METHOD_WRAPPER("stringstream", "stringstream& opShl(?&in) const", StringStreamPipeInVarArg);
+    REGISTER_METHOD_WRAPPER("stringstream", "stringstream& opShr(string&out) const", StringStreamPipeOut);
     // *** Dict
     RegisterScriptDictionary(engine);
     // *** Math
