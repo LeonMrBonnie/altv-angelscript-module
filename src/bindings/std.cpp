@@ -127,7 +127,7 @@ static ModuleExtension stdExtension("", [](asIScriptEngine* engine, DocsGenerato
     REGISTER_METHOD_WRAPPER("array<T>", "T& shift()", ArrayShift);
     // Finds an element in the array
     REGISTER_FUNCDEF("bool FindCallback(int index)", "Callback used for array find");
-    REGISTER_METHOD_WRAPPER("array<T>", "T& find(FindCallback@ callback)", ArrayFind);
+    REGISTER_METHOD_WRAPPER("array<T>", "T& find(FindCallback@ callback) const", ArrayFind);
 
     // *** String
     RegisterStdString(engine);
