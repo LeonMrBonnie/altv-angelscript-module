@@ -89,7 +89,6 @@ static void StringStreamDefaultConstructor(void* memory)
 
 static void StringStreamConstructor(void* memory, const std::string& value)
 {
-    Log::Info << "Memory: " << memory << " Value: " << value << Log::Endl;
     new(memory) std::stringstream(value);
 }
 
