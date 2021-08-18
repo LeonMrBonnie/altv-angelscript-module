@@ -103,14 +103,14 @@ namespace Helpers
         REGISTER_PROPERTY_WRAPPER_GET(type, "bool", "valid", IsValid<T>);
 
         REGISTER_METHOD_WRAPPER(
-          type, "bool HasMeta(const string&in key)", (GenericWrapper<T, alt::IBaseObject, &alt::IBaseObject::HasMetaData, bool, std::string&>));
-        REGISTER_METHOD_WRAPPER(type, "bool GetMeta(const string&in key, ?&out outValue)", GetMeta<T>);
+          type, "bool HasMeta(const string&in key) const", (GenericWrapper<T, alt::IBaseObject, &alt::IBaseObject::HasMetaData, bool, std::string&>));
+        REGISTER_METHOD_WRAPPER(type, "bool GetMeta(const string&in key, ?&out outValue) const", GetMeta<T>);
         REGISTER_METHOD_WRAPPER(type, "void SetMeta(const string&in key, ?&in value)", SetMeta<T>);
         REGISTER_METHOD_WRAPPER(
           type, "void DeleteMeta(const string&in key)", (GenericWrapper<T, alt::IBaseObject, &alt::IBaseObject::DeleteMetaData, void, std::string&>));
 
-        REGISTER_METHOD_WRAPPER(type, "bool HasData(const string&in key)", HasData<T>);
-        REGISTER_METHOD_WRAPPER(type, "bool GetData(const string&in key, ?&out outValue)", GetData<T>);
+        REGISTER_METHOD_WRAPPER(type, "bool HasData(const string&in key) const", HasData<T>);
+        REGISTER_METHOD_WRAPPER(type, "bool GetData(const string&in key, ?&out outValue) const", GetData<T>);
         REGISTER_METHOD_WRAPPER(type, "void SetData(const string&in key, ?&in value)", SetData<T>);
         REGISTER_METHOD_WRAPPER(type, "void DeleteData(const string&in key)", DeleteData<T>);
 

@@ -109,9 +109,10 @@ namespace Helpers
         REGISTER_METHOD_WRAPPER(type, "void SetNetOwner(Player@ player, bool disableMigration = false)", SetNetOwner<T>);
 #endif
 
-        REGISTER_METHOD_WRAPPER(
-          type, "bool HasSyncedMeta(const string&in key)", (GenericWrapper<T, alt::IEntity, &alt::IEntity::HasSyncedMetaData, bool, std::string&>));
-        REGISTER_METHOD_WRAPPER(type, "bool GetSyncedMeta(const string&in key, ?&out outValue)", GetSyncedMeta<T>);
+        REGISTER_METHOD_WRAPPER(type,
+                                "bool HasSyncedMeta(const string&in key) const",
+                                (GenericWrapper<T, alt::IEntity, &alt::IEntity::HasSyncedMetaData, bool, std::string&>));
+        REGISTER_METHOD_WRAPPER(type, "bool GetSyncedMeta(const string&in key, ?&out outValue) const", GetSyncedMeta<T>);
 #ifdef SERVER_MODULE
         REGISTER_METHOD_WRAPPER(type, "void SetSyncedMeta(const string&in key, ?&in value)", SetSyncedMeta<T>);
         REGISTER_METHOD_WRAPPER(type,
@@ -120,9 +121,9 @@ namespace Helpers
 #endif
 
         REGISTER_METHOD_WRAPPER(type,
-                                "bool HasStreamSyncedMeta(const string&in key)",
+                                "bool HasStreamSyncedMeta(const string&in key) const",
                                 (GenericWrapper<T, alt::IEntity, &alt::IEntity::HasStreamSyncedMetaData, bool, std::string&>));
-        REGISTER_METHOD_WRAPPER(type, "bool GetStreamSyncedMeta(const string&in key, ?&out outValue)", GetStreamSyncedMeta<T>);
+        REGISTER_METHOD_WRAPPER(type, "bool GetStreamSyncedMeta(const string&in key, ?&out outValue) const", GetStreamSyncedMeta<T>);
 #ifdef SERVER_MODULE
         REGISTER_METHOD_WRAPPER(type, "void SetStreamSyncedMeta(const string&in key, ?&in value)", SetStreamSyncedMeta<T>);
         REGISTER_METHOD_WRAPPER(type,

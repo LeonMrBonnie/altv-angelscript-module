@@ -34,7 +34,7 @@ static ModuleExtension voiceChannelExtension("alt", [](asIScriptEngine* engine, 
       "VoiceChannel", "float", "maxDistance", (GenericWrapper<alt::IVoiceChannel, alt::IVoiceChannel, &alt::IVoiceChannel::GetMaxDistance, float>));
 
     REGISTER_METHOD_WRAPPER("VoiceChannel",
-                            "bool HasPlayer(Player@ player)",
+                            "bool HasPlayer(Player@ player) const",
                             (GenericWrapper<alt::IVoiceChannel, alt::IVoiceChannel, &alt::IVoiceChannel::HasPlayer, bool, alt::IPlayer*>));
     REGISTER_METHOD_WRAPPER("VoiceChannel",
                             "void AddPlayer(Player@ player)",
@@ -44,7 +44,7 @@ static ModuleExtension voiceChannelExtension("alt", [](asIScriptEngine* engine, 
                             (GenericWrapper<alt::IVoiceChannel, alt::IVoiceChannel, &alt::IVoiceChannel::RemovePlayer, void, alt::IPlayer*>));
 
     REGISTER_METHOD_WRAPPER("VoiceChannel",
-                            "bool IsPlayerMuted(Player@ player)",
+                            "bool IsPlayerMuted(Player@ player) const",
                             (GenericWrapper<alt::IVoiceChannel, alt::IVoiceChannel, &alt::IVoiceChannel::IsPlayerMuted, bool, alt::IPlayer*>));
     REGISTER_METHOD_WRAPPER("VoiceChannel",
                             "void MutePlayer(Player@ player)",

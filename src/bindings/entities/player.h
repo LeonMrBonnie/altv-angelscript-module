@@ -183,10 +183,10 @@ namespace Helpers
 #endif
 
         REGISTER_METHOD_WRAPPER(type,
-                                "bool HasWeaponComponent(uint weapon, uint component)",
+                                "bool HasWeaponComponent(uint weapon, uint component) const",
                                 (GenericWrapper<T, alt::IPlayer, &alt::IPlayer::HasWeaponComponent, bool, uint32_t, uint32_t>));
         REGISTER_METHOD_WRAPPER(
-          type, "uint GetWeaponTint(uint weapon)", (GenericWrapper<T, alt::IPlayer, &alt::IPlayer::GetWeaponTintIndex, uint32_t, uint32_t>));
+          type, "uint GetWeaponTint(uint weapon) const", (GenericWrapper<T, alt::IPlayer, &alt::IPlayer::GetWeaponTintIndex, uint32_t, uint32_t>));
 #ifdef SERVER_MODULE
         REGISTER_METHOD_WRAPPER(type,
                                 "void SetWeaponTint(uint weapon, uint8 tint)",
@@ -215,7 +215,7 @@ namespace Helpers
         REGISTER_METHOD_WRAPPER(
           type, "void Kick(const string&in reason = \"Kicked\")", (GenericWrapper<T, alt::IPlayer, &alt::IPlayer::Kick, void, const std::string&>));
         REGISTER_METHOD_WRAPPER(type,
-                                "bool IsEntityInStreamRange(Entity@ entity)",
+                                "bool IsEntityInStreamRange(Entity@ entity) const",
                                 (GenericWrapper<T, alt::IPlayer, &alt::IPlayer::IsEntityInStreamingRange, bool, alt::IEntity*>));
 #endif
 
@@ -223,9 +223,10 @@ namespace Helpers
         REGISTER_VARIADIC_METHOD(type, "void", "Emit", "const string&in event", 32, Emit);
 
         REGISTER_METHOD_WRAPPER(
-          type, "Cloth GetClothes(uint8 component)", (GenericWrapper<T, alt::IPlayer, &alt::IPlayer::GetClothes, alt::Cloth, uint8_t>));
-        REGISTER_METHOD_WRAPPER(
-          type, "DlcCloth GetDlcClothes(uint8 component)", (GenericWrapper<T, alt::IPlayer, &alt::IPlayer::GetDlcClothes, alt::DlcCloth, uint8_t>));
+          type, "Cloth GetClothes(uint8 component) const", (GenericWrapper<T, alt::IPlayer, &alt::IPlayer::GetClothes, alt::Cloth, uint8_t>));
+        REGISTER_METHOD_WRAPPER(type,
+                                "DlcCloth GetDlcClothes(uint8 component) const",
+                                (GenericWrapper<T, alt::IPlayer, &alt::IPlayer::GetDlcClothes, alt::DlcCloth, uint8_t>));
         REGISTER_METHOD_WRAPPER(type,
                                 "void SetClothes(uint8 component, uint16 drawable, uint8 texture, uint8 palette = 2)",
                                 (GenericWrapper<T, alt::IPlayer, &alt::IPlayer::SetClothes, void, uint8_t, uint16_t, uint8_t, uint8_t>));
@@ -234,9 +235,9 @@ namespace Helpers
                                 (GenericWrapper<T, alt::IPlayer, &alt::IPlayer::SetDlcClothes, void, uint8_t, uint16_t, uint8_t, uint8_t, uint32_t>));
 
         REGISTER_METHOD_WRAPPER(
-          type, "Prop GetProps(uint8 component)", (GenericWrapper<T, alt::IPlayer, &alt::IPlayer::GetProps, alt::Prop, uint8_t>));
+          type, "Prop GetProps(uint8 component) const", (GenericWrapper<T, alt::IPlayer, &alt::IPlayer::GetProps, alt::Prop, uint8_t>));
         REGISTER_METHOD_WRAPPER(
-          type, "DlcProp GetDlcProps(uint8 component)", (GenericWrapper<T, alt::IPlayer, &alt::IPlayer::GetDlcProps, alt::DlcProp, uint8_t>));
+          type, "DlcProp GetDlcProps(uint8 component) const", (GenericWrapper<T, alt::IPlayer, &alt::IPlayer::GetDlcProps, alt::DlcProp, uint8_t>));
         REGISTER_METHOD_WRAPPER(type,
                                 "void SetProps(uint8 component, uint16 drawable, uint8 texture, uint8 palette = 2)",
                                 (GenericWrapper<T, alt::IPlayer, &alt::IPlayer::SetProps, void, uint8_t, uint16_t, uint8_t>));
