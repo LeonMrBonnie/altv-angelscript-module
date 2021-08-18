@@ -1,6 +1,7 @@
 #include "Log.h"
 #include "../../helpers/module.h"
 #include "entity.h"
+#include "../data/vehicleNeon.h"
 
 using namespace Helpers;
 using namespace Data;
@@ -36,12 +37,19 @@ static std::string GetNumberplateText(alt::IVehicle* vehicle)
     return vehicle->GetNumberplateText().ToString();
 }
 
-static void GetActiveNeon(alt::IVehicle* vehicle, bool& left, bool& right, bool& front, bool& back)
+#ifdef SERVER_MODULE
+static VehicleNeon GetActiveNeon(alt::IVehicle* vehicle)
 {
+    bool front, back, left, right;
     vehicle->GetNeonActive(&left, &right, &front, &back);
+    return VehicleNeon(front, back, left, right);
 }
 
-#ifdef SERVER_MODULE
+static void SetActiveNeon(alt::IVehicle* vehicle, VehicleNeon& neon)
+{
+    vehicle->SetNeonActive(neon.left, neon.right, neon.front, neon.back);
+}
+
 static alt::IVehicle* GetAttached(alt::IVehicle* vehicle)
 {
     auto attached = vehicle->GetAttached();
@@ -305,10 +313,11 @@ static ModuleExtension playerExtension("alt", [](asIScriptEngine* engine, DocsGe
     REGISTER_METHOD_WRAPPER("Vehicle",
                             "void SetExtraOn(uint8 extra, bool toggle)",
                             (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::ToggleExtra, void, uint8_t, bool>));
-    REGISTER_METHOD_WRAPPER("Vehicle", "void GetActiveNeon(bool&out left, bool&out right, bool&out front, bool&out back) const", GetActiveNeon);
+    REGISTER_METHOD_WRAPPER("Vehicle", "VehicleNeon GetActiveNeon() const", GetActiveNeon);
     REGISTER_METHOD_WRAPPER("Vehicle",
                             "void SetActiveNeon(bool left, bool right, bool front, bool back)",
                             (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::SetNeonActive, void, bool, bool, bool, bool>));
+    REGISTER_METHOD_WRAPPER("Vehicle", "void SetActiveNeon(VehicleNeon&in neon)", SetActiveNeon);
     REGISTER_METHOD_WRAPPER("Vehicle",
                             "uint8 GetDoorState(uint8 door) const",
                             (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::GetDoorState, uint8_t, uint8_t>));
