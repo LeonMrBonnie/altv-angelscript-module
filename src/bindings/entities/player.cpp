@@ -9,15 +9,6 @@ static std::string ToString(alt::IPlayer* player)
     return str.str();
 }
 
-#pragma region Client
-#ifdef CLIENT_MODULE
-static alt::IPlayer* GetLocalPlayer()
-{
-    return alt::ICore::Instance().GetLocalPlayer().Get();
-}
-#endif
-#pragma endregion
-
 static ModuleExtension playerExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs) {
     RegisterAsPlayer<alt::IPlayer>(engine, docs, "Player");
 
