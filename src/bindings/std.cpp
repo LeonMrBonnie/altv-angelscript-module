@@ -115,6 +115,26 @@ static std::stringstream* StringStreamPipeOut(std::stringstream* stream, std::st
     return stream;
 }
 
+static inline std::string RepeatStr(std::string& str, uint32_t times, const std::string& seperator)
+{
+    std::string result;
+    bool        useSeperator = seperator.size() != 0;
+    for(uint32_t i = 0; i < times; i++)
+    {
+        if(i != 0 && useSeperator) result += seperator;
+        result += str;
+    }
+    return result;
+}
+static std::string StringRepeat(std::string* str, uint32_t times, const std::string& seperator)
+{
+    return RepeatStr(*str, times, seperator);
+}
+static std::string StringMultiply(std::string* str, uint32_t times)
+{
+    return RepeatStr(*str, times, "");
+}
+
 static ModuleExtension stdExtension("", [](asIScriptEngine* engine, DocsGenerator* docs) {
     // *** Array
     RegisterScriptArray(engine, true);
@@ -131,6 +151,9 @@ static ModuleExtension stdExtension("", [](asIScriptEngine* engine, DocsGenerato
     // *** String
     RegisterStdString(engine);
     RegisterStdStringUtils(engine);
+    REGISTER_METHOD_WRAPPER("string", "string repeat(uint times, const string&in seperator = \"\") const", StringRepeat);
+    REGISTER_METHOD_WRAPPER("string", "string opMul(uint times) const", StringMultiply);
+    // Stringstream
     REGISTER_VALUE_CLASS("stringstream", std::stringstream, asOBJ_VALUE | asOBJ_POD, "A string stream");
     REGISTER_CONSTRUCTOR("stringstream", "", StringStreamDefaultConstructor);
     REGISTER_CONSTRUCTOR("stringstream", "const string&in str", StringStreamConstructor);
