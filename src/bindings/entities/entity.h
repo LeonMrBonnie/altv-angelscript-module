@@ -85,6 +85,12 @@ static void SetStreamSyncedMeta(T* obj, const std::string& key, void* ref, int t
 }
 #endif
 
+template<class T>
+static bool ObjEquals(T* obj, T* otherObj)
+{
+    return obj->GetID() == otherObj->GetID();
+}
+
 namespace Helpers
 {
     template<class T>
@@ -134,5 +140,7 @@ namespace Helpers
 #ifdef CLIENT_MODULE
         REGISTER_PROPERTY_WRAPPER_GET(type, "ScriptID", "scriptID", (GenericWrapper<T, alt::IEntity, &alt::IEntity::GetScriptGuid, int32_t>));
 #endif
+
+        REGISTER_METHOD_WRAPPER(type, "bool opEquals(Entity@ entity) const", ObjEquals<T>);
     }
 }  // namespace Helpers
