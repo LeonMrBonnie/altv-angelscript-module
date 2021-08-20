@@ -160,7 +160,7 @@ static ModuleExtension stdExtension("", [](asIScriptEngine* engine, DocsGenerato
     REGISTER_METHOD_WRAPPER("stringstream", "string str() const", StringStreamToString);
     REGISTER_METHOD_WRAPPER("stringstream", "string opImplConv() const", StringStreamToString);
     REGISTER_METHOD_WRAPPER("stringstream", "string opConv() const", StringStreamToString);
-    REGISTER_METHOD_WRAPPER("stringstream", "stringstream& opShl(const string&in) const", StringStreamPipeIn);
+    REGISTER_METHOD_WRAPPER("stringstream", "stringstream& opShl(const string&in)", StringStreamPipeIn);
     REGISTER_METHOD_WRAPPER("stringstream", "stringstream& opShl(?&in) const", StringStreamPipeInVarArg);
     REGISTER_METHOD_WRAPPER("stringstream", "stringstream& opShr(string&out) const", StringStreamPipeOut);
     // *** Dict
