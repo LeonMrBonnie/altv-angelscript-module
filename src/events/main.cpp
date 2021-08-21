@@ -105,4 +105,17 @@ REGISTER_EVENT_HANDLER(alt::CEvent::Type::RENDER,
                        "void",
                        "",
                        [](AngelScriptResource* resource, const alt::CEvent* event, asIScriptContext* context) { return context->Execute(); });
+
+REGISTER_EVENT_HANDLER(alt::CEvent::Type::TASK_CHANGE,
+                       TaskChange,
+                       "void",
+                       "uint&in oldTask, uint&in newTask",
+                       [](AngelScriptResource* resource, const alt::CEvent* event, asIScriptContext* context) {
+                           auto ev      = static_cast<const alt::CTaskChangeEvent*>(event);
+                           auto oldTask = ev->GetOldTask();
+                           context->SetArgAddress(0, &oldTask);
+                           auto newTask = ev->GetNewTask();
+                           context->SetArgAddress(1, &newTask);
+                           return context->Execute();
+                       })
 #endif
