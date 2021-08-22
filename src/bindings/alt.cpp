@@ -363,6 +363,44 @@ static void EmitToAllClients(asIScriptGeneric* gen)
     // alt::ICore::Instance().TriggerClientEventForAll(event, args);
 }
 
+static void EmitToClients(asIScriptGeneric* gen)
+{
+    #ifdef DEBUG_MODE
+    Helpers::Benchmark benchmark("EmitToClients");
+    #endif
+
+    GET_RESOURCE();
+    void*         ref     = gen->GetArgAddress(0);
+    int           typeId  = 0;
+    std::string   event   = *static_cast<std::string*>(ref);
+    CScriptArray* clients = static_cast<CScriptArray*>(gen->GetArgObject(1));
+
+    alt::MValueArgs args;
+    for(int i = 1; i < gen->GetArgCount(); i++)
+    {
+        ref    = gen->GetArgAddress(i);
+        typeId = gen->GetArgTypeId(i);
+        if(typeId & asTYPEID_OBJHANDLE)
+        {
+            // We're receiving a reference to the handle, so we need to dereference it
+            ref = *(void**)ref;
+            resource->GetRuntime()->GetEngine()->AddRefScriptObject(ref, resource->GetRuntime()->GetEngine()->GetTypeInfoById(typeId));
+        }
+        if(typeId == asTYPEID_VOID) continue;
+        auto mvalue = Helpers::ValueToMValue(typeId, ref);
+        args.Push(mvalue);
+    }
+
+    alt::Array<alt::Ref<alt::IPlayer>> arr;
+    for(asUINT i = 0; i < clients->GetSize(); i++)
+    {
+        auto client = *(alt::IPlayer**)clients->At(i);
+        arr.Push(client);
+    }
+
+    alt::ICore::Instance().TriggerClientEvent(arr, event, args);
+}
+
 static void SetSyncedMeta(const std::string& key, void* ref, int typeId)
 {
     auto mvalue = Helpers::ValueToMValue(typeId, ref);
@@ -901,6 +939,12 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_VARIADIC_FUNC("void", "Emit", "const string&in event", 32, Emit, "Emits a local event (Max 32 args)");
 #ifdef SERVER_MODULE
     REGISTER_VARIADIC_FUNC("void", "EmitToAllClients", "const string&in event", 32, EmitToAllClients, "Emits a event to all clients (Max 32 args)");
+    REGISTER_VARIADIC_FUNC("void",
+                           "EmitToClients",
+                           "const string&in event, array<Player@>@ clients",
+                           32,
+                           EmitToClients,
+                           "Emits a event to all specified clients (Max 32 args)");
 #endif
 
     // Metadata
