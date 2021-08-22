@@ -360,7 +360,7 @@ static void EmitToAllClients(asIScriptGeneric* gen)
         auto mvalue = Helpers::ValueToMValue(typeId, ref);
         args.Push(mvalue);
     }
-    // alt::ICore::Instance().TriggerClientEventForAll(event, args);
+    alt::ICore::Instance().TriggerClientEventForAll(event, args);
 }
 
 static void EmitToClients(asIScriptGeneric* gen)
