@@ -65,17 +65,9 @@ static void* ArrayFind(CScriptArray* array, asIScriptFunction* callback)
     auto context = asGetActiveContext();
     for(asUINT i = 0; i < size; i++)
     {
-        // clang-format off
-        int r = context->Prepare(callback);
-        if(r < 0) { THROW_ERROR("Failed to prepare find callback"); context->Unprepare(); break; }
-        r = context->SetArgDWord(0, i);
-        if(r < 0) { THROW_ERROR("Failed to set find callback index parameter"); context->Unprepare(); break; }
-        r = context->Execute();
-        if(r < 0) { THROW_ERROR("Failed to execute find callback"); context->Unprepare(); break; }
-        bool result = (bool)context->GetReturnByte();
-        context->Unprepare();
-        if(result) return array->At(i);
-        // clang-format on
+        void* result = CallFunction(context, callback, { { &i, asTYPEID_UINT32 } });
+        if(result == nullptr) break;
+        if(*(bool*)result) return array->At(i);
     }
 
     callback->Release();

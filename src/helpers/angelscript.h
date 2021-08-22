@@ -414,4 +414,91 @@ namespace Helpers
 #endif
         std::free(ptr);
     }
+
+    static bool IsTypePrimitive(int type)
+    {
+        switch(type)
+        {
+            // Bool
+            case asTYPEID_BOOL:
+            // Int
+            case asTYPEID_INT8:
+            case asTYPEID_INT16:
+            case asTYPEID_INT32:
+            case asTYPEID_INT64:
+            // Uint
+            case asTYPEID_UINT8:
+            case asTYPEID_UINT16:
+            case asTYPEID_UINT32:
+            case asTYPEID_UINT64:
+            // Float
+            case asTYPEID_FLOAT:
+            case asTYPEID_DOUBLE: return true;
+            default: return false;
+        }
+    }
+    static bool IsTypeUInt(int type)
+    {
+        switch(type)
+        {
+            case asTYPEID_UINT8:
+            case asTYPEID_UINT16:
+            case asTYPEID_UINT32:
+            case asTYPEID_UINT64: return true;
+            default: return false;
+        }
+    }
+    static bool IsTypeInt(int type)
+    {
+        switch(type)
+        {
+            case asTYPEID_INT8:
+            case asTYPEID_INT16:
+            case asTYPEID_INT32:
+            case asTYPEID_INT64: return true;
+            default: return false;
+        }
+    }
+
+    static inline void* CallFunction(asIScriptContext*                  context,
+                                     asIScriptFunction*                 function,
+                                     std::vector<std::pair<void*, int>> args   = std::vector<std::pair<void*, int>>(),
+                                     void*                              object = nullptr)
+    {
+        // clang-format off
+        int r = context->Prepare(function);
+        if(r < 0) { Log::Error << "Failed to prepare callback" << ". Error code: " << r << Log::Endl; context->Unprepare(); return nullptr; }
+        if(object)
+        {
+            r = context->SetObject(object);
+            if(r < 0) { Log::Error << "Failed to set callback object" << ". Error code: " << r << Log::Endl; context->Unprepare(); return nullptr; }
+        }
+        for(size_t i = 0; i < args.size(); i++)
+        {
+            auto [ptr, type] = args[i];
+            if(IsTypePrimitive(type)) r = context->SetArgAddress(i, ptr);
+            else r = context->SetArgObject(i, ptr);
+
+            if(r < 0) { Log::Error << "Failed to set parameter " << i << ". Error code: " << r << Log::Endl; context->Unprepare(); return nullptr; }
+        }
+        r = context->Execute();
+        if(r < 0) { Log::Error << "Failed to execute callback" << ". Error code: " << r << Log::Endl; context->Unprepare(); return nullptr; }
+        // clang-format on
+        void* result     = nullptr;
+        int   returnType = function->GetReturnTypeId();
+        if(returnType != asTYPEID_VOID)
+        {
+            auto address = context->GetAddressOfReturnValue();
+            if(returnType & asTYPEID_OBJHANDLE)
+            {
+                asIScriptObject* obj = *(asIScriptObject**)address;
+                obj->AddRef();
+                result = obj;
+            }
+            else
+                result = address;
+        }
+        context->Unprepare();
+        return result;
+    }
 }  // namespace Helpers

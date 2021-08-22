@@ -530,12 +530,7 @@ static void TakeScreenshotCallback(asIScriptFunction* callback)
           auto context  = pair->first->GetContext();
           auto callback = pair->second;
 
-          context->Prepare(callback);
-          context->SetArgObject(0, (void*)image.CStr());
-          context->Execute();
-          context->Unprepare();
-
-          callback->Release();
+          CallFunction(context, callback, { { (void*)image.CStr(), -1 } });
           delete pair;
       },
       pair);
@@ -570,12 +565,7 @@ static void TakeScreenshotGameOnlyCallback(asIScriptFunction* callback)
           auto context  = pair->first->GetContext();
           auto callback = pair->second;
 
-          context->Prepare(callback);
-          context->SetArgObject(0, (void*)image.CStr());
-          context->Execute();
-          context->Unprepare();
-
-          callback->Release();
+          CallFunction(context, callback, { { (void*)image.CStr(), -1 } });
           delete pair;
       },
       pair);

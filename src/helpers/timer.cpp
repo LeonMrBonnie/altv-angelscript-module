@@ -16,18 +16,9 @@ bool Timer::Update(int64_t time)
     if(elapsed >= interval)
     {
         auto context = resource->GetContext();
-        int  r       = context->Prepare(callback);
-        CHECK_AS_RETURN("Timer prepare callback", r, false);
-        if(object)
-        {
-            r = context->SetObject(object);
-            CHECK_AS_RETURN("Timer set object", r, false);
-        }
-        r = context->Execute();
-        CHECK_AS_RETURN("Timer execute callback", r, false);
+        CallFunction(context, callback, {}, object);
 
         lastRun = time;
-
         return !once;
     }
 

@@ -236,50 +236,6 @@ namespace Helpers
                      << Log::Endl;
         return core.CreateMValueNone();
     }
-    static bool IsTypePrimitive(int type)
-    {
-        switch(type)
-        {
-            // Bool
-            case asTYPEID_BOOL:
-            // Int
-            case asTYPEID_INT8:
-            case asTYPEID_INT16:
-            case asTYPEID_INT32:
-            case asTYPEID_INT64:
-            // Uint
-            case asTYPEID_UINT8:
-            case asTYPEID_UINT16:
-            case asTYPEID_UINT32:
-            case asTYPEID_UINT64:
-            // Float
-            case asTYPEID_FLOAT:
-            case asTYPEID_DOUBLE: return true;
-            default: return false;
-        }
-    }
-    static bool IsTypeUInt(int type)
-    {
-        switch(type)
-        {
-            case asTYPEID_UINT8:
-            case asTYPEID_UINT16:
-            case asTYPEID_UINT32:
-            case asTYPEID_UINT64: return true;
-            default: return false;
-        }
-    }
-    static bool IsTypeInt(int type)
-    {
-        switch(type)
-        {
-            case asTYPEID_INT8:
-            case asTYPEID_INT16:
-            case asTYPEID_INT32:
-            case asTYPEID_INT64: return true;
-            default: return false;
-        }
-    }
 
     class MValueFunc : public alt::IMValueFunction::Impl
     {
@@ -291,22 +247,21 @@ namespace Helpers
 
         alt::MValue Call(alt::MValueArgs args) const override
         {
-            auto context = resource->GetContext();
-            context->Prepare(func);
+            auto                               context = resource->GetContext();
+            std::vector<std::pair<void*, int>> funcArgs;
             for(uint32_t i = 0; i < args.GetSize(); i++)
             {
                 int  ret;
                 auto arg         = args[i];
                 auto [type, val] = MValueToValue(resource->GetRuntime(), arg);
-                if(IsTypePrimitive(type)) ret = context->SetArgAddress(i, val);
-                else
-                    ret = context->SetArgObject(i, val);
-                CHECK_AS_RETURN("Call MValue function", ret, nullptr);
+                funcArgs.push_back({ val, type });
             }
-            int r = context->Execute();
-            CHECK_FUNCTION_RETURN(r, alt::ICore::Instance().CreateMValueNone());
-            auto value = ValueToMValue(func->GetReturnTypeId(), context->GetReturnAddress());
-            context->Unprepare();
+            void* result = CallFunction(context, func, funcArgs);
+            auto  value  = ValueToMValue(func->GetReturnTypeId(), result);
+            for(auto [ptr, typeId] : funcArgs)
+            {
+                if(typeId != -1 && typeId != AngelScriptRuntime::Instance().GetBaseObjectTypeId()) delete ptr;
+            }
             return value;
         }
     };

@@ -126,13 +126,9 @@ bool AngelScriptResource::Start()
         runtime->GetEngine()->EndConfigGroup();
         return false;
     }
-    r = context->Prepare(func);
-    CHECK_AS_RETURN("Context prepare", r, false);
 
     // Execute script
-    r = context->Execute();
-    CHECK_FUNCTION_RETURN(r, false);
-    context->Unprepare();
+    CallFunction(context, func);
 
     runtime->GetEngine()->EndConfigGroup();
 
@@ -168,12 +164,7 @@ bool AngelScriptResource::Stop()
         asIScriptFunction* func = module->GetFunctionByDecl("void Stop()");
         if(func != nullptr && context != nullptr)
         {
-            auto r = context->Prepare(func);
-            CHECK_AS_RETURN("Stop function call", r, false);
-
-            r = context->Execute();
-            CHECK_FUNCTION_RETURN(r, true);
-            context->Unprepare();
+            CallFunction(context, func);
         }
         module->Discard();
     }
@@ -401,36 +392,20 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
     std::vector<asIScriptFunction*> handlers = GetCustomEventHandlers(name, false);
     if(handlers.size() == 0 && scriptClasses.size() == 0) return;
 
-    std::vector<std::tuple<int, void*>> handlerArgs;
+    std::vector<std::pair<void*, int>> handlerArgs;
+#ifdef SERVER_MODULE
+    if(!local) handlerArgs.push_back({ player.Get(), -1 });
+#endif
     for(auto arg : args)
     {
-        std::tuple<int, void*> converted = Helpers::MValueToValue(runtime, arg);
-        handlerArgs.push_back(converted);
+        std::tuple<int, void*> result = Helpers::MValueToValue(runtime, arg);
+        auto [type, ptr]              = result;
+        handlerArgs.push_back({ ptr, type });
     }
 
     for(auto handler : handlers)
     {
-        auto r = context->Prepare(handler);
-        CHECK_AS_RETURN("Prepare custom event handler", r, );
-#ifdef SERVER_MODULE
-        context->SetArgObject(0, player.Get());
-#endif
-        for(int i = 0; i < handlerArgs.size(); i++)
-        {
-            int argOffset = i;
-#ifdef SERVER_MODULE
-            argOffset += 1;
-#endif
-            auto [typeId, ptr] = handlerArgs[i];
-            int ret;
-            if(Helpers::IsTypePrimitive(typeId)) ret = context->SetArgAddress(argOffset, ptr);
-            else
-                ret = context->SetArgObject(argOffset, ptr);
-            CHECK_AS_RETURN("Set custom event handler arg", ret, );
-        }
-        r = context->Execute();
-        CHECK_FUNCTION_RETURN(r, );
-        context->Unprepare();
+        CallFunction(context, handler, handlerArgs);
     }
 
     // Check if any script classes exist
@@ -460,53 +435,25 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
             }
             if(eventFunc != nullptr)
             {
-                int r = context->Prepare(eventFunc);
-                CHECK_AS_RETURN("Prepare script class event method", r, );
-                r = context->SetObject(scriptClass);
-                CHECK_AS_RETURN("Set script class event method object", r, );
+                std::vector<std::pair<void*, int>> args = handlerArgs;
 #ifdef SERVER_MODULE
                 if(!local)
                 {
-                    r = context->SetArgObject(0, player.Get());
-                    CHECK_AS_RETURN("Set script class event method player object", r, );
+                    args.insert(args.begin(), { player.Get(), -1 });
                 }
 #endif
                 if(isGeneric)
                 {
-#ifdef SERVER_MODULE
-                    auto offset = local ? 0 : 1;
-#endif
-#ifdef CLIENT_MODULE
-                    auto offset = 0;
-#endif
-                    r = context->SetArgObject(offset, (void*)name.c_str());
-                    CHECK_AS_RETURN("Set generic script class event method event name", r, );
+                    args.insert(args.begin(), { (void*)name.c_str(), -1 });
                 }
-                for(int i = 0; i < handlerArgs.size(); i++)
-                {
-                    int argOffset = i;
-#ifdef SERVER_MODULE
-                    if(!local) argOffset += 1;
-#endif
-                    if(isGeneric) argOffset += 1;
-
-                    auto [typeId, ptr] = handlerArgs[i];
-                    int ret;
-                    if(Helpers::IsTypePrimitive(typeId)) ret = context->SetArgAddress(argOffset, ptr);
-                    else
-                        ret = context->SetArgObject(argOffset, ptr);
-                    CHECK_AS_RETURN("Set custom event handler arg", ret, );
-                }
-                r = context->Execute();
-                CHECK_FUNCTION_RETURN(r, );
-                context->Unprepare();
+                CallFunction(context, eventFunc, handlerArgs, scriptClass);
             }
         }
     }
 
-    for(auto [typeId, ptr] : handlerArgs)
+    for(auto [ptr, typeId] : handlerArgs)
     {
-        if(typeId != runtime->GetBaseObjectTypeId()) delete ptr;
+        if(typeId != -1 && typeId != runtime->GetBaseObjectTypeId()) delete ptr;
     }
 }
 
@@ -589,13 +536,7 @@ void AngelScriptResource::OnTick()
     // Execute eval functions
     for(auto func : evalFunctions)
     {
-        int r = r = context->Prepare(func);
-        CHECK_AS_RETURN("Context prepare", r, );
-        r = context->Execute();
-        CHECK_AS_RETURN("Context execute", r, );
-        r = context->Unprepare();
-        CHECK_AS_RETURN("Context unprepare", r, );
-        func->Release();
+        CallFunction(context, func);
     }
     evalFunctions.clear();
 
@@ -669,11 +610,10 @@ bool AngelScriptResource::RegisterMetadata(CScriptBuilder& builder, asIScriptCon
                 Log::Error << "Script class '" << type->GetName() << "' has no factory" << Log::Endl;
                 continue;
             }
-            context->Prepare(factory);
-            int r = context->Execute();
-            CHECK_FUNCTION_RETURN(r, false);
-            asIScriptObject* obj = *(asIScriptObject**)context->GetAddressOfReturnValue();
-            obj->AddRef();
+
+            void* result = CallFunction(context, factory);
+            if(!result) continue;
+            asIScriptObject* obj = (asIScriptObject*)result;
             // Store our script class instance
             scriptClasses.push_back(obj);
             context->Unprepare();
