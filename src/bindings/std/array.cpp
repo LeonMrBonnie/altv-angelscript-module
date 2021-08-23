@@ -57,6 +57,7 @@ static void* ArrayShift(CScriptArray* array)
     array->RemoveAt(0);
     return result;
 }
+/* broken
 static void* ArrayFind(CScriptArray* array, asIScriptFunction* callback)
 {
     asIScriptEngine*  engine  = AngelScriptRuntime::Instance().GetEngine();
@@ -82,12 +83,13 @@ static void* ArrayFind(CScriptArray* array, asIScriptFunction* callback)
         context->PopState();
         if(callResult)
         {
-            result = CopyItem(engine, item, type);
+            result = item;
             break;
         }
     }
     return result;
 }
+*/
 
 static StdExtension arrayExtension([](asIScriptEngine* engine, DocsGenerator* docs) {
     RegisterScriptArray(engine, true);
@@ -99,8 +101,8 @@ static StdExtension arrayExtension([](asIScriptEngine* engine, DocsGenerator* do
     // Returns first item and removes it from array
     REGISTER_METHOD_WRAPPER("array<T>", "T& shift()", ArrayShift);
     // Finds an element in the array
-    REGISTER_FUNCDEF("bool array<T>::findCallback(const T&in if_handle_then_const item, const uint idx)", "Callback used for array find");
-    REGISTER_METHOD_WRAPPER("array<T>", "T& find(const findCallback&in callback) const", ArrayFind);
+    // REGISTER_FUNCDEF("bool array<T>::findCallback(const T&in if_handle_then_const item, const uint idx)", "Callback used for array find");
+    // REGISTER_METHOD_WRAPPER("array<T>", "T& find(const findCallback&in callback) const", ArrayFind);
 
     // We register this here because it needs the array template class
     RegisterStdStringUtils(engine);
