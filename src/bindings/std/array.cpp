@@ -78,7 +78,6 @@ static void* ArrayFind(CScriptArray* array, asIScriptFunction* callback)
         r = context->Execute();
         CHECK_AS_RETURN("Find callback execute", r, NULL);
         bool callResult = context->GetReturnByte();
-        Log::Info << "Result: " << callResult << Log::Endl;
         context->Unprepare();
         context->PopState();
         if(callResult)
@@ -87,8 +86,6 @@ static void* ArrayFind(CScriptArray* array, asIScriptFunction* callback)
             break;
         }
     }
-    Log::Warning << __FUNCTION__ << " "
-                 << "done" << Log::Endl;
     return result;
 }
 
