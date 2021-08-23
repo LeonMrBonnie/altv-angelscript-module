@@ -58,7 +58,7 @@ static void* ArrayShift(CScriptArray* array)
     array->RemoveAt(0);
     return result;
 }
-/* broken
+
 static void* ArrayFind(CScriptArray* array, asIScriptFunction* callback)
 {
     asIScriptEngine*  engine  = AngelScriptRuntime::Instance().GetEngine();
@@ -67,11 +67,11 @@ static void* ArrayFind(CScriptArray* array, asIScriptFunction* callback)
     asIScriptContext* context = asGetActiveContext();
     void*             result  = nullptr;
 
+    context->PushState();
     for(asUINT i = 0; i < size; i++)
     {
         auto item = array->At(i);
-        context->PushState();
-        int r = context->Prepare(callback);
+        int  r    = context->Prepare(callback);
         CHECK_AS_RETURN("Find callback prepare", r, NULL);
         r = context->SetArgAddress(0, item);
         CHECK_AS_RETURN("Find callback set item", r, NULL);
@@ -80,17 +80,15 @@ static void* ArrayFind(CScriptArray* array, asIScriptFunction* callback)
         r = context->Execute();
         CHECK_AS_RETURN("Find callback execute", r, NULL);
         bool callResult = context->GetReturnByte();
-        context->Unprepare();
-        context->PopState();
         if(callResult)
         {
             result = item;
             break;
         }
     }
+    context->PopState();
     return result;
 }
-*/
 
 static StdExtension arrayExtension([](asIScriptEngine* engine, DocsGenerator* docs) {
     RegisterScriptArray(engine, true);
@@ -102,8 +100,8 @@ static StdExtension arrayExtension([](asIScriptEngine* engine, DocsGenerator* do
     // Returns first item and removes it from array
     REGISTER_METHOD_WRAPPER("array<T>", "T& shift()", ArrayShift);
     // Finds an element in the array
-    // REGISTER_FUNCDEF("bool array<T>::findCallback(const T&in if_handle_then_const item, const uint idx)", "Callback used for array find");
-    // REGISTER_METHOD_WRAPPER("array<T>", "T& find(const findCallback&in callback) const", ArrayFind);
+    REGISTER_FUNCDEF("bool array<T>::findCallback(const T&in if_handle_then_const item, const uint idx)", "Callback used for array find");
+    REGISTER_METHOD_WRAPPER("array<T>", "T& find(const findCallback&in callback) const", ArrayFind);
 
     // We register this here because it needs the array template class
     RegisterStdStringUtils(engine);
