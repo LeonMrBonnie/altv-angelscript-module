@@ -39,9 +39,10 @@ static void ArrayPush(CScriptArray* array, void* item)
 }
 static void* ArrayPop(CScriptArray* array)
 {
-    void* item = array->At(array->GetSize() - 1);
+    asUINT offset = array->GetSize() - 1;
+    void*  item   = array->At(offset);
     if(item == NULL) return NULL;
-    array->RemoveLast();
+    array->RemoveAt(offset);
     return item;
 }
 static void* ArrayShift(CScriptArray* array)
