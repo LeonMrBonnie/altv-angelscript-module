@@ -36,7 +36,8 @@ AngelScriptRuntime::AngelScriptRuntime()
     RegisterScriptInterfaces(engine);
 }
 
-void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine)
+extern StdExtension stringExtension;
+void                AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine)
 {
 #ifdef SERVER_MODULE
     Helpers::DocsGenerator docs("altServer");
@@ -46,10 +47,12 @@ void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine)
 #endif
 
     // Register standard library
-    ModuleExtension::RegisterAll("", engine);
+    Helpers::DocsGenerator stdDocs("");
+    stringExtension.Register(engine, &stdDocs);
+    ModuleExtension::RegisterAllStd(engine, &stdDocs);
 
     // Register data
-    Helpers::ModuleExtension::RegisterAllData(engine, &docs);
+    ModuleExtension::RegisterAllData(engine, &docs);
 
     // Register ref classes
     REGISTER_REF_CLASS("BaseObject", alt::IBaseObject, asOBJ_REF, "Base object superclass for all alt:V base objects", "");

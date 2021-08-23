@@ -54,9 +54,10 @@ static std::stringstream* StringStreamPipeOut(std::stringstream* stream, std::st
     return stream;
 }
 
-static ModuleExtension stringExtension("", [](asIScriptEngine* engine, DocsGenerator* docs) {
+static bool         registered = false;
+extern StdExtension stringExtension([](asIScriptEngine* engine, DocsGenerator* docs) {
+    if(registered) return;
     RegisterStdString(engine);
-    RegisterStdStringUtils(engine);
 
     REGISTER_METHOD_WRAPPER("string", "string repeat(uint times, const string&in seperator = \"\") const", StringRepeat);
     REGISTER_METHOD_WRAPPER("string", "string opMul(uint times) const", StringMultiply);
@@ -70,4 +71,6 @@ static ModuleExtension stringExtension("", [](asIScriptEngine* engine, DocsGener
     REGISTER_METHOD_WRAPPER("stringstream", "stringstream& opShl(const string&in)", StringStreamPipeIn);
     REGISTER_METHOD_WRAPPER("stringstream", "stringstream& opShl(?&in) const", StringStreamPipeInVarArg);
     REGISTER_METHOD_WRAPPER("stringstream", "stringstream& opShr(string&out) const", StringStreamPipeOut);
+
+    registered = true;
 });

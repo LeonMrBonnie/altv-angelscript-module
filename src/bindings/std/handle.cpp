@@ -3,7 +3,7 @@
 #include "helpers/angelscript.h"
 #include "angelscript/addon/scripthandle/scripthandle.h"
 
-static ModuleExtension handleExtension("", [](asIScriptEngine* engine, DocsGenerator* docs) {
+static StdExtension handleExtension([](asIScriptEngine* engine, DocsGenerator* docs) {
     //
     RegisterScriptHandle(engine);
 });

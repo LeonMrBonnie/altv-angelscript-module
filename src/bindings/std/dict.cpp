@@ -3,7 +3,7 @@
 #include "helpers/angelscript.h"
 #include "angelscript/addon/scriptdictionary/scriptdictionary.h"
 
-static ModuleExtension dictExtension("", [](asIScriptEngine* engine, DocsGenerator* docs) {
+static StdExtension dictExtension([](asIScriptEngine* engine, DocsGenerator* docs) {
     //
     RegisterScriptDictionary(engine);
 });
