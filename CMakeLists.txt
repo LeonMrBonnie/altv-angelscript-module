@@ -57,14 +57,16 @@ add_library(${PROJECT_MODULE_NAME} SHARED
 	${JIT_COMPILER_FILE}
 )
 
-set_target_properties(${PROJECT_MODULE_NAME} PROPERTIES 
-	COMPILE_FLAGS 
-		"/W1 /nologo /EHsc"
-	COMPILE_FLAGS_DEBUG
-		"/MDd /Od /Ob0 /Zi"
-	COMPILE_FLAGS_RELEASE
-		"/MD /O2 /Ob2"
-)
+if(WIN32)
+    set_target_properties(${PROJECT_MODULE_NAME} PROPERTIES 
+        COMPILE_FLAGS 
+            "/W1 /nologo /EHsc"
+        COMPILE_FLAGS_DEBUG
+            "/MDd /Od /Ob0 /Zi"
+        COMPILE_FLAGS_RELEASE
+            "/MD /O2 /Ob2"
+    )
+endif()
 
 target_link_options(${PROJECT_MODULE_NAME} PRIVATE "/DEBUG")
 
