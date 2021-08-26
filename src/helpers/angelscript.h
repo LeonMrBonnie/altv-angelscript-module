@@ -10,8 +10,8 @@
 #include "runtime.h"
 #include "bindings/data/vector3.h"
 #include "bindings/data/vector2.h"
-#include "angelscript/addon/scriptdictionary/scriptdictionary.h"
-#include "angelscript/addon/scriptarray/scriptarray.h"
+#include "angelscript/add_on/scriptdictionary/scriptdictionary.h"
+#include "angelscript/add_on/scriptarray/scriptarray.h"
 #include "angelscript/include/angelscript.h"
 
 #define CHECK_FUNCTION_RETURN(r, ret)                                                           \

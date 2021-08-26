@@ -1,7 +1,7 @@
 #include "Log.h"
 #include "helpers/module.h"
 #include "helpers/angelscript.h"
-#include "angelscript/addon/scriptarray/scriptarray.h"
+#include "angelscript/add_on/scriptarray/scriptarray.h"
 #include <regex>
 
 static void ConstructRegex(void* memory, const std::string& regex)

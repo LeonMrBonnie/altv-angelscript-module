@@ -1,8 +1,8 @@
 #include "Log.h"
 #include "helpers/module.h"
 #include "helpers/angelscript.h"
-#include "angelscript/addon/scriptarray/scriptarray.h"
-#include "angelscript/addon/scriptstdstring/scriptstdstring.h"
+#include "angelscript/add_on/scriptarray/scriptarray.h"
+#include "angelscript/add_on/scriptstdstring/scriptstdstring.h"
 
 using namespace Helpers;
 

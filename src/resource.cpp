@@ -7,7 +7,7 @@
 #include "helpers/benchmark.h"
 #include "helpers/angelscript.h"
 #include "helpers/libImport.h"
-#include "angelscript/addon/scriptany/scriptany.h"
+#include "angelscript/add_on/scriptany/scriptany.h"
 #include <regex>
 #include <string>
 

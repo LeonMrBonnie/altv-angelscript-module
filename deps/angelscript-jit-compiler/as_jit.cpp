@@ -7,13 +7,13 @@
 #include <functional>
 #include <cstdint>
 
-#include "angelscript/include/as_scriptfunction.h"
-#include "angelscript/include/as_objecttype.h"
-#include "angelscript/include/as_callfunc.h"
-#include "angelscript/include/as_scriptengine.h"
-#include "angelscript/include/as_scriptobject.h"
-#include "angelscript/include/as_texts.h"
-#include "angelscript/include/as_context.h"
+#include "angelscript/source/as_scriptfunction.h"
+#include "angelscript/source/as_objecttype.h"
+#include "angelscript/source/as_callfunc.h"
+#include "angelscript/source/as_scriptengine.h"
+#include "angelscript/source/as_scriptobject.h"
+#include "angelscript/source/as_texts.h"
+#include "angelscript/source/as_context.h"
 
 #include "virtual_asm.h"
 using namespace assembler;

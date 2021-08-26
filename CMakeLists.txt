@@ -46,6 +46,7 @@ file(GLOB_RECURSE PROJECT_SOURCE_FILES "./src/*.h" "./src/*.cpp")
 include_directories(
 	"${PROJECT_SOURCE_DIR}/src"
 	"${PROJECT_SOURCE_DIR}/deps"
+    "${PROJECT_SOURCE_DIR}/deps/angelscript"
 )
 
 add_library(${PROJECT_MODULE_NAME} SHARED

@@ -4,9 +4,9 @@
 #include "Log.h"
 #include "helpers/timer.h"
 #include "angelscript/include/angelscript.h"
-#include "angelscript/addon/scriptarray/scriptarray.h"
-#include "angelscript/addon/scriptbuilder/scriptbuilder.h"
-#include "angelscript/addon/scripthelper/scripthelper.h"
+#include "angelscript/add_on/scriptarray/scriptarray.h"
+#include "angelscript/add_on/scriptbuilder/scriptbuilder.h"
+#include "angelscript/add_on/scripthelper/scripthelper.h"
 #include "cpp-sdk/events/CWebSocketClientEvent.h"
 
 class AngelScriptRuntime;

@@ -8,7 +8,7 @@
 #include "../bindings/data/vector3.h"
 #include "../bindings/data/vector2.h"
 #include "../runtime.h"
-#include "angelscript/addon/scriptdictionary/scriptdictionary.h"
+#include "angelscript/add_on/scriptdictionary/scriptdictionary.h"
 #include "angelscript.h"
 
 namespace Helpers

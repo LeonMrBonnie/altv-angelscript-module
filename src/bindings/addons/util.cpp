@@ -1,6 +1,6 @@
 #include "../../helpers/module.h"
 #include "../../helpers/angelscript.h"
-#include "angelscript/addon/scriptbuilder/scriptbuilder.h"
+#include "angelscript/add_on/scriptbuilder/scriptbuilder.h"
 #include <chrono>
 
 using namespace Helpers;

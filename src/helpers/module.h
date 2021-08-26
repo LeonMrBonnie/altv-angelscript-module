@@ -3,7 +3,7 @@
 #include "cpp-sdk/SDK.h"
 #include "Log.h"
 #include "angelscript/include/angelscript.h"
-#include "angelscript/addon/scriptbuilder/scriptbuilder.h"
+#include "angelscript/add_on/scriptbuilder/scriptbuilder.h"
 #include "../resource.h"
 #include "./docs.h"
 

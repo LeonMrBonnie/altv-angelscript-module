@@ -1,5 +1,5 @@
 #include "helpers/events.h"
-#include "angelscript/addon/scriptarray/scriptarray.h"
+#include "angelscript/add_on/scriptarray/scriptarray.h"
 #include "../runtime.h"
 #include "../bindings/data/keyState.h"
 
