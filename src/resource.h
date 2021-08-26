@@ -178,7 +178,7 @@ public:
     bool Stop();
 
     bool OnEvent(const alt::CEvent* event);
-    void OnTick();
+    void OnTick() override;
 
     void OnCreateBaseObject(alt::Ref<alt::IBaseObject> object) override;
     void OnRemoveBaseObject(alt::Ref<alt::IBaseObject> object) override;
