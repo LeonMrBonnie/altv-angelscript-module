@@ -11,14 +11,12 @@
         #define _getfunc(module, name, type) (type) GetProcAddress((HMODULE)module, name);
         #define _unloadlib(lib)              FreeLibrary((HMODULE)lib)
         #define _seperator                   "\\"
-    /*
     #else
         #include <dlfcn.h>
-        #define _getlib(name)                dlopen((name + ".so").c_str(), RTLD_NOW);
+        #define _getlib(name)                dlopen((name + ".so").c_str(), 0x00002);
         #define _getfunc(module, name, type) (type) dlsym(module, name);
         #define _unloadlib(lib)              dlclose(lib)
         #define _seperator                   "/"
-    */
     #endif
 
     #include <algorithm>
@@ -63,7 +61,7 @@ static inline void* ImportLibrary(std::string& name, const AngelScriptResource* 
 
 // ********** Pragma Handlers **********
 
-static void DoLibImport(std::string& pragma, const AngelScriptResource* resource)
+static void DoLibImport(std::string pragma, const AngelScriptResource* resource)
 {
     GET_PRAGMA_PARTS(pragma, 3, "Error in libImport pragma: Needs 3 arguments (library, namespace, function declaration)");
 
@@ -124,7 +122,7 @@ struct ScriptStruct
 // Key = Name
 static std::unordered_map<std::string, ScriptStruct> scriptStructs;
 
-static void DoDeclareStruct(std::string& pragma)
+static void DoDeclareStruct(std::string pragma)
 {
     GET_PRAGMA_PARTS(pragma, 4, "Error in declareStruct pragma: Needs 4 arguments (library, namespace, name, size)");
 
@@ -172,7 +170,7 @@ static void DoDeclareStruct(std::string& pragma)
     #endif
 }
 
-static void DoStructProperty(std::string& pragma)
+static void DoStructProperty(std::string pragma)
 {
     GET_PRAGMA_PARTS(pragma, 3, "Error in structProperty pragma: Needs 3 arguments (struct name, property name, type)");
 
@@ -249,7 +247,7 @@ static void DoStructProperty(std::string& pragma)
     scriptStruct.curOffset += Helpers::GetTypeSize(typeId);
 }
 
-static void DoEndStruct(std::string& pragma)
+static void DoEndStruct(std::string pragma)
 {
     GET_PRAGMA_PARTS(pragma, 1, "Error in endStruct pragma: Needs 1 argument (struct name)");
 

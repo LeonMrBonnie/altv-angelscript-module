@@ -60,15 +60,13 @@ add_library(${PROJECT_MODULE_NAME} SHARED
 if(WIN32)
     set_target_properties(${PROJECT_MODULE_NAME} PROPERTIES 
         COMPILE_FLAGS 
-            "/W1 /nologo /EHsc"
+            "/W1 /nologo /EHsc /DEBUG"
         COMPILE_FLAGS_DEBUG
             "/MDd /Od /Ob0 /Zi"
         COMPILE_FLAGS_RELEASE
             "/MD /O2 /Ob2"
     )
 endif()
-
-target_link_options(${PROJECT_MODULE_NAME} PRIVATE "/DEBUG")
 
 target_link_libraries(${PROJECT_MODULE_NAME} PRIVATE
   ${ANGELSCRIPT_LIB_PATH}
