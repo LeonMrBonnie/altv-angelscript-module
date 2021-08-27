@@ -5,8 +5,6 @@ cmake_minimum_required (VERSION 3.8)
 
 project ("altv-angelscript-module")
 
-list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
-
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -38,6 +36,7 @@ endif()
 set(ANGELSCRIPT_LIB_PATH ${PROJECT_SOURCE_DIR}/deps/angelscript/lib/${ANGELSCRIPT_LIB})
 
 # Download dependencies
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 include(DownloadDeps)
 download_deps()
 
