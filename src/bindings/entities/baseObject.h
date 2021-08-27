@@ -6,16 +6,54 @@
 
 using namespace Helpers;
 
+static inline std::string GetBaseObjectTypeName(alt::IBaseObject::Type type)
+{
+    using Type = alt::IBaseObject::Type;
+    switch(type)
+    {
+        case Type::PLAYER: return "Player";
+        case Type::VEHICLE: return "Vehicle";
+        case Type::BLIP: return "Blip";
+        case Type::WEBVIEW: return "WebView";
+        case Type::VOICE_CHANNEL: return "VoiceChannel";
+        case Type::COLSHAPE: return "Colshape";
+        case Type::CHECKPOINT: return "Checkpoint";
+        case Type::WEBSOCKET_CLIENT: return "WebsocketClient";
+        case Type::HTTP_CLIENT: return "HttpClient";
+        case Type::AUDIO: return "Audio";
+        case Type::LOCAL_PLAYER: return "LocalPlayer";
+        default: return "? Unknown";
+    }
+}
+
 template<class T>
 static void AddRef(T* obj)
 {
+#ifdef DEBUG_MODE
+    std::stringstream stream;
+    stream << "0x" << std::hex << (uintptr_t)obj;
+    Log::Colored << "~lc~[DEBUG] ~lg~" << __FUNCTION__ << " ~lk~" << stream.str() << " ~lc~(Type: ~lk~" << GetBaseObjectTypeName(obj->GetType())
+                 << "~lc~, RefCount: ~lk~" << obj->GetRefCount() + 1 << "~lc~)" << Log::Endl;
+#endif
     obj->AddRef();
 }
 
 template<class T>
 static void RemoveRef(T* obj)
 {
+#ifdef DEBUG_MODE
+    std::stringstream stream;
+    stream << "0x" << std::hex << (uintptr_t)obj;
+    Log::Colored << "~lc~[DEBUG] ~lr~" << __FUNCTION__ << " ~lk~" << stream.str() << " ~lc~(Type: ~lk~" << GetBaseObjectTypeName(obj->GetType())
+                 << "~lc~, RefCount: ~lk~" << obj->GetRefCount() - 1 << "~lc~)" << Log::Endl;
+#endif
     obj->RemoveRef();
+}
+
+template<class T>
+static uint64_t GetRefCount(T* obj)
+{
+    return obj->GetRefCount();
 }
 
 template<class T>
@@ -97,6 +135,7 @@ namespace Helpers
     {
         engine->RegisterObjectBehaviour(type, asBEHAVE_ADDREF, "void f()", asFUNCTION(AddRef<T>), asCALL_CDECL_OBJLAST);
         engine->RegisterObjectBehaviour(type, asBEHAVE_RELEASE, "void f()", asFUNCTION(RemoveRef<T>), asCALL_CDECL_OBJLAST);
+        REGISTER_PROPERTY_WRAPPER_GET(type, "uint64", "refCount", GetRefCount<T>);
 
         REGISTER_PROPERTY_WRAPPER_GET(
           type, "uint8", "type", (GenericWrapper<T, alt::IBaseObject, &alt::IBaseObject::GetType, alt::IBaseObject::Type>));
