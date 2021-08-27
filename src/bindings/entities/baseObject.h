@@ -115,5 +115,8 @@ namespace Helpers
         REGISTER_METHOD_WRAPPER(type, "void DeleteData(const string&in key)", DeleteData<T>);
 
         REGISTER_METHOD_WRAPPER(type, "void Destroy()", Destroy<T>);
+
+        // Implicit conversion to bool checks if the object is valid
+        REGISTER_METHOD_WRAPPER(type, "bool opImplConv() const", IsValid<T>);
     }
 }  // namespace Helpers
