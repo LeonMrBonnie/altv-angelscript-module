@@ -71,8 +71,3 @@ target_link_libraries(${PROJECT_MODULE_NAME} PRIVATE
   ${ANGELSCRIPT_LIB_PATH}
   ${CRYPTOPP_LIB}
 )
-
-if(TARGET clangformat)
-    include(ClangFormat)
-    target_clangformat_setup(${PROJECT_MODULE_NAME})
-endif()
