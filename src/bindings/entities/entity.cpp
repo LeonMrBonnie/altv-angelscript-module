@@ -17,9 +17,15 @@ static ModuleExtension entityExtension("alt", [](asIScriptEngine* engine, DocsGe
     // Casts
     REGISTER_METHOD_WRAPPER("Entity", "alt::Player@ opCast() const", (Cast<alt::IPlayer, alt::IBaseObject::Type::PLAYER>));
     REGISTER_METHOD_WRAPPER("Entity", "alt::Vehicle@ opCast() const", (Cast<alt::IVehicle, alt::IBaseObject::Type::VEHICLE>));
+#ifdef CLIENT_MODULE
+    REGISTER_METHOD_WRAPPER("Entity", "alt::LocalPlayer@ opCast() const", (Cast<alt::ILocalPlayer, alt::IBaseObject::Type::LOCAL_PLAYER>));
+#endif
 
     // todo: add config option to toggle this
     // !!! this can cause nasty bugs, use with caution
     REGISTER_METHOD_WRAPPER("Entity", "alt::Player@ opImplCast() const", (Cast<alt::IPlayer, alt::IBaseObject::Type::PLAYER>));
     REGISTER_METHOD_WRAPPER("Entity", "alt::Vehicle@ opImplCast() const", (Cast<alt::IVehicle, alt::IBaseObject::Type::VEHICLE>));
+#ifdef CLIENT_MODULE
+    REGISTER_METHOD_WRAPPER("Entity", "alt::LocalPlayer@ opImplCast() const", (Cast<alt::ILocalPlayer, alt::IBaseObject::Type::LOCAL_PLAYER>));
+#endif
 });
