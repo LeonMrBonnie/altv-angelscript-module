@@ -54,6 +54,29 @@ REGISTER_EVENT_HANDLER(alt::CEvent::Type::NETOWNER_CHANGE,
                            context->SetArgObject(2, ev->GetNewOwner().Get());
                            return context->Execute();
                        });
+
+REGISTER_EVENT_HANDLER(
+  alt::CEvent::Type::VEHICLE_DAMAGE,
+  VehicleDamage,
+  "void",
+  "Vehicle@ vehicle, Entity@ attacker, uint&in bodyHealthDamage, uint&in additionalBodyHealthDamage, uint&in engineHealthDamage, uint&in petrolTankHealthDamage, uint&in weapon",
+  [](AngelScriptResource* resource, const alt::CEvent* event, asIScriptContext* context) {
+      auto ev = static_cast<const alt::CVehicleDamageEvent*>(event);
+
+      context->SetArgObject(0, ev->GetTarget().Get());
+      context->SetArgObject(1, ev->GetDamager().Get());
+      auto bodyHealthDamage = ev->GetBodyHealthDamage();
+      context->SetArgAddress(2, &bodyHealthDamage);
+      auto additionalBodyHealthDamage = ev->GetBodyAdditionalHealthDamage();
+      context->SetArgAddress(3, &additionalBodyHealthDamage);
+      auto engineDamage = ev->GetEngineHealthDamage();
+      context->SetArgAddress(4, &engineDamage);
+      auto petrolDamage = ev->GetPetrolTankHealthDamage();
+      context->SetArgAddress(5, &petrolDamage);
+      auto weapon = ev->GetDamagedWith();
+      context->SetArgAddress(6, &weapon);
+      return context->Execute();
+  });
 #endif
 
 #ifdef CLIENT_MODULE
