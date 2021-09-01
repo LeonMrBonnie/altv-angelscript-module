@@ -108,6 +108,12 @@ namespace Helpers
         REGISTER_PROPERTY_WRAPPER_GET(type, "bool", "visible", (GenericWrapper<T, alt::IEntity, &alt::IEntity::GetVisible, bool>));
 #ifdef SERVER_MODULE
         REGISTER_PROPERTY_WRAPPER_SET(type, "bool", "visible", (GenericWrapper<T, alt::IEntity, &alt::IEntity::SetVisible, void, bool>));
+
+        REGISTER_PROPERTY_WRAPPER_GET(type, "bool", "streamed", (GenericWrapper<T, alt::IEntity, &alt::IEntity::GetStreamed, bool>));
+        REGISTER_PROPERTY_WRAPPER_SET(type, "bool", "streamed", (GenericWrapper<T, alt::IEntity, &alt::IEntity::SetStreamed, void, bool>));
+#endif
+#ifdef CLIENT_MODULE
+        REGISTER_PROPERTY_WRAPPER_GET(type, "ScriptID", "scriptID", (GenericWrapper<T, alt::IEntity, &alt::IEntity::GetScriptGuid, int32_t>));
 #endif
 
         REGISTER_METHOD_WRAPPER(type, "Player@+ GetNetOwner() const", GetNetOwner<T>);
@@ -135,10 +141,6 @@ namespace Helpers
         REGISTER_METHOD_WRAPPER(type,
                                 "void DeleteStreamSyncedMeta(const string&in key)",
                                 (GenericWrapper<T, alt::IEntity, &alt::IEntity::DeleteStreamSyncedMetaData, void, std::string&>));
-#endif
-
-#ifdef CLIENT_MODULE
-        REGISTER_PROPERTY_WRAPPER_GET(type, "ScriptID", "scriptID", (GenericWrapper<T, alt::IEntity, &alt::IEntity::GetScriptGuid, int32_t>));
 #endif
 
         REGISTER_METHOD_WRAPPER(type, "bool opEquals(Entity@ entity) const", ObjEquals<T>);
