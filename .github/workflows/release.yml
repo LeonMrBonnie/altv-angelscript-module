@@ -14,6 +14,7 @@ jobs:
     steps:
       - name: Extract version
         id: version
+        shell: bash
         run: |
           TAG=${GITHUB_REF/refs\/tags\//}
           echo ::set-output name=BRANCH::${TAG/\/*}
@@ -45,6 +46,7 @@ jobs:
     steps:
       - name: Extract version
         id: version
+        shell: bash
         run: |
           TAG=${GITHUB_REF/refs\/tags\//}
           echo ::set-output name=BRANCH::${TAG/\/*}
