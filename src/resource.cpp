@@ -315,8 +315,8 @@ bool AngelScriptResource::OnEvent(const alt::CEvent* ev)
     }
 
     // Invoke global event handlers
-    auto callbacks      = GetEventHandlers(ev->GetType());
-    bool shouldContinue = event->InvokeEventHandlers(this, ev, callbacks);
+    auto callbacks = GetEventHandlers(ev->GetType());
+    bool cancel    = event->InvokeEventHandlers(this, ev, callbacks);
 
     // Check if any script class exists
     if(scriptClasses.size() != 0)
@@ -340,12 +340,14 @@ bool AngelScriptResource::OnEvent(const alt::CEvent* ev)
             if(eventFuncs.size() != 0)
             {
                 bool result = event->InvokeEventHandlers(this, ev, eventFuncs, scriptClass);
-                if(!shouldContinue && result) shouldContinue = true;
+                if(!cancel && result) cancel = true;
             }
         }
     }
 
-    return shouldContinue;
+    if(cancel) ev->Cancel();
+
+    return true;
 }
 
 // todo: rework this shit code

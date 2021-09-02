@@ -11,9 +11,9 @@ bool Helpers::Event::InvokeEventHandlers(AngelScriptResource*            resourc
                                          asIScriptObject*                object)
 {
     // If the return type of the event is bool, it should return a value
-    bool              shouldReturn   = strcmp(GetReturnType(), "bool") == 0;
-    asIScriptContext* context        = resource->GetContext();
-    bool              shouldContinue = true;
+    bool              shouldReturn = strcmp(GetReturnType(), "bool") == 0;
+    asIScriptContext* context      = resource->GetContext();
+    bool              cancel       = false;
 
     for(auto callback : handlers)
     {
@@ -32,14 +32,13 @@ bool Helpers::Event::InvokeEventHandlers(AngelScriptResource*            resourc
             if(callback->GetReturnTypeId() != asTYPEID_BOOL)
             {
                 Log::Error << "Event handler '" << callback->GetDeclaration() << "' should return a bool" << Log::Endl;
-                context->Unprepare();
                 continue;
             }
             auto result = context->GetReturnByte();
-            if(result == 0) shouldContinue = false;
+            if(result == 1) cancel = true;
         }
-        context->Unprepare();
     }
+    context->Unprepare();
 
-    return shouldContinue;
+    return cancel;
 }
