@@ -18,6 +18,7 @@ jobs:
         id: version
         run: |
           TAG=${GITHUB_REF/refs\/tags\//}
+          echo ::set-output name=BRANCH::${TAG/\/*}
           echo ::set-output name=VERSION::${TAG/*\/}
 
   build-windows-server:
