@@ -51,117 +51,117 @@ jobs:
           name: server-windows
           path: ./dist/server/
 
-    build-windows-client:
-      name: Build windows (client)
-      runs-on: windows-2019
-      if: env.build-windows-client == 'true'
-      needs: [get-version]
-      steps:
-        - name: Checkout repository
+  build-windows-client:
+    name: Build windows (client)
+    runs-on: windows-2019
+    if: env.build-windows-client == 'true'
+    needs: [get-version]
+    steps:
+      - name: Checkout repository
           uses: actions/checkout@v2
           with:
-            submodules: recursive
-            lfs: false
+          submodules: recursive
+          lfs: false
 
-        - name: Build module
+      - name: Build module
           shell: cmd
           run: |
-            cd .\\tools
-            .\\build-client.bat %VERSION%
+          cd .\\tools
+          .\\build-client.bat %VERSION%
           env:
+          VERSION: ${{ needs.get-version.outputs.version }}
+
+      - name: Upload artifacts
+          uses: actions/upload-artifact@v2
+          with:
+          name: client-windows
+          path: ./dist/client/
+
+  build-linux:
+    name: Build linux
+    runs-on: ubuntu-18.04
+    if: env.build-linux-server == 'true'
+    needs: [get-version]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+          lfs: false
+
+      - name: Build module
+        run: |
+          chmod 777 ./tools/build.sh
+          cd ./tools
+          ./build.sh %VERSION%
+        env:
             VERSION: ${{ needs.get-version.outputs.version }}
 
-        - name: Upload artifacts
-          uses: actions/upload-artifact@v2
-          with:
-            name: client-windows
-            path: ./dist/client/
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: server-linux
+          path: ./dist/server/
 
-    build-linux:
-      name: Build linux
-      runs-on: ubuntu-18.04
-      if: env.build-linux-server == 'true'
-      needs: [get-version]
-      steps:
-        - name: Checkout repository
-          uses: actions/checkout@v2
-          with:
-            submodules: recursive
-            lfs: false
+  release:
+    name: Release
+    runs-on: ubuntu-18.04
+    needs: [get-version, build-windows-server, build-windows-client, build-linux]
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          path: ./dist
 
-        - name: Build module
-          run: |
-            chmod 777 ./tools/build.sh
-            cd ./tools
-            ./build.sh %VERSION%
-          env:
-              VERSION: ${{ needs.get-version.outputs.version }}
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ needs.get-version.outputs.version }}
 
-        - name: Upload artifacts
-          uses: actions/upload-artifact@v2
-          with:
-            name: server-linux
-            path: ./dist/server/
+      - name: Upload windows server artifacts
+        if: env.build-windows-server == 'true'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/server-windows/angelscript-module.dll
+          asset_name: angelscript-module.dll
+          asset_content_type: application/octet-stream
 
-    release:
-        name: Release
-        runs-on: ubuntu-18.04
-        needs: [get-version, build-windows-server, build-windows-client, build-linux]
-        steps:
-          - name: Download artifacts
-            uses: actions/download-artifact@v2
-            with:
-              path: ./dist
+      - name: Upload windows client artifacts
+        if: env.build-windows-client == 'true'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/client-windows/angelscript-client-module.dll
+          asset_name: angelscript-client-module.dll
+          asset_content_type: application/octet-stream
 
-          - name: Create Release
-            id: create_release
-            uses: actions/create-release@v1
-            env:
-              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            with:
-              tag_name: ${{ github.ref }}
-              release_name: ${{ needs.get-version.outputs.version }}
+      - name: Upload linux server artifacts
+        if: env.build-linux-server == 'true'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/server-linux/libangelscript-module.so
+          asset_name: libangelscript-module.so
+          asset_content_type: application/octet-stream
 
-          - name: Upload windows server artifacts
-            if: env.build-windows-server == 'true'
-            uses: actions/upload-release-asset@v1
-            env:
-              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            with:
-              upload_url: ${{ steps.create_release.outputs.upload_url }}
-              asset_path: ./dist/server-windows/angelscript-module.dll
-              asset_name: angelscript-module.dll
-              asset_content_type: application/octet-stream
-
-          - name: Upload windows client artifacts
-            if: env.build-windows-client == 'true'
-            uses: actions/upload-release-asset@v1
-            env:
-              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            with:
-              upload_url: ${{ steps.create_release.outputs.upload_url }}
-              asset_path: ./dist/client-windows/angelscript-client-module.dll
-              asset_name: angelscript-client-module.dll
-              asset_content_type: application/octet-stream
-
-          - name: Upload linux server artifacts
-            if: env.build-linux-server == 'true'
-            uses: actions/upload-release-asset@v1
-            env:
-              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            with:
-              upload_url: ${{ steps.create_release.outputs.upload_url }}
-              asset_path: ./dist/server-linux/libangelscript-module.so
-              asset_name: libangelscript-module.so
-              asset_content_type: application/octet-stream
-
-    delete-artifacts:
-      name: Delete artifacts
-      runs-on: ubuntu-18.04
-      needs: [release]
-      steps:
-        - name: Delete artifacts
-          uses: kolpav/purge-artifacts-action@v1
-          with:
-            token: ${{ secrets.GITHUB_TOKEN }}
-            expire-in: 0
+  delete-artifacts:
+    name: Delete artifacts
+    runs-on: ubuntu-18.04
+    needs: [release]
+    steps:
+      - name: Delete artifacts
+        uses: kolpav/purge-artifacts-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          expire-in: 0
