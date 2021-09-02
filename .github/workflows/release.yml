@@ -7,11 +7,6 @@ on:
       - 'rc/*.*-rc*'
       - 'release/*.*'
 
-env:
-  ENABLE_WINDOWS_SERVER: true
-  ENABLE_WINDOWS_CLIENT: true
-  ENABLE_LINUX_SERVER: true
-
 jobs:
   get-version:
     name: Get release version
@@ -28,7 +23,6 @@ jobs:
   build-windows-server:
     name: Build windows (server)
     runs-on: windows-2019
-    if: ${{ ENABLE_WINDOWS_SERVER == 'true' }}
     needs: [get-version]
     steps:
       - name: Checkout repository
@@ -54,7 +48,6 @@ jobs:
   build-windows-client:
     name: Build windows (client)
     runs-on: windows-2019
-    if: ${{ ENABLE_WINDOWS_CLIENT == 'true' }}
     needs: [get-version]
     steps:
       - name: Checkout repository
@@ -68,7 +61,7 @@ jobs:
         run: |
           cd .\\tools
           .\\build-client.bat %VERSION%
-          env:
+        env:
           VERSION: ${{ needs.get-version.outputs.version }}
 
       - name: Upload artifacts
@@ -80,7 +73,6 @@ jobs:
   build-linux:
     name: Build linux
     runs-on: ubuntu-18.04
-    if: ${{ ENABLE_LINUX_SERVER == 'true' }}
     needs: [get-version]
     steps:
       - name: Checkout repository
@@ -123,7 +115,6 @@ jobs:
           release_name: ${{ needs.get-version.outputs.version }}
 
       - name: Upload windows server artifacts
-        if: ${{ ENABLE_WINDOWS_SERVER == 'true' }}
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -134,7 +125,6 @@ jobs:
           asset_content_type: application/octet-stream
 
       - name: Upload windows client artifacts
-        if: ${{ ENABLE_WINDOWS_CLIENT == 'true' }}
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -145,7 +135,6 @@ jobs:
           asset_content_type: application/octet-stream
 
       - name: Upload linux server artifacts
-        if: ${{ ENABLE_LINUX_SERVER == 'true' }}
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
