@@ -57,14 +57,15 @@ add_library(${PROJECT_MODULE_NAME} SHARED
 )
 
 if(WIN32)
-    set_target_properties(${PROJECT_MODULE_NAME} PROPERTIES 
-        COMPILE_FLAGS 
+    set_target_properties(${PROJECT_MODULE_NAME} PROPERTIES
+        COMPILE_FLAGS
             "/W1 /nologo /EHsc /DEBUG"
         COMPILE_FLAGS_DEBUG
             "/MDd /Od /Ob0 /Zi"
         COMPILE_FLAGS_RELEASE
             "/MD /O2 /Ob2"
     )
+    set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /DEBUG")
 endif()
 
 target_link_libraries(${PROJECT_MODULE_NAME} PRIVATE
