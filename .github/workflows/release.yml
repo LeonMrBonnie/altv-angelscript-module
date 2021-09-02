@@ -58,22 +58,22 @@ jobs:
     needs: [get-version]
     steps:
       - name: Checkout repository
-          uses: actions/checkout@v2
-          with:
+        uses: actions/checkout@v2
+        with:
           submodules: recursive
           lfs: false
 
       - name: Build module
-          shell: cmd
-          run: |
+        shell: cmd
+        run: |
           cd .\\tools
           .\\build-client.bat %VERSION%
           env:
           VERSION: ${{ needs.get-version.outputs.version }}
 
       - name: Upload artifacts
-          uses: actions/upload-artifact@v2
-          with:
+        uses: actions/upload-artifact@v2
+        with:
           name: client-windows
           path: ./dist/client/
 
@@ -95,7 +95,7 @@ jobs:
           cd ./tools
           ./build.sh %VERSION%
         env:
-            VERSION: ${{ needs.get-version.outputs.version }}
+          VERSION: ${{ needs.get-version.outputs.version }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
