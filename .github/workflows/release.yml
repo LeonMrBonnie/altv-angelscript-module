@@ -1,124 +1,157 @@
 name: Release
 
-on: 
+on:
   push:
     tags:
       - 'dev/*.*-dev*'
       - 'rc/*.*-rc*'
       - 'release/*.*'
 
-env:
-  BUILD_TYPE: Release
-
 jobs:
-  release:
-    runs-on: windows-latest
+  get-version:
+    name: Get release version
+    runs-on: ubuntu-18.04
     outputs:
-      url: ${{ steps.create_release.outputs.upload_url }}
+      version: ${{ steps.version.VERSION }}
     steps:
-    - name: Extract version
-      id: version
-      shell: bash
-      run: |
-        TAG=${GITHUB_REF/refs\/tags\//}
-        echo ::set-output name=BRANCH::${TAG/\/*}
-        echo ::set-output name=VERSION::${TAG/*\/}
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: ${{ steps.version.outputs.VERSION }}
-        draft: false
-        prerelease: false
+      - name: Extract version
+        id: version
+        run: |
+          TAG=${GITHUB_REF/refs\/tags\//}
+          echo ::set-output name=BRANCH::${TAG/\/*}
+          echo ::set-output name=VERSION::${TAG/*\/}
 
-  build:
-    needs: release
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        include:
-          - os: windows-latest
-            OS_TYPE: Windows
-            FILE: angelscript-module.dll
-          #- os: ubuntu-18.04
-          #  OS_TYPE: Linux
-          #  FILE: libangelscript-module.so
-
+  build-windows-server:
+    name: Build windows (server)
+    runs-on: windows-2019
+    needs: [get-version]
     steps:
-    - name: Checkout repository
-      if: matrix.OS_TYPE == 'Linux'
-      uses: actions/checkout@v2
-      with:
-        submodules: recursive
-        lfs: true
-    - name: Checkout repository
-      if: matrix.OS_TYPE == 'Windows'
-      uses: actions/checkout@v2
-      with:
-        submodules: recursive
-        lfs: false
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+          lfs: false
 
-    - name: Extract version
-      id: version
-      shell: bash
-      run: |
-        TAG=${GITHUB_REF/refs\/tags\//}
-        echo ::set-output name=BRANCH::${TAG/\/*}
-        echo ::set-output name=VERSION::${TAG/*\/}
+      - name: Build module
+        shell: cmd
+        run: |
+          cd .\\tools
+          .\\build-server.bat %VERSION%
+        env:
+          VERSION: ${{ needs.get-version.outputs.version }}
 
-    - name: Build server (Windows)
-      if: matrix.OS_TYPE == 'Windows'
-      shell: cmd
-      run: |
-        cd .\\tools
-        .\\build-server.bat %VERSION%
-      env:
-        VERSION: ${{ steps.version.outputs.VERSION }}
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: server-windows
+          path: ./dist/server/
 
-    - name: Clear build directory
-      if: matrix.OS_TYPE == 'Windows'
-      uses: JesseTG/rm@v1.0.0
-      with:
-        path: ./build
+  build-windows-client:
+    name: Build windows (client)
+    runs-on: windows-2019
+    needs: [get-version]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+          lfs: false
 
-    - name: Build client (Windows)
-      if: matrix.OS_TYPE == 'Windows'
-      shell: cmd
-      run: |
-        cd .\\tools
-        .\\build-client.bat %VERSION%
-      env:
-        VERSION: ${{ steps.version.outputs.VERSION }}
+      - name: Build module
+        shell: cmd
+        run: |
+          cd .\\tools
+          .\\build-client.bat %VERSION%
+        env:
+          VERSION: ${{ needs.get-version.outputs.version }}
 
-    - name: Build (Linux)
-      if: matrix.OS_TYPE == 'Linux'
-      run: |
-        chmod 777 ./tools/build.sh
-        cd ./tools
-        ./build.sh %VERSION%
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: client-windows
+          path: ./dist/client/
 
-    - name: Upload Release Server Assets
-      id: upload_release_assets_server
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ needs.release.outputs.url }}
-        asset_path: ./dist/server/${{ matrix.FILE }}
-        asset_name: ${{ matrix.FILE }}
-        asset_content_type: application/octet-stream
+  build-linux:
+    name: Build linux
+    runs-on: ubuntu-18.04
+    needs: [get-version]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+          lfs: false
 
-    - name: Upload Release Client Assets
-      if: matrix.OS_TYPE == 'Windows'
-      id: upload_release_assets_client
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ needs.release.outputs.url }}
-        asset_path: ./dist/client/angelscript-client-module.dll
-        asset_name: angelscript-client-module.dll
-        asset_content_type: application/octet-stream
+      - name: Build module
+        run: |
+          chmod 777 ./tools/build.sh
+          cd ./tools
+          ./build.sh %VERSION%
+        env:
+          VERSION: ${{ needs.get-version.outputs.version }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: server-linux
+          path: ./dist/server/
+
+  release:
+    name: Release
+    runs-on: ubuntu-18.04
+    needs: [get-version, build-windows-server, build-windows-client, build-linux]
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          path: ./dist
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ needs.get-version.outputs.version }}
+
+      - name: Upload windows server artifacts
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/server-windows/angelscript-module.dll
+          asset_name: angelscript-module.dll
+          asset_content_type: application/octet-stream
+
+      - name: Upload windows client artifacts
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/client-windows/angelscript-client-module.dll
+          asset_name: angelscript-client-module.dll
+          asset_content_type: application/octet-stream
+
+      - name: Upload linux server artifacts
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/server-linux/libangelscript-module.so
+          asset_name: libangelscript-module.so
+          asset_content_type: application/octet-stream
+
+  delete-artifacts:
+    name: Delete artifacts
+    runs-on: ubuntu-18.04
+    needs: [release]
+    steps:
+      - name: Delete artifacts
+        uses: kolpav/purge-artifacts-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          expire-in: 0
