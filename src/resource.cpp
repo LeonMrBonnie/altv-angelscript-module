@@ -3,10 +3,11 @@
 #include "runtime.h"
 #include "helpers/module.h"
 #include "helpers/events.h"
-#include "angelscript/addon/scriptany/scriptany.h"
 #include "helpers/convert.h"
 #include "helpers/benchmark.h"
 #include "helpers/angelscript.h"
+#include "helpers/libImport.h"
+#include "angelscript/add_on/scriptany/scriptany.h"
 #include <regex>
 #include <string>
 
@@ -39,6 +40,8 @@ bool AngelScriptResource::Start()
         return false;
     }
 
+    runtime->GetEngine()->BeginConfigGroup(resource->GetName().CStr());
+
     // Compile file
     CScriptBuilder builder;
 
@@ -59,6 +62,7 @@ bool AngelScriptResource::Start()
         if(byteStream.HasErrored())
         {
             Log::Error << "Failed to open bytecode file" << Log::Endl;
+            runtime->GetEngine()->EndConfigGroup();
             return false;
         }
         r = module->LoadByteCode(&byteStream);
@@ -89,7 +93,7 @@ bool AngelScriptResource::Start()
         byteStream.Close();
         CHECK_AS_RETURN("Save bytecode", r, false);
         Log::Colored << "~g~Successfully saved the compiled bytecode to the file ~w~" << fileName + ".asb" << Log::Endl;
-
+        runtime->GetEngine()->EndConfigGroup();
         return true;
     }
 #endif
@@ -103,7 +107,11 @@ bool AngelScriptResource::Start()
 
     // Register Metadata
     bool result = RegisterMetadata(builder, context);
-    if(!result) return false;
+    if(!result)
+    {
+        runtime->GetEngine()->EndConfigGroup();
+        return false;
+    }
 
     if(scriptClasses.size() != 0) return true;
 
@@ -115,20 +123,19 @@ bool AngelScriptResource::Start()
         Log::Error << "The main entrypoint ('void Start()') was not found" << Log::Endl;
         module->Discard();
         context->Release();
+        runtime->GetEngine()->EndConfigGroup();
         return false;
     }
-    r = context->Prepare(func);
-    CHECK_AS_RETURN("Context prepare", r, false);
 
     // Execute script
-    r = context->Execute();
-    CHECK_FUNCTION_RETURN(r, false);
-    context->Unprepare();
+    CallFunction(context, func);
+
+    runtime->GetEngine()->EndConfigGroup();
 
     return true;
 }
 
-alt::String AngelScriptResource::ReadFile(alt::String path)
+alt::String AngelScriptResource::ReadFile(alt::String path) const
 {
     auto pkg = resource->GetPackage();
     // Check if file exists
@@ -143,6 +150,12 @@ alt::String AngelScriptResource::ReadFile(alt::String path)
     return src;
 }
 
+void AngelScriptResource::RegisterEventHandler(alt::CEvent::Type event, asIScriptFunction* handler)
+{
+    if(!Helpers::CheckEventFunctionParams(handler)) return;
+    eventHandlers.insert({ event, handler });
+}
+
 bool AngelScriptResource::Stop()
 {
     // Gets Stop function and if exists calls it
@@ -151,12 +164,7 @@ bool AngelScriptResource::Stop()
         asIScriptFunction* func = module->GetFunctionByDecl("void Stop()");
         if(func != nullptr && context != nullptr)
         {
-            auto r = context->Prepare(func);
-            CHECK_AS_RETURN("Stop function call", r, false);
-
-            r = context->Execute();
-            CHECK_FUNCTION_RETURN(r, true);
-            context->Unprepare();
+            CallFunction(context, func);
         }
         module->Discard();
     }
@@ -179,6 +187,12 @@ bool AngelScriptResource::Stop()
         kv.second->Release();
     }
     customRemoteEventHandlers.clear();
+
+    for(auto func : importedFunctions)
+    {
+        func->Release();
+    }
+    importedFunctions.clear();
 
     if(scriptClasses.size() != 0)
     {
@@ -206,7 +220,58 @@ bool AngelScriptResource::Stop()
     }
     timers.clear();
 
+    for(auto func : libraryImportFunctions)
+    {
+        func->Release();
+    }
+    libraryImportFunctions.clear();
+
+    for(auto dll : importedLibraries)
+    {
+        LibraryImport::FreeLibrary(dll);
+    }
+    importedLibraries.clear();
+
+    // todo: fix cleaning up the library import functions
+    // Remove the config group to clear library import functions from global namespace
+    int result = runtime->GetEngine()->RemoveConfigGroup(resource->GetName().CStr());
+    /*
+    if(result == asCONFIG_GROUP_IS_IN_USE)
+    {
+        // Try to do one full cycle of the garbage collector
+        runtime->GetEngine()->GarbageCollect(asGC_FULL_CYCLE);
+        result = runtime->GetEngine()->RemoveConfigGroup(resource->GetName().CStr());
+        if(result == asCONFIG_GROUP_IS_IN_USE)
+        {
+            // A dll function is still used after doing a garbage collector cycle, so it is used elsewhere
+            Log::Error << "The dll import functions could not be cleaned up because they are still used somewhere" << Log::Endl;
+            Log::Error << "Make sure you don't use dll import functions in other resources other than the one that registered it!" << Log::Endl;
+        }
+    }
+    */
     return true;
+}
+
+static inline bool IsEventRemoteScriptEvent(alt::CEvent::Type type)
+{
+#ifdef SERVER_MODULE
+    if(type == alt::CEvent::Type::CLIENT_SCRIPT_EVENT) return true;
+#endif
+#ifdef CLIENT_MODULE
+    if(type == alt::CEvent::Type::SERVER_SCRIPT_EVENT) return true;
+#endif
+    return false;
+}
+
+static inline bool IsEventLocalScriptEvent(alt::CEvent::Type type)
+{
+#ifdef SERVER_MODULE
+    if(type == alt::CEvent::Type::SERVER_SCRIPT_EVENT) return true;
+#endif
+#ifdef CLIENT_MODULE
+    if(type == alt::CEvent::Type::CLIENT_SCRIPT_EVENT) return true;
+#endif
+    return false;
 }
 
 bool AngelScriptResource::OnEvent(const alt::CEvent* ev)
@@ -215,25 +280,20 @@ bool AngelScriptResource::OnEvent(const alt::CEvent* ev)
     Helpers::Benchmark benchmark("OnEvent_" + resource->GetName().ToString() + "_" + std::string(std::to_string((uint16_t)ev->GetType())));
 #endif
 
-    if(ev->GetType() == alt::CEvent::Type::SERVER_SCRIPT_EVENT)
+    // Custom script events
+    if(IsEventLocalScriptEvent(ev->GetType()))
     {
-#ifdef SERVER_MODULE
         HandleCustomEvent(ev, true);
-#else
-        HandleCustomEvent(ev, false);
-#endif
         return true;
     }
-    else if(ev->GetType() == alt::CEvent::Type::CLIENT_SCRIPT_EVENT)
+    else if(IsEventRemoteScriptEvent(ev->GetType()))
     {
-#ifdef SERVER_MODULE
         HandleCustomEvent(ev, false);
-#else
-        HandleCustomEvent(ev, true);
-#endif
         return true;
     }
+
 #ifdef CLIENT_MODULE
+    // Entity events
     else if(ev->GetType() == alt::CEvent::Type::WEB_VIEW_EVENT)
     {
         HandleWebviewEvent(static_cast<const alt::CWebViewEvent*>(ev));
@@ -245,6 +305,7 @@ bool AngelScriptResource::OnEvent(const alt::CEvent* ev)
         return true;
     }
 #endif
+
     // Get the handler for the specified event
     auto event = Helpers::Event::GetEvent(ev->GetType());
     if(event == nullptr)
@@ -252,28 +313,10 @@ bool AngelScriptResource::OnEvent(const alt::CEvent* ev)
         Log::Error << "Unhandled event type " << std::to_string((uint16_t)ev->GetType()) << Log::Endl;
         return true;
     }
-    // Get all script callbacks for the event
-    auto callbacks  = GetEventHandlers(ev->GetType());
-    auto returnType = event->GetReturnType();
-    // If the return type of the event is bool, it should return a value
-    bool shouldReturn = strcmp(returnType, "bool") == 0;
 
-    // Loop over all script callbacks and call them with the args
-    for(auto callback : callbacks)
-    {
-        auto r = context->Prepare(callback);
-        CHECK_AS_RETURN("Prepare event handler", r, true);
-        // Set the event args and execute callback
-        r = event->Execute(this, ev);
-        CHECK_FUNCTION_RETURN(r, true);
-        if(r == asEXECUTION_FINISHED && shouldReturn)
-        {
-            auto result = context->GetReturnByte();
-            context->Unprepare();
-            return result == 1 ? true : false;
-        }
-        context->Unprepare();
-    }
+    // Invoke global event handlers
+    auto callbacks = GetEventHandlers(ev->GetType());
+    bool cancel    = event->InvokeEventHandlers(this, ev, callbacks);
 
     // Check if any script class exists
     if(scriptClasses.size() != 0)
@@ -281,8 +324,8 @@ bool AngelScriptResource::OnEvent(const alt::CEvent* ev)
         for(auto scriptClass : scriptClasses)
         {
             // Get the method of the script class for the event if it exists
-            auto               type      = scriptClass->GetObjectType();
-            asIScriptFunction* eventFunc = nullptr;
+            asITypeInfo*                    type = scriptClass->GetObjectType();
+            std::vector<asIScriptFunction*> eventFuncs;
             for(asUINT i = 0; i < type->GetMethodCount(); i++)
             {
                 auto func = type->GetMethodByIndex(i, true);
@@ -291,32 +334,23 @@ bool AngelScriptResource::OnEvent(const alt::CEvent* ev)
 
                 Event* eventData = static_cast<Event*>(data);
                 if(eventData->GetType() != ev->GetType()) continue;
-
-                eventFunc = func;
-                break;
+                eventFuncs.push_back(func);
             }
-            if(eventFunc != nullptr)
+            // Invoke event handlers for the script class
+            if(eventFuncs.size() != 0)
             {
-                int r = context->Prepare(eventFunc);
-                CHECK_AS_RETURN("Prepare script class event method", r, true);
-                r = context->SetObject(scriptClass);
-                CHECK_AS_RETURN("Set script class event method object", r, true);
-                r = event->Execute(this, ev);
-                CHECK_FUNCTION_RETURN(r, true);
-                if(r == asEXECUTION_FINISHED && shouldReturn)
-                {
-                    auto result = context->GetReturnByte();
-                    context->Unprepare();
-                    return result == 1 ? true : false;
-                }
-                context->Unprepare();
+                bool result = event->InvokeEventHandlers(this, ev, eventFuncs, scriptClass);
+                if(!cancel && result) cancel = true;
             }
         }
     }
 
+    if(cancel) ev->Cancel();
+
     return true;
 }
 
+// todo: rework this shit code
 void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local)
 {
 #ifdef DEBUG_MODE
@@ -360,36 +394,20 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
     std::vector<asIScriptFunction*> handlers = GetCustomEventHandlers(name, false);
     if(handlers.size() == 0 && scriptClasses.size() == 0) return;
 
-    std::vector<std::tuple<int, void*>> handlerArgs;
+    std::vector<std::pair<void*, int>> handlerArgs;
+#ifdef SERVER_MODULE
+    if(!local) handlerArgs.push_back({ player.Get(), -1 });
+#endif
     for(auto arg : args)
     {
-        std::tuple<int, void*> converted = Helpers::MValueToValue(runtime, arg);
-        handlerArgs.push_back(converted);
+        std::tuple<int, void*> result = Helpers::MValueToValue(runtime, arg);
+        auto [type, ptr]              = result;
+        handlerArgs.push_back({ ptr, type });
     }
 
     for(auto handler : handlers)
     {
-        auto r = context->Prepare(handler);
-        CHECK_AS_RETURN("Prepare custom event handler", r, );
-#ifdef SERVER_MODULE
-        context->SetArgObject(0, player.Get());
-#endif
-        for(int i = 0; i < handlerArgs.size(); i++)
-        {
-            int argOffset = i;
-#ifdef SERVER_MODULE
-            argOffset += 1;
-#endif
-            auto [typeId, ptr] = handlerArgs[i];
-            int ret;
-            if(Helpers::IsTypePrimitive(typeId)) ret = context->SetArgAddress(argOffset, ptr);
-            else
-                ret = context->SetArgObject(argOffset, ptr);
-            CHECK_AS_RETURN("Set custom event handler arg", ret, );
-        }
-        r = context->Execute();
-        CHECK_FUNCTION_RETURN(r, );
-        context->Unprepare();
+        CallFunction(context, handler, handlerArgs);
     }
 
     // Check if any script classes exist
@@ -419,53 +437,25 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
             }
             if(eventFunc != nullptr)
             {
-                int r = context->Prepare(eventFunc);
-                CHECK_AS_RETURN("Prepare script class event method", r, );
-                r = context->SetObject(scriptClass);
-                CHECK_AS_RETURN("Set script class event method object", r, );
+                std::vector<std::pair<void*, int>> args = handlerArgs;
 #ifdef SERVER_MODULE
                 if(!local)
                 {
-                    r = context->SetArgObject(0, player.Get());
-                    CHECK_AS_RETURN("Set script class event method player object", r, );
+                    args.insert(args.begin(), { player.Get(), -1 });
                 }
 #endif
                 if(isGeneric)
                 {
-#ifdef SERVER_MODULE
-                    auto offset = local ? 0 : 1;
-#endif
-#ifdef CLIENT_MODULE
-                    auto offset = 0;
-#endif
-                    r = context->SetArgObject(offset, (void*)name.c_str());
-                    CHECK_AS_RETURN("Set generic script class event method event name", r, );
+                    args.insert(args.begin(), { (void*)name.c_str(), -1 });
                 }
-                for(int i = 0; i < handlerArgs.size(); i++)
-                {
-                    int argOffset = i;
-#ifdef SERVER_MODULE
-                    if(!local) argOffset += 1;
-#endif
-                    if(isGeneric) argOffset += 1;
-
-                    auto [typeId, ptr] = handlerArgs[i];
-                    int ret;
-                    if(Helpers::IsTypePrimitive(typeId)) ret = context->SetArgAddress(argOffset, ptr);
-                    else
-                        ret = context->SetArgObject(argOffset, ptr);
-                    CHECK_AS_RETURN("Set custom event handler arg", ret, );
-                }
-                r = context->Execute();
-                CHECK_FUNCTION_RETURN(r, );
-                context->Unprepare();
+                CallFunction(context, eventFunc, handlerArgs, scriptClass);
             }
         }
     }
 
-    for(auto [typeId, ptr] : handlerArgs)
+    for(auto [ptr, typeId] : handlerArgs)
     {
-        if(typeId != runtime->GetBaseObjectTypeId()) delete ptr;
+        if(typeId != -1 && typeId != runtime->GetBaseObjectTypeId()) delete ptr;
     }
 }
 
@@ -510,7 +500,20 @@ void AngelScriptResource::DeleteObjectData(alt::IBaseObject* object, const std::
     objectData.at(object).erase(key);
 }
 
-void AngelScriptResource::ShowDebugInfo()
+bool AngelScriptResource::Eval(const std::string& code)
+{
+    std::stringstream evalCode;
+    evalCode << "void exec() {" << code << " }";
+
+    asIScriptFunction* func = nullptr;
+    int                r    = module->CompileFunction("eval", evalCode.str().c_str(), 0, 0, &func);
+    CHECK_AS_RETURN("Compile eval code", r, false);
+
+    evalFunctions.push_back(func);
+    return true;
+}
+
+void AngelScriptResource::ShowDebugInfo() const
 {
     Log::Colored << "*************** ~y~" << resource->GetName() << " ~w~***************" << Log::Endl;
     Log::Colored << "Script classes: ~g~" << scriptClasses.size() << Log::Endl;
@@ -532,6 +535,13 @@ void AngelScriptResource::ShowDebugInfo()
 
 void AngelScriptResource::OnTick()
 {
+    // Execute eval functions
+    for(auto func : evalFunctions)
+    {
+        CallFunction(context, func);
+    }
+    evalFunctions.clear();
+
     // Remove all invalid timers
     for(auto& id : invalidTimers) timers.erase(id);
     invalidTimers.clear();
@@ -547,7 +557,7 @@ void AngelScriptResource::OnTick()
 void AngelScriptResource::OnCreateBaseObject(alt::Ref<alt::IBaseObject> object)
 {
     objects.insert({ object->GetType(), object });
-    objectData.insert({ object, std::map<std::string, std::pair<int, void*>>() });
+    objectData.insert({ object, std::unordered_map<std::string, std::pair<int, void*>>() });
 }
 
 void AngelScriptResource::OnRemoveBaseObject(alt::Ref<alt::IBaseObject> object)
@@ -602,11 +612,10 @@ bool AngelScriptResource::RegisterMetadata(CScriptBuilder& builder, asIScriptCon
                 Log::Error << "Script class '" << type->GetName() << "' has no factory" << Log::Endl;
                 continue;
             }
-            context->Prepare(factory);
-            int r = context->Execute();
-            CHECK_FUNCTION_RETURN(r, false);
-            asIScriptObject* obj = *(asIScriptObject**)context->GetAddressOfReturnValue();
-            obj->AddRef();
+
+            void* result = CallFunction(context, factory);
+            if(!result) continue;
+            asIScriptObject* obj = (asIScriptObject*)result;
             // Store our script class instance
             scriptClasses.push_back(obj);
             context->Unprepare();
@@ -618,12 +627,14 @@ bool AngelScriptResource::RegisterMetadata(CScriptBuilder& builder, asIScriptCon
                 // Get metadata for the method
                 std::vector<std::string> methodMetas = builder.GetMetadataForTypeMethod(type->GetTypeId(), method);
 
+                // todo: store this data on the resource instead of on the class method
                 for(auto methodMeta : methodMetas)
                 {
                     // Get the event associated with the metadata
                     Event* event = Event::GetByMetadata(methodMeta);
                     if(event != nullptr)
                     {
+                        if(!Helpers::CheckEventFunctionParams(method)) continue;
                         // Store the event on the method
                         method->SetUserData(event);
                         continue;
@@ -634,6 +645,7 @@ bool AngelScriptResource::RegisterMetadata(CScriptBuilder& builder, asIScriptCon
                     auto result = std::regex_search(methodMeta.cbegin(), methodMeta.cend(), results, customEventRemoteRegex);
                     if(result)
                     {
+                        if(!Helpers::CheckEventFunctionParams(method)) continue;
                         auto eventName = results[1].str();
                         // Store the custom event name on the method
                         method->SetUserData(new std::string(eventName), 2);
@@ -643,6 +655,7 @@ bool AngelScriptResource::RegisterMetadata(CScriptBuilder& builder, asIScriptCon
                     result = std::regex_search(methodMeta.cbegin(), methodMeta.cend(), results, customEventLocalRegex);
                     if(result)
                     {
+                        if(!Helpers::CheckEventFunctionParams(method)) continue;
                         auto eventName = results[1].str();
                         // Store the custom event name on the method
                         method->SetUserData(new std::string(eventName), 1);
@@ -722,14 +735,31 @@ void AngelScriptResource::RegisterImports()
         // The resource is not a angelscript resource
         else
         {
-            Log::Warning << "Importing a function from a non-AngelScript resource is currently not possible" << Log::Endl;
             // todo: add import of functions from non angelscript resources
             /*
+            auto funcInfo = Helpers::GetFunctionInfoFromDecl(decl);
+            AS_ASSERT(funcInfo.valid, "Invalid function declaration specified", );
+
             for(auto it = exports->Begin(); it; it = exports->Next())
             {
                 auto name = it->GetKey();
-                auto func = it->GetValue().As<alt::MValueFunctionConst>();
-            }*/
+                if(name != functionName) continue;
+                auto val = it->GetValue();
+                if(val->GetType() != alt::IMValue::Type::FUNCTION) continue;
+
+                auto               func = val.As<alt::MValueFunctionConst>();
+                std::stringstream  code;
+                asIScriptFunction* outFunc;
+
+                code << decl << " {";
+                code << "}";
+
+                int r = module->CompileFunction(source, code.str().c_str(), 0, 0, &outFunc);
+                CHECK_AS_RETURN("Import function compilation", r, );
+                importedFunctions.push_back(outFunc);
+                module->BindImportedFunction(i, outFunc);
+            }
+            */
         }
     }
 }

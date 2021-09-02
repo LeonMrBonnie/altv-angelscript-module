@@ -1,7 +1,7 @@
 #pragma once
 #include "nlohmann/json.hpp"
 #include "helpers/angelscript.h"
-#include "angelscript/addon/scriptdictionary/scriptdictionary.h"
+#include "angelscript/add_on/scriptdictionary/scriptdictionary.h"
 
 namespace JSON
 {

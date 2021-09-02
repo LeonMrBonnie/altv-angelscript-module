@@ -1,8 +1,8 @@
 #include "Log.h"
 #include "../helpers/module.h"
 #include "../runtime.h"
-#include "angelscript/addon/scriptdictionary/scriptdictionary.h"
-#include "angelscript/addon/scriptany/scriptany.h"
+#include "angelscript/add_on/scriptdictionary/scriptdictionary.h"
+#include "angelscript/add_on/scriptany/scriptany.h"
 #include "../helpers/convert.h"
 #include "../helpers/angelscript.h"
 #include "../helpers/benchmark.h"
@@ -334,6 +334,73 @@ static bool GetSyncedMeta(const std::string& key, void* ref, int typeId)
 }
 
 #ifdef SERVER_MODULE
+static void EmitToAllClients(asIScriptGeneric* gen)
+{
+    #ifdef DEBUG_MODE
+    Helpers::Benchmark benchmark("EmitToAllClients");
+    #endif
+
+    GET_RESOURCE();
+    void*           ref    = gen->GetArgAddress(0);
+    int             typeId = 0;
+    std::string     event  = *static_cast<std::string*>(ref);
+    alt::MValueArgs args;
+
+    for(int i = 1; i < gen->GetArgCount(); i++)
+    {
+        ref    = gen->GetArgAddress(i);
+        typeId = gen->GetArgTypeId(i);
+        if(typeId & asTYPEID_OBJHANDLE)
+        {
+            // We're receiving a reference to the handle, so we need to dereference it
+            ref = *(void**)ref;
+            resource->GetRuntime()->GetEngine()->AddRefScriptObject(ref, resource->GetRuntime()->GetEngine()->GetTypeInfoById(typeId));
+        }
+        if(typeId == asTYPEID_VOID) continue;
+        auto mvalue = Helpers::ValueToMValue(typeId, ref);
+        args.Push(mvalue);
+    }
+    alt::ICore::Instance().TriggerClientEventForAll(event, args);
+}
+
+static void EmitToClients(asIScriptGeneric* gen)
+{
+    #ifdef DEBUG_MODE
+    Helpers::Benchmark benchmark("EmitToClients");
+    #endif
+
+    GET_RESOURCE();
+    void*         ref     = gen->GetArgAddress(0);
+    int           typeId  = 0;
+    std::string   event   = *static_cast<std::string*>(ref);
+    CScriptArray* clients = static_cast<CScriptArray*>(gen->GetArgObject(1));
+
+    alt::MValueArgs args;
+    for(int i = 1; i < gen->GetArgCount(); i++)
+    {
+        ref    = gen->GetArgAddress(i);
+        typeId = gen->GetArgTypeId(i);
+        if(typeId & asTYPEID_OBJHANDLE)
+        {
+            // We're receiving a reference to the handle, so we need to dereference it
+            ref = *(void**)ref;
+            resource->GetRuntime()->GetEngine()->AddRefScriptObject(ref, resource->GetRuntime()->GetEngine()->GetTypeInfoById(typeId));
+        }
+        if(typeId == asTYPEID_VOID) continue;
+        auto mvalue = Helpers::ValueToMValue(typeId, ref);
+        args.Push(mvalue);
+    }
+
+    alt::Array<alt::Ref<alt::IPlayer>> arr;
+    for(asUINT i = 0; i < clients->GetSize(); i++)
+    {
+        auto client = *(alt::IPlayer**)clients->At(i);
+        arr.Push(client);
+    }
+
+    alt::ICore::Instance().TriggerClientEvent(arr, event, args);
+}
+
 static void SetSyncedMeta(const std::string& key, void* ref, int typeId)
 {
     auto mvalue = Helpers::ValueToMValue(typeId, ref);
@@ -501,12 +568,7 @@ static void TakeScreenshotCallback(asIScriptFunction* callback)
           auto context  = pair->first->GetContext();
           auto callback = pair->second;
 
-          context->Prepare(callback);
-          context->SetArgObject(0, (void*)image.CStr());
-          context->Execute();
-          context->Unprepare();
-
-          callback->Release();
+          CallFunction(context, callback, { { (void*)image.CStr(), -1 } });
           delete pair;
       },
       pair);
@@ -541,12 +603,7 @@ static void TakeScreenshotGameOnlyCallback(asIScriptFunction* callback)
           auto context  = pair->first->GetContext();
           auto callback = pair->second;
 
-          context->Prepare(callback);
-          context->SetArgObject(0, (void*)image.CStr());
-          context->Execute();
-          context->Unprepare();
-
-          callback->Release();
+          CallFunction(context, callback, { { (void*)image.CStr(), -1 } });
           delete pair;
       },
       pair);
@@ -758,11 +815,7 @@ static int32_t GetMsPerGameMinute()
 
 static void SetWeatherCycle(CScriptArray* weathers, CScriptArray* multipliers)
 {
-    if(weathers->GetElementTypeId() != asTYPEID_UINT8 || multipliers->GetElementTypeId() != asTYPEID_UINT8)
-    {
-        THROW_ERROR("SetWeatherCycle: Expected two uint8 arrays");
-        return;
-    }
+    AS_ASSERT(weathers->GetElementTypeId() == asTYPEID_UINT8 && multipliers->GetElementTypeId() == asTYPEID_UINT8, "Expected two uint8 arrays", );
 
     alt::Array<uint8_t> weatherArr, multiplierArr;
     for(asUINT i = 0; i < weathers->GetSize(); i++)
@@ -795,6 +848,32 @@ static alt::PermissionState GetPermissionState(alt::Permission permission)
 static bool IsGameFocused()
 {
     return alt::ICore::Instance().IsGameFocused();
+}
+
+static void SetAngularVelocity(uint32_t scriptId, Data::Vector3& velocity)
+{
+    alt::ICore::Instance().SetAngularVelocity(scriptId, { velocity.x, velocity.y, velocity.z, 0 });
+}
+
+static void LoadModel(uint32_t hash, bool async = false)
+{
+    if(async) alt::ICore::Instance().LoadModelAsync(hash);
+    else
+        alt::ICore::Instance().LoadModel(hash);
+}
+
+static bool LoadYtyp(const std::string& path)
+{
+    return alt::ICore::Instance().LoadYtyp(path);
+}
+static bool UnloadYtyp(const std::string& path)
+{
+    return alt::ICore::Instance().UnloadYtyp(path);
+}
+
+static std::string GetHeadshotBase64(uint8_t id)
+{
+    return alt::ICore::Instance().HeadshotToBase64(id).ToString();
 }
 #endif
 
@@ -858,6 +937,15 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
       "void OnClient(const string&in event, const string&in handlerName)", OnClient, "Registers an event handler for a remote custom event");
 #endif
     REGISTER_VARIADIC_FUNC("void", "Emit", "const string&in event", 32, Emit, "Emits a local event (Max 32 args)");
+#ifdef SERVER_MODULE
+    REGISTER_VARIADIC_FUNC("void", "EmitToAllClients", "const string&in event", 32, EmitToAllClients, "Emits a event to all clients (Max 32 args)");
+    REGISTER_VARIADIC_FUNC("void",
+                           "EmitToClients",
+                           "const string&in event, array<Player@>@ clients",
+                           32,
+                           EmitToClients,
+                           "Emits a event to all specified clients (Max 32 args)");
+#endif
 
     // Metadata
     REGISTER_GLOBAL_FUNC("bool HasMeta(const string&in key)", HasMeta, "Returns whether the specified meta key exists");
@@ -876,10 +964,6 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
 #endif
 
 #ifdef CLIENT_MODULE
-    REGISTER_ENUM("KeyState", "Keypress state used for keypress event");
-    REGISTER_ENUM_VALUE("KeyState", "UP", alt::CKeyboardEvent::KeyState::UP);
-    REGISTER_ENUM_VALUE("KeyState", "DOWN", alt::CKeyboardEvent::KeyState::DOWN);
-
     REGISTER_GLOBAL_FUNC("DiscordData GetDiscordData()", GetDiscordData, "Gets the current discord state");
 
     REGISTER_GLOBAL_FUNC("void SetStat(const string&in stat, ?&in value)", SetStat, "Sets the specified stat to the specified value");
@@ -960,18 +1044,18 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
 
     REGISTER_GLOBAL_FUNC("void SetCamFrozen(bool state)", SetCamFrozen, "Toggles whether the cam is frozen");
 
-    REGISTER_ENUM("Permission", "A alt:V permission");
-    REGISTER_ENUM_VALUE("Permission", "None", alt::Permission::None);
-    REGISTER_ENUM_VALUE("Permission", "ScreenCapture", alt::Permission::ScreenCapture);
-    REGISTER_ENUM_VALUE("Permission", "WebRTC", alt::Permission::WebRTC);
-    REGISTER_ENUM_VALUE("Permission", "All", alt::Permission::All);
-    REGISTER_ENUM("PermissionState", "A alt:V permission state");
-    REGISTER_ENUM_VALUE("PermissionState", "Allowed", alt::PermissionState::Allowed);
-    REGISTER_ENUM_VALUE("PermissionState", "Denied", alt::PermissionState::Denied);
-    REGISTER_ENUM_VALUE("PermissionState", "Unspecified", alt::PermissionState::Unspecified);
-    REGISTER_ENUM_VALUE("PermissionState", "Failed", alt::PermissionState::Failed);
     REGISTER_GLOBAL_FUNC("PermissionState GetPermissionState(Permission permission)", GetPermissionState, "Gets the state of the given permission");
 
     REGISTER_GLOBAL_PROPERTY_READ_ONLY("bool", "isGameFocused", IsGameFocused);
+
+    REGISTER_GLOBAL_FUNC(
+      "void SetAngularVelocity(ScriptID entity, const Vector3&in velocity)", SetAngularVelocity, "Sets the angular velocity of the specified entity");
+
+    REGISTER_GLOBAL_FUNC("void LoadModel(Hash hash, bool async = false)", LoadModel, "Loads the given model into memory");
+
+    REGISTER_GLOBAL_FUNC("bool LoadYtyp(const string&in path)", LoadYtyp, "Loads the YTYP at the given path into memory");
+    REGISTER_GLOBAL_FUNC("bool UnloadYtyp(const string&in path)", UnloadYtyp, "Unloads the YTYP at the given path out of memory");
+
+    REGISTER_GLOBAL_FUNC("string GetHeadshotBase64(uint8 id)", GetHeadshotBase64, "Gets the base64 encoded image of the given headshot");
 #endif
 });

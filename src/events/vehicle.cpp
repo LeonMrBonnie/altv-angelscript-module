@@ -1,5 +1,5 @@
 #include "helpers/events.h"
-#include "angelscript/addon/scriptarray/scriptarray.h"
+#include "angelscript/add_on/scriptarray/scriptarray.h"
 #include "cpp-sdk/events/CVehicleAttachEvent.h"
 #include "cpp-sdk/events/CVehicleDetachEvent.h"
 #include "cpp-sdk/events/CNetOwnerChangeEvent.h"
@@ -52,6 +52,68 @@ REGISTER_EVENT_HANDLER(alt::CEvent::Type::NETOWNER_CHANGE,
                            context->SetArgObject(0, ev->GetTarget().Get());
                            context->SetArgObject(1, ev->GetOldOwner().Get());
                            context->SetArgObject(2, ev->GetNewOwner().Get());
+                           return context->Execute();
+                       });
+
+REGISTER_EVENT_HANDLER(
+  alt::CEvent::Type::VEHICLE_DAMAGE,
+  VehicleDamage,
+  "void",
+  "Vehicle@ vehicle, Entity@ attacker, uint&in bodyHealthDamage, uint&in additionalBodyHealthDamage, uint&in engineHealthDamage, uint&in petrolTankHealthDamage, uint&in weapon",
+  [](AngelScriptResource* resource, const alt::CEvent* event, asIScriptContext* context) {
+      auto ev = static_cast<const alt::CVehicleDamageEvent*>(event);
+
+      context->SetArgObject(0, ev->GetTarget().Get());
+      context->SetArgObject(1, ev->GetDamager().Get());
+      auto bodyHealthDamage = ev->GetBodyHealthDamage();
+      context->SetArgAddress(2, &bodyHealthDamage);
+      auto additionalBodyHealthDamage = ev->GetBodyAdditionalHealthDamage();
+      context->SetArgAddress(3, &additionalBodyHealthDamage);
+      auto engineDamage = ev->GetEngineHealthDamage();
+      context->SetArgAddress(4, &engineDamage);
+      auto petrolDamage = ev->GetPetrolTankHealthDamage();
+      context->SetArgAddress(5, &petrolDamage);
+      auto weapon = ev->GetDamagedWith();
+      context->SetArgAddress(6, &weapon);
+      return context->Execute();
+  });
+#endif
+
+#ifdef CLIENT_MODULE
+REGISTER_EVENT_HANDLER(alt::CEvent::Type::PLAYER_ENTER_VEHICLE,
+                       VehicleEnter,
+                       "void",
+                       "Vehicle@ vehicle",
+                       [](AngelScriptResource* resource, const alt::CEvent* event, asIScriptContext* context) {
+                           auto ev = static_cast<const alt::CPlayerEnterVehicleEvent*>(event);
+
+                           context->SetArgObject(0, ev->GetTarget().Get());
+                           return context->Execute();
+                       });
+
+REGISTER_EVENT_HANDLER(alt::CEvent::Type::PLAYER_LEAVE_VEHICLE,
+                       VehicleLeave,
+                       "void",
+                       "Vehicle@ vehicle",
+                       [](AngelScriptResource* resource, const alt::CEvent* event, asIScriptContext* context) {
+                           auto ev = static_cast<const alt::CPlayerLeaveVehicleEvent*>(event);
+
+                           context->SetArgObject(0, ev->GetTarget().Get());
+                           return context->Execute();
+                       });
+
+REGISTER_EVENT_HANDLER(alt::CEvent::Type::PLAYER_CHANGE_VEHICLE_SEAT,
+                       VehicleSeatChange,
+                       "void",
+                       "Vehicle@ vehicle, uint8&in newSeat, uint8&in oldSeat",
+                       [](AngelScriptResource* resource, const alt::CEvent* event, asIScriptContext* context) {
+                           auto ev = static_cast<const alt::CPlayerChangeVehicleSeatEvent*>(event);
+
+                           context->SetArgObject(0, ev->GetTarget().Get());
+                           auto seat = ev->GetNewSeat();
+                           context->SetArgAddress(1, &seat);
+                           auto oldSeat = ev->GetOldSeat();
+                           context->SetArgAddress(2, &oldSeat);
                            return context->Execute();
                        });
 #endif

@@ -85,6 +85,12 @@ static void SetStreamSyncedMeta(T* obj, const std::string& key, void* ref, int t
 }
 #endif
 
+template<class T>
+static bool ObjEquals(T* obj, T* otherObj)
+{
+    return obj->GetID() == otherObj->GetID();
+}
+
 namespace Helpers
 {
     template<class T>
@@ -102,6 +108,12 @@ namespace Helpers
         REGISTER_PROPERTY_WRAPPER_GET(type, "bool", "visible", (GenericWrapper<T, alt::IEntity, &alt::IEntity::GetVisible, bool>));
 #ifdef SERVER_MODULE
         REGISTER_PROPERTY_WRAPPER_SET(type, "bool", "visible", (GenericWrapper<T, alt::IEntity, &alt::IEntity::SetVisible, void, bool>));
+
+        REGISTER_PROPERTY_WRAPPER_GET(type, "bool", "streamed", (GenericWrapper<T, alt::IEntity, &alt::IEntity::GetStreamed, bool>));
+        REGISTER_PROPERTY_WRAPPER_SET(type, "bool", "streamed", (GenericWrapper<T, alt::IEntity, &alt::IEntity::SetStreamed, void, bool>));
+#endif
+#ifdef CLIENT_MODULE
+        REGISTER_PROPERTY_WRAPPER_GET(type, "ScriptID", "scriptID", (GenericWrapper<T, alt::IEntity, &alt::IEntity::GetScriptGuid, int32_t>));
 #endif
 
         REGISTER_METHOD_WRAPPER(type, "Player@+ GetNetOwner() const", GetNetOwner<T>);
@@ -109,9 +121,10 @@ namespace Helpers
         REGISTER_METHOD_WRAPPER(type, "void SetNetOwner(Player@ player, bool disableMigration = false)", SetNetOwner<T>);
 #endif
 
-        REGISTER_METHOD_WRAPPER(
-          type, "bool HasSyncedMeta(const string&in key)", (GenericWrapper<T, alt::IEntity, &alt::IEntity::HasSyncedMetaData, bool, std::string&>));
-        REGISTER_METHOD_WRAPPER(type, "bool GetSyncedMeta(const string&in key, ?&out outValue)", GetSyncedMeta<T>);
+        REGISTER_METHOD_WRAPPER(type,
+                                "bool HasSyncedMeta(const string&in key) const",
+                                (GenericWrapper<T, alt::IEntity, &alt::IEntity::HasSyncedMetaData, bool, std::string&>));
+        REGISTER_METHOD_WRAPPER(type, "bool GetSyncedMeta(const string&in key, ?&out outValue) const", GetSyncedMeta<T>);
 #ifdef SERVER_MODULE
         REGISTER_METHOD_WRAPPER(type, "void SetSyncedMeta(const string&in key, ?&in value)", SetSyncedMeta<T>);
         REGISTER_METHOD_WRAPPER(type,
@@ -120,14 +133,16 @@ namespace Helpers
 #endif
 
         REGISTER_METHOD_WRAPPER(type,
-                                "bool HasStreamSyncedMeta(const string&in key)",
+                                "bool HasStreamSyncedMeta(const string&in key) const",
                                 (GenericWrapper<T, alt::IEntity, &alt::IEntity::HasStreamSyncedMetaData, bool, std::string&>));
-        REGISTER_METHOD_WRAPPER(type, "bool GetStreamSyncedMeta(const string&in key, ?&out outValue)", GetStreamSyncedMeta<T>);
+        REGISTER_METHOD_WRAPPER(type, "bool GetStreamSyncedMeta(const string&in key, ?&out outValue) const", GetStreamSyncedMeta<T>);
 #ifdef SERVER_MODULE
         REGISTER_METHOD_WRAPPER(type, "void SetStreamSyncedMeta(const string&in key, ?&in value)", SetStreamSyncedMeta<T>);
         REGISTER_METHOD_WRAPPER(type,
                                 "void DeleteStreamSyncedMeta(const string&in key)",
                                 (GenericWrapper<T, alt::IEntity, &alt::IEntity::DeleteStreamSyncedMetaData, void, std::string&>));
 #endif
+
+        REGISTER_METHOD_WRAPPER(type, "bool opEquals(Entity@ entity) const", ObjEquals<T>);
     }
 }  // namespace Helpers

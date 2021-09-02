@@ -77,7 +77,10 @@
         "numeric": "cpp",
         "stack": "cpp",
         "stop_token": "cpp",
-        "valarray": "cpp"
+        "valarray": "cpp",
+        "charconv": "cpp",
+        "format": "cpp",
+        "optional": "cpp"
     },
     "editor.formatOnSave": true,
 }

@@ -1,6 +1,7 @@
 #include "helpers/events.h"
-#include "angelscript/addon/scriptarray/scriptarray.h"
+#include "angelscript/add_on/scriptarray/scriptarray.h"
 #include "../runtime.h"
+#include "../bindings/data/keyState.h"
 
 using namespace Helpers;
 
@@ -17,6 +18,17 @@ REGISTER_EVENT_HANDLER(alt::CEvent::Type::RESOURCE_START,
 
 REGISTER_EVENT_HANDLER(alt::CEvent::Type::RESOURCE_STOP,
                        ResourceStop,
+                       "void",
+                       "const string&in resource",
+                       [](AngelScriptResource* resource, const alt::CEvent* event, asIScriptContext* context) {
+                           auto ev = static_cast<const alt::CResourceStopEvent*>(event);
+
+                           context->SetArgObject(0, (void*)ev->GetResource()->GetName().CStr());
+                           return context->Execute();
+                       });
+
+REGISTER_EVENT_HANDLER(alt::CEvent::Type::RESOURCE_ERROR,
+                       ResourceError,
                        "void",
                        "const string&in resource",
                        [](AngelScriptResource* resource, const alt::CEvent* event, asIScriptContext* context) {
@@ -77,13 +89,14 @@ REGISTER_EVENT_HANDLER(alt::CEvent::Type::DISCONNECT_EVENT,
 REGISTER_EVENT_HANDLER(alt::CEvent::Type::KEYBOARD_EVENT,
                        KeyPress,
                        "void",
-                       "uint&in key, KeyState&in state",
+                       "uint&in key, KeyState state",
                        [](AngelScriptResource* resource, const alt::CEvent* event, asIScriptContext* context) {
                            auto ev  = static_cast<const alt::CKeyboardEvent*>(event);
                            auto key = ev->GetKeyCode();
                            context->SetArgAddress(0, &key);
-                           auto state = ev->GetKeyState();
-                           context->SetArgAddress(1, &state);
+                           auto           state = ev->GetKeyState();
+                           Data::KeyState keyState({ ev->GetKeyState() == alt::CKeyboardEvent::KeyState::DOWN, false });
+                           context->SetArgObject(1, &keyState);
                            return context->Execute();
                        });
 
@@ -92,4 +105,17 @@ REGISTER_EVENT_HANDLER(alt::CEvent::Type::RENDER,
                        "void",
                        "",
                        [](AngelScriptResource* resource, const alt::CEvent* event, asIScriptContext* context) { return context->Execute(); });
+
+REGISTER_EVENT_HANDLER(alt::CEvent::Type::TASK_CHANGE,
+                       TaskChange,
+                       "void",
+                       "uint&in oldTask, uint&in newTask",
+                       [](AngelScriptResource* resource, const alt::CEvent* event, asIScriptContext* context) {
+                           auto ev      = static_cast<const alt::CTaskChangeEvent*>(event);
+                           auto oldTask = ev->GetOldTask();
+                           context->SetArgAddress(0, &oldTask);
+                           auto newTask = ev->GetNewTask();
+                           context->SetArgAddress(1, &newTask);
+                           return context->Execute();
+                       })
 #endif

@@ -26,21 +26,26 @@ endif()
 if(UNIX)
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/build/linux64/${COMPILE_FOLDER})
 	set(JIT_COMPILER_FILE ${PROJECT_SOURCE_DIR}/deps/angelscript-jit-compiler/virtual_asm_linux.cpp)
-	set(ANGELSCRIPT_LIB ${PROJECT_SOURCE_DIR}/deps/angelscript/lib/libangelscript.a)
+	set(ANGELSCRIPT_LIB libangelscript.a)
 else()
 	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/build/win64/${COMPILE_FOLDER})
-	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MD /Zi")
-	set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /DEBUG /OPT:REF /OPT:ICF")
 	set(JIT_COMPILER_FILE ${PROJECT_SOURCE_DIR}/deps/angelscript-jit-compiler/virtual_asm_windows.cpp)
-	set(ANGELSCRIPT_LIB ${PROJECT_SOURCE_DIR}/deps/angelscript/lib/angelscript.lib)
+	set(ANGELSCRIPT_LIB angelscript.lib)
 	set(CRYPTOPP_LIB ${PROJECT_SOURCE_DIR}/deps/cryptopp/cryptlib.lib)
 endif()
+set(ANGELSCRIPT_LIB_PATH ${PROJECT_SOURCE_DIR}/deps/angelscript/lib/${ANGELSCRIPT_LIB})
+
+# Download dependencies
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+include(DownloadDeps)
+download_deps()
 
 file(GLOB_RECURSE PROJECT_SOURCE_FILES "./src/*.h" "./src/*.cpp")
 
 include_directories(
 	"${PROJECT_SOURCE_DIR}/src"
 	"${PROJECT_SOURCE_DIR}/deps"
+    "${PROJECT_SOURCE_DIR}/deps/angelscript"
 )
 
 add_library(${PROJECT_MODULE_NAME} SHARED
@@ -51,13 +56,18 @@ add_library(${PROJECT_MODULE_NAME} SHARED
 	${JIT_COMPILER_FILE}
 )
 
+if(WIN32)
+    set_target_properties(${PROJECT_MODULE_NAME} PROPERTIES 
+        COMPILE_FLAGS 
+            "/W1 /nologo /EHsc /DEBUG"
+        COMPILE_FLAGS_DEBUG
+            "/MDd /Od /Ob0 /Zi"
+        COMPILE_FLAGS_RELEASE
+            "/MD /O2 /Ob2"
+    )
+endif()
+
 target_link_libraries(${PROJECT_MODULE_NAME} PRIVATE
-  ${ANGELSCRIPT_LIB}
+  ${ANGELSCRIPT_LIB_PATH}
   ${CRYPTOPP_LIB}
 )
-
-if(TARGET clangformat)
-    list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
-    include(ClangFormat)
-    target_clangformat_setup(${PROJECT_MODULE_NAME})
-endif()

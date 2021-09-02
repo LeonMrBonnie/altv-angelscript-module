@@ -27,16 +27,6 @@
         }
       },
       {
-        "label": "Format",
-        "type": "shell",
-        "command": "cd tools && ./format.sh",
-        "windows": {
-          "command": "cd tools && format.bat"
-        },
-        "problemMatcher": ["$msCompile"],
-        "group": "build"
-      },
-      {
         "label": "Update C++ SDK",
         "type": "shell",
         "command": "cd tools && ./update-sdk.sh",

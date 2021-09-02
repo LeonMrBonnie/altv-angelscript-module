@@ -1,7 +1,7 @@
 @echo off
 
-pushd ..
+cd ..
 
-pushd deps/cpp-sdk
-git pull upstream dev
-pushd ../..
+cd deps/cpp-sdk
+git pull origin master
+cd ../..

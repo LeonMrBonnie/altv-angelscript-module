@@ -1,4 +1,4 @@
-// Generated on Sun Jun  6 16:33:41 2021
+// Generated on Fri Jul 16 02:48:41 2021
 
 namespace altServer
 {
@@ -103,13 +103,13 @@ namespace altServer
     array<Entity@>@ GetAllEntities();
 
     // Gets the player with the specified ID
-    Player@+ GetPlayerByID(uint16 id);
+    Player@ GetPlayerByID(uint16 id);
 
     // Gets the vehicle with the specified ID
-    Vehicle@+ GetVehicleByID(uint16 id);
+    Vehicle@ GetVehicleByID(uint16 id);
 
     // Gets the entity with the specified ID
-    Entity@+ GetEntityByID(uint16 id);
+    Entity@ GetEntityByID(uint16 id);
 
     // Returns whether the specified resource exists and is started
     bool HasResource(const string&in name);
@@ -180,6 +180,9 @@ namespace altServer
     // Emits a local event (Max 32 args)
     void Emit(const string&in event, ...);
 
+    // Emits a event to all clients (Max 32 args)
+    void EmitToAllClients(const string&in event, ...);
+
     // Returns whether the specified meta key exists
     bool HasMeta(const string&in key);
 
@@ -226,7 +229,6 @@ namespace altServer
 
         Vector2(float x, float y);
         Vector2(int x, int y);
-        float Length();
         Vector2 Add(Vector2 vector);
         Vector2 Add(float x, float y);
         Vector2 Add(float value);
@@ -237,6 +239,9 @@ namespace altServer
         Vector2 Mult(float x, float y);
         Vector2 Mult(float value);
         float Distance(Vector2 vector);
+        float Length();
+        Vector2 ToRadians();
+        Vector2 ToDegrees();
         string opImplConv() const;
     };
 
@@ -249,7 +254,6 @@ namespace altServer
 
         Vector3(float x, float y, float z);
         Vector3(int x, int y, int z);
-        float Length();
         Vector3 Add(Vector3 vector);
         Vector3 Add(float x, float y, float z);
         Vector3 Add(float value);
@@ -260,6 +264,9 @@ namespace altServer
         Vector3 Mult(float x, float y, float z);
         Vector3 Mult(float value);
         float Distance(Vector3 vector);
+        float Length();
+        Vector3 ToRadians();
+        Vector3 ToDegrees();
         string opImplConv() const;
     };
 
@@ -356,7 +363,7 @@ namespace altServer
         void SetData(const string&in key, ?&in value);
         void DeleteData(const string&in key);
         void Destroy();
-        Player@+ GetNetOwner() const;
+        Player@ GetNetOwner() const;
         void SetNetOwner(Player@ player, bool disableMigration = false);
         bool HasSyncedMeta(const string&in key);
         bool GetSyncedMeta(const string&in key, ?&out outValue);
@@ -421,7 +428,7 @@ namespace altServer
         void SetData(const string&in key, ?&in value);
         void DeleteData(const string&in key);
         void Destroy();
-        Player@+ GetNetOwner() const;
+        Player@ GetNetOwner() const;
         void SetNetOwner(Player@ player, bool disableMigration = false);
         bool HasSyncedMeta(const string&in key);
         bool GetSyncedMeta(const string&in key, ?&out outValue);
@@ -431,7 +438,6 @@ namespace altServer
         bool GetStreamSyncedMeta(const string&in key, ?&out outValue);
         void SetStreamSyncedMeta(const string&in key, ?&in value);
         void DeleteStreamSyncedMeta(const string&in key);
-        string opImplConv() const;
         void Spawn(float x, float y, float z, uint delay = 0);
         void Spawn(int x, int y, int z, uint delay = 0);
         void Spawn(Vector3 pos, uint delay = 0);
@@ -458,6 +464,7 @@ namespace altServer
         DlcProp GetDlcProps(uint8 component);
         void SetProps(uint8 component, uint16 drawable, uint8 texture, uint8 palette = 2);
         void SetDlcProps(uint8 component, uint16 drawable, uint8 texture, uint8 palette, uint dlc);
+        string opImplConv() const;
     };
 
     // alt:V Vehicle Entity
@@ -471,7 +478,7 @@ namespace altServer
         Hash model;
         Vector3 rot;
         bool visible;
-        Player@+ driver;
+        Player@ driver;
         bool destroyed;
         uint8 modKitsCount;
         uint8 modKit;
@@ -519,11 +526,10 @@ namespace altServer
         uint additionalBodyHealth;
         bool armoredWindows;
         bool manualEngineControl;
-        Vehicle@+ attached;
-        Vehicle@+ attachedTo;
+        Vehicle@ attached;
+        Vehicle@ attachedTo;
 
-        Vehicle(Hash model, Vector3 pos, Vector3 rot);
-        Vehicle(const string&in model, Vector3 pos, Vector3 rot);
+        Vehicle(Hash model, Vector3&in pos, Vector3&in rot);
         bool HasMeta(const string&in key);
         bool GetMeta(const string&in key, ?&out outValue);
         void SetMeta(const string&in key, ?&in value);
@@ -533,7 +539,7 @@ namespace altServer
         void SetData(const string&in key, ?&in value);
         void DeleteData(const string&in key);
         void Destroy();
-        Player@+ GetNetOwner() const;
+        Player@ GetNetOwner() const;
         void SetNetOwner(Player@ player, bool disableMigration = false);
         bool HasSyncedMeta(const string&in key);
         bool GetSyncedMeta(const string&in key, ?&out outValue);
@@ -794,9 +800,9 @@ namespace altServer
         int dimension;
         uint16 blipType;
         bool global;
-        Player@+ target;
+        Player@ target;
         bool attached;
-        Entity@+ attachedTo;
+        Entity@ attachedTo;
 
         Blip(Player@ target, uint16 type, Vector3 pos);
         Blip(Player@ target, uint16 type, Entity@ attachTo);

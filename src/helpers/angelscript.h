@@ -1,14 +1,18 @@
 #pragma once
 
+#include <regex>
+#include <map>
+
 #include "cpp-sdk/SDK.h"
 #include "Log.h"
-#include "angelscript/include/angelscript.h"
 #include "./module.h"
+#include "./libImport.h"
 #include "runtime.h"
 #include "bindings/data/vector3.h"
 #include "bindings/data/vector2.h"
-#include "angelscript/addon/scriptdictionary/scriptdictionary.h"
-#include "angelscript/addon/scriptarray/scriptarray.h"
+#include "angelscript/add_on/scriptdictionary/scriptdictionary.h"
+#include "angelscript/add_on/scriptarray/scriptarray.h"
+#include "angelscript/include/angelscript.h"
 
 #define CHECK_FUNCTION_RETURN(r, ret)                                                           \
     if(r == asEXECUTION_EXCEPTION)                                                              \
@@ -25,6 +29,12 @@
         THROW_ERROR(error);                 \
         return result;                      \
     }
+
+static std::unordered_map<int, std::string> typeNameMap = {
+    { asTYPEID_VOID, "void" },     { asTYPEID_BOOL, "bool" },     { asTYPEID_INT8, "int8" },   { asTYPEID_INT16, "int16" },
+    { asTYPEID_INT32, "int32" },   { asTYPEID_INT64, "int64" },   { asTYPEID_UINT8, "uint8" }, { asTYPEID_UINT16, "uint16" },
+    { asTYPEID_UINT32, "uint32" }, { asTYPEID_UINT64, "uint64" }, { asTYPEID_FLOAT, "float" }, { asTYPEID_DOUBLE, "double" }
+};
 
 namespace Helpers
 {
@@ -50,102 +60,104 @@ namespace Helpers
 
     static std::string GetTypeName(int typeId)
     {
+        if(typeNameMap.count(typeId) != 0) return typeNameMap.at(typeId);
         auto&        runtime  = AngelScriptRuntime::Instance();
         asITypeInfo* typeInfo = runtime.GetEngine()->GetTypeInfoById(typeId);
         if(typeInfo != nullptr) return typeInfo->GetName();
-        else
-            switch(typeId)
-            {
-                case asTYPEID_VOID: return "void";
-                case asTYPEID_BOOL: return "bool";
-                case asTYPEID_INT8: return "int8";
-                case asTYPEID_INT16: return "int16";
-                case asTYPEID_INT32: return "int32";
-                case asTYPEID_INT64: return "int64";
-                case asTYPEID_UINT8: return "uint8";
-                case asTYPEID_UINT16: return "uint16";
-                case asTYPEID_UINT32: return "uint32";
-                case asTYPEID_UINT64: return "uint64";
-                case asTYPEID_FLOAT: return "float";
-                case asTYPEID_DOUBLE: return "double";
-            }
         return "unknown";
     }
-    static std::string GetVarData(asIScriptContext* context, int stackLevel, int varIdx)
+    // Returns -1 if typeId was not found
+    static int GetTypeIdFromName(std::string& name)
     {
-        auto&       runtime     = AngelScriptRuntime::Instance();
-        const char* name        = context->GetVarName(varIdx, stackLevel);
-        void*       val         = context->GetAddressOfVar(varIdx, stackLevel);
-        int         valTypeId   = context->GetVarTypeId(varIdx, stackLevel);
-        std::string valTypeName = GetTypeName(valTypeId);
-        std::string valString;
-        if(val == nullptr) valTypeId = asTYPEID_VOID;
-
-        switch(valTypeId)
+        auto typeInfo = AngelScriptRuntime::Instance().GetEngine()->GetTypeInfoByName(name.c_str());
+        if(typeInfo) return typeInfo->GetTypeId();
+        for(auto pair : typeNameMap)
+        {
+            if(pair.second == name) return pair.first;
+        }
+        return -1;
+    }
+    static uint32_t GetTypeSize(int typeId)
+    {
+        auto engine   = AngelScriptRuntime::Instance().GetEngine();
+        auto typeInfo = engine->GetTypeInfoById(typeId);
+        if(typeInfo) return typeInfo->GetSize();
+        return engine->GetSizeOfPrimitiveType(typeId);
+    }
+    static std::string ValueToString(void* val, int typeId)
+    {
+        if(val == nullptr) typeId = asTYPEID_VOID;
+        AngelScriptRuntime& runtime = AngelScriptRuntime::Instance();
+        std::string         result;
+        switch(typeId)
         {
             // Unknown / Void
             case asTYPEID_VOID:
             {
-                valString = "<void>";
+                result = "<void>";
                 break;
             }
             // Bool
             case asTYPEID_BOOL:
             {
-                valString = std::to_string(*(bool*)val);
+                result = std::to_string(*(bool*)val);
                 break;
             }
             // Int
             case asTYPEID_INT8:
             {
-                valString = std::to_string(*(int8_t*)val);
+                result = std::to_string(*(int8_t*)val);
                 break;
             }
             case asTYPEID_INT16:
             {
-                valString = std::to_string(*(int16_t*)val);
+                result = std::to_string(*(int16_t*)val);
                 break;
             }
             case asTYPEID_INT32:
             {
-                valString = std::to_string(*(int32_t*)val);
+                result = std::to_string(*(int32_t*)val);
                 break;
             }
             case asTYPEID_INT64:
             {
-                valString = std::to_string(*(int64_t*)val);
+                result = std::to_string(*(int64_t*)val);
                 break;
             }
             // Uint
             case asTYPEID_UINT8:
             {
-                valString = std::to_string(*(uint8_t*)val);
+                result = std::to_string(*(uint8_t*)val);
                 break;
             }
             case asTYPEID_UINT16:
             {
-                valString = std::to_string(*(uint16_t*)val);
+                result = std::to_string(*(uint16_t*)val);
                 break;
             }
             case asTYPEID_UINT32:
             {
-                valString = std::to_string(*(uint32_t*)val);
+                result = std::to_string(*(uint32_t*)val);
                 break;
             }
             case asTYPEID_UINT64:
             {
-                valString = std::to_string(*(uint64_t*)val);
+                result = std::to_string(*(uint64_t*)val);
                 break;
             }
             // Float
             case asTYPEID_FLOAT:
             {
-                valString = std::to_string(*(float*)val);
+                std::ostringstream stream;
+                stream << *(float*)val;
+                result = stream.str();
                 break;
             }
             case asTYPEID_DOUBLE:
             {
-                valString = std::to_string(*(double*)val);
+                std::ostringstream stream;
+                stream << *(double*)val;
+                result = stream.str();
                 break;
             }
             // Not primitive
@@ -153,60 +165,71 @@ namespace Helpers
             {
                 // Because these type ids are not constant and can change with every update, we have to check
                 // them in an if chain here, instead of directly in the switch expression
-                if(valTypeId == runtime.GetStringTypeId())
+                if(typeId == runtime.GetStringTypeId())
                 {
-                    valString = *(std::string*)val;
+                    result = *(std::string*)val;
                 }
-                else if(valTypeId == runtime.GetVector3TypeId())
+                else if(typeId == runtime.GetVector3TypeId())
                 {
                     auto              vector = *static_cast<Data::Vector3*>(val);
                     std::stringstream stream;
                     stream << "Vector3{ x: " << vector.x << ", y: " << vector.y << ", z: " << vector.z << " }";
-                    valString = stream.str();
+                    result = stream.str();
                 }
-                else if(valTypeId == runtime.GetVector2TypeId())
+                else if(typeId == runtime.GetVector2TypeId())
                 {
                     auto              vector = *static_cast<Data::Vector2*>(val);
                     std::stringstream stream;
                     stream << "Vector2{ x: " << vector.x << ", y: " << vector.y << " }";
-                    valString = stream.str();
+                    result = stream.str();
                 }
-                else if(valTypeId == runtime.GetRGBATypeId())
+                else if(typeId == runtime.GetRGBATypeId())
                 {
                     auto              rgba = *static_cast<alt::RGBA*>(val);
                     std::stringstream stream;
                     stream << "RGBA{ r: " << rgba.r << ", g: " << rgba.g << ", b: " << rgba.b << ", a: " << rgba.a << " }";
-                    valString = stream.str();
+                    result = stream.str();
                 }
-                else if(valTypeId == runtime.GetBaseObjectTypeId() || valTypeId == runtime.GetWorldObjectTypeId() ||
-                        valTypeId == runtime.GetEntityTypeId() || valTypeId == runtime.GetPlayerTypeId() || valTypeId == runtime.GetVehicleTypeId())
+                else if(typeId == runtime.GetBaseObjectTypeId() || typeId == runtime.GetWorldObjectTypeId() || typeId == runtime.GetEntityTypeId() ||
+                        typeId == runtime.GetPlayerTypeId() || typeId == runtime.GetVehicleTypeId())
                 {
                     auto              obj = static_cast<alt::IBaseObject*>(val);
                     std::stringstream stream;
                     stream << "BaseObject{ type: " << (uint16_t)obj->GetType() << " }";
-                    valString = stream.str();
+                    result = stream.str();
                 }
-                else if(valTypeId == runtime.GetDictTypeId())
+                else if(typeId == runtime.GetDictTypeId())
                 {
                     auto              dict = static_cast<CScriptDictionary*>(val);
                     std::stringstream stream;
                     stream << "Dictionary{ size: " << dict->GetSize() << " }";
-                    valString = stream.str();
+                    result = stream.str();
                 }
-                else if(valTypeName == "array")
+                else if(GetTypeName(typeId) == "array")
                 {
                     auto              array = static_cast<CScriptArray*>(val);
                     std::stringstream stream;
                     stream << "Array{ size: " << array->GetSize() << ", type: " << GetTypeName(array->GetElementTypeId()) << " }";
-                    valString = stream.str();
+                    result = stream.str();
                 }
                 else
                 {
-                    valString = "<N/A>";
+                    result = "<N/A>";
                 }
                 break;
             }
         }
+        return result;
+    }
+
+    static inline std::string GetCallstackVarData(asIScriptContext* context, int stackLevel, int varIdx)
+    {
+        auto&       runtime     = AngelScriptRuntime::Instance();
+        const char* name        = context->GetVarName(varIdx, stackLevel);
+        void*       val         = context->GetAddressOfVar(varIdx, stackLevel);
+        int         valTypeId   = context->GetVarTypeId(varIdx, stackLevel);
+        std::string valTypeName = GetTypeName(valTypeId);
+        std::string valString   = ValueToString(val, valTypeId);
 
         std::stringstream str;
         str << "[~y~" << valTypeName << "~w~] " << name << ": ~b~" << valString;
@@ -231,7 +254,7 @@ namespace Helpers
             Log::Colored << "~b~Vars:" << Log::Endl;
             for(int n = 0; n < context->GetVarCount(i); n++)
             {
-                Log::Colored << "~b~-~w~ " << GetVarData(context, i, n) << Log::Endl;
+                Log::Colored << "~b~-~w~ " << GetCallstackVarData(context, i, n) << Log::Endl;
             }
         }
     }
@@ -259,7 +282,10 @@ namespace Helpers
     static int PragmaHandler(const std::string& pragmaText, CScriptBuilder& builder, void* data)
     {
         auto resource = static_cast<AngelScriptResource*>(data);
-        return 0;
+        if(LibraryImport::LibraryImportPragmaHandler(pragmaText, resource)) return 0;
+
+        Log::Warning << "Unknown pragma directive used: '" << pragmaText << "'" << Log::Endl;
+        return -1;
     }
 
     // Handles infos, warnings, errors etc. by AngelScript
@@ -285,6 +311,14 @@ namespace Helpers
                 break;
             }
         }
+    }
+
+    static void CircularRefDetectedHandler(asITypeInfo* type, const void*, void*)
+    {
+        auto resource = AngelScriptRuntime::Instance().GetResourceByModule(type->GetModule());
+        Log::Warning << "!!! Circular ref detected !!!" << Log::Endl;
+        Log::Warning << "Type: " << type->GetName() << Log::Endl;
+        Log::Warning << "Resource: " << resource->GetIResource()->GetName() << Log::Endl;
     }
 
     static const char* GetContextStateName(asEContextState state)
@@ -315,5 +349,156 @@ namespace Helpers
             totalProperties += typeClass->GetPropertyCount();
         }
         return { totalMethods, totalProperties };
+    }
+
+    struct FunctionInfo
+    {
+        bool                     valid = false;
+        std::string              returnTypeName;
+        std::string              functionName;
+        std::vector<std::string> argTypes;
+    };
+    static FunctionInfo GetFunctionInfoFromDecl(const std::string& decl)
+    {
+        static std::regex funcInfoRegex("(.*?) (.*?)\\((.*?)\\)");
+
+        FunctionInfo info;
+        std::smatch  results;
+        auto         result = std::regex_search(decl.cbegin(), decl.cend(), results, funcInfoRegex);
+        if(!result) return info;
+
+        info.valid          = true;
+        info.returnTypeName = results[1].str();
+        info.functionName   = results[2].str();
+        std::vector<std::string> argTypes;
+        for(int i = 3; i < results.size(); i++)
+        {
+            argTypes.push_back(results[i].str());
+        }
+        return info;
+    }
+
+#ifdef DEBUG_MEMORY
+    static std::unordered_map<void*, size_t> allocations = {};
+    extern bool                              showAllocationMessages;
+
+    static inline std::string PointerToHex(void* ptr)
+    {
+        std::stringstream stream;
+        stream << "0x" << std::hex << (uintptr_t)ptr;
+        return stream.str();
+    }
+#endif
+
+    static void* MemoryAlloc(size_t size)
+    {
+        void* ptr = std::malloc(size);
+#ifdef DEBUG_MEMORY
+        if(showAllocationMessages)
+            Log::Colored << "~lc~[DEBUG] "
+                         << "~ly~Allocated ~lk~" << size << " ~lc~bytes (Ptr: ~lk~" << PointerToHex(ptr) << "~lc~)" << Log::Endl;
+        allocations.insert({ ptr, size });
+#endif
+        return ptr;
+    }
+    static void MemoryFree(void* ptr)
+    {
+#ifdef DEBUG_MEMORY
+        if(showAllocationMessages)
+        {
+            auto size = allocations.at(ptr);
+            Log::Colored << "~lc~[DEBUG] "
+                         << "~lg~Freed ~lk~" << size << " ~lc~bytes (Ptr: ~lk~" << PointerToHex(ptr) << "~lc~)" << Log::Endl;
+        }
+        allocations.erase(ptr);
+#endif
+        std::free(ptr);
+    }
+
+    static bool IsTypePrimitive(int type)
+    {
+        switch(type)
+        {
+            // Bool
+            case asTYPEID_BOOL:
+            // Int
+            case asTYPEID_INT8:
+            case asTYPEID_INT16:
+            case asTYPEID_INT32:
+            case asTYPEID_INT64:
+            // Uint
+            case asTYPEID_UINT8:
+            case asTYPEID_UINT16:
+            case asTYPEID_UINT32:
+            case asTYPEID_UINT64:
+            // Float
+            case asTYPEID_FLOAT:
+            case asTYPEID_DOUBLE: return true;
+            default: return false;
+        }
+    }
+    static bool IsTypeUInt(int type)
+    {
+        switch(type)
+        {
+            case asTYPEID_UINT8:
+            case asTYPEID_UINT16:
+            case asTYPEID_UINT32:
+            case asTYPEID_UINT64: return true;
+            default: return false;
+        }
+    }
+    static bool IsTypeInt(int type)
+    {
+        switch(type)
+        {
+            case asTYPEID_INT8:
+            case asTYPEID_INT16:
+            case asTYPEID_INT32:
+            case asTYPEID_INT64: return true;
+            default: return false;
+        }
+    }
+
+    static inline void* CallFunction(asIScriptContext*                  context,
+                                     asIScriptFunction*                 function,
+                                     std::vector<std::pair<void*, int>> args   = std::vector<std::pair<void*, int>>(),
+                                     void*                              object = nullptr)
+    {
+        // clang-format off
+        int r = context->Prepare(function);
+        if(r < 0) { Log::Error << "Failed to prepare callback" << ". Error code: " << r << Log::Endl; context->Unprepare(); return nullptr; }
+        if(object)
+        {
+            r = context->SetObject(object);
+            if(r < 0) { Log::Error << "Failed to set callback object" << ". Error code: " << r << Log::Endl; context->Unprepare(); return nullptr; }
+        }
+        for(size_t i = 0; i < args.size(); i++)
+        {
+            auto [ptr, type] = args[i];
+            if(IsTypePrimitive(type)) r = context->SetArgAddress(i, ptr);
+            else r = context->SetArgObject(i, ptr);
+
+            if(r < 0) { Log::Error << "Failed to set parameter " << i << ". Error code: " << r << Log::Endl; context->Unprepare(); return nullptr; }
+        }
+        r = context->Execute();
+        if(r < 0) { Log::Error << "Failed to execute callback" << ". Error code: " << r << Log::Endl; context->Unprepare(); return nullptr; }
+        // clang-format on
+        void* result     = nullptr;
+        int   returnType = function->GetReturnTypeId();
+        if(returnType != asTYPEID_VOID)
+        {
+            auto address = context->GetAddressOfReturnValue();
+            if(returnType & asTYPEID_OBJHANDLE)
+            {
+                asIScriptObject* obj = *(asIScriptObject**)address;
+                obj->AddRef();
+                result = obj;
+            }
+            else
+                result = address;
+        }
+        context->Unprepare();
+        return result;
     }
 }  // namespace Helpers

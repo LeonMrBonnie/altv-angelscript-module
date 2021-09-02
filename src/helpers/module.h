@@ -3,10 +3,9 @@
 #include "cpp-sdk/SDK.h"
 #include "Log.h"
 #include "angelscript/include/angelscript.h"
-#include "angelscript/addon/scriptbuilder/scriptbuilder.h"
+#include "angelscript/add_on/scriptbuilder/scriptbuilder.h"
 #include "../resource.h"
 #include "./docs.h"
-#include <algorithm>
 
 // Registers a new global function (e.g. 'alt::Log')
 #define REGISTER_GLOBAL_FUNC(decl, func, desc)                                                \
@@ -203,12 +202,13 @@ namespace Helpers
         std::string    name;
         CreateCallback callback;
         bool           isDataExtension;
+        bool           isStdExtension;
 
     public:
         // Creates a new module extension
         // Module extensions are used to register new classes, properties, methods etc.
-        ModuleExtension(std::string name, CreateCallback callback, bool isDataExtension = false)
-            : name(std::move(name)), callback(callback), isDataExtension(isDataExtension)
+        ModuleExtension(std::string name, CreateCallback callback, bool isDataExtension = false, bool isStdExtension = false)
+            : name(std::move(name)), callback(callback), isDataExtension(isDataExtension), isStdExtension(isStdExtension)
         {
             extensions.push_back(this);
         }
@@ -220,6 +220,10 @@ namespace Helpers
         bool IsDataExtension()
         {
             return isDataExtension;
+        }
+        bool IsStdExtension()
+        {
+            return isStdExtension;
         }
 
         void Register(asIScriptEngine* engine, DocsGenerator* docs)
@@ -255,6 +259,15 @@ namespace Helpers
                 if(extension->IsDataExtension()) extension->Register(engine, docs);
             }
         }
+        // Registers all std extensions
+        static void RegisterAllStd(asIScriptEngine* engine, DocsGenerator* docs)
+        {
+            engine->SetDefaultNamespace("");
+            for(auto extension : extensions)
+            {
+                if(extension->IsStdExtension()) extension->Register(engine, docs);
+            }
+        }
 
         static size_t GetCount()
         {
@@ -270,6 +283,12 @@ namespace Helpers
     {
     public:
         DataExtension(CreateCallback callback) : ModuleExtension("alt", callback, true) {}
+        DataExtension(const std::string& name, CreateCallback callback) : ModuleExtension(name, callback, true) {}
+    };
+    class StdExtension : public ModuleExtension
+    {
+    public:
+        StdExtension(CreateCallback callback) : ModuleExtension("", callback, false, true) {}
     };
 
     // Generic Wrapper for class methods

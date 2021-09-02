@@ -1,4 +1,4 @@
-// Generated on Fri May 28 23:55:46 2021
+// Generated on Fri Jul 16 02:40:48 2021
 
 namespace altClient
 {
@@ -7,7 +7,34 @@ namespace altClient
     // Callback used for timers
     funcdef void TimerCallback();
 
+    // Callback used for screenshot methods
+    funcdef void ScreenshotCallback(const string&in base64Image);
+
+    // ********** Typedefs **********
+
+    typedef uint32 Hash;
+
+    typedef int32 ScriptID;
+
     // ********** Enums **********
+
+    // A alt:V permission
+    enum Permission
+    {
+        None = 0,
+        ScreenCapture = 1,
+        WebRTC = 2,
+        All = 3,
+    };
+
+    // A alt:V permission state
+    enum PermissionState
+    {
+        Allowed = 0,
+        Denied = 1,
+        Unspecified = 2,
+        Failed = 3,
+    };
 
     // Types used by base objects
     enum BaseObjectType
@@ -80,10 +107,36 @@ namespace altClient
 
     string resourceName;
 
+    bool sandboxMode;
+
+    bool gameControlsEnabled;
+
+    bool cursorShown;
+
+    bool voiceInputMuted;
+
+    bool voiceActivationEnabled;
+
+    uint voiceActivationKey;
+
+    string licenseHash;
+
+    string locale;
+
+    bool streamerMode;
+
+    bool menuOpen;
+
+    bool consoleOpen;
+
+    bool isGameFocused;
+
+    LocalPlayer@+ localPlayer;
+
     // ********** Functions **********
 
     // Hashes the given string using the joaat algorithm
-    uint Hash(const string&in value);
+    Hash ToHash(const string&in value);
 
     // Gets all players on the server
     array<Player@>@ GetAllPlayers();
@@ -163,51 +216,145 @@ namespace altClient
     // Sets the specified synced meta key to the specified value
     bool GetSyncedMeta(const string&in key, ?&out outValue);
 
+    // Gets the current discord state
+    DiscordData GetDiscordData();
+
+    // Sets the specified stat to the specified value
+    void SetStat(const string&in stat, ?&in value);
+
+    // Gets the specified stat value
+    void GetStat(const string&in stat, ?&out value);
+
+    // Resets the specified stat value
+    void ResetStat(const string&in stat);
+
+    // Takes a screenshot of the alt:V window
+    void TakeScreenshot(ScreenshotCallback@ callback);
+
+    // Takes a screenshot of the alt:V window and emits the result to the specified event
+    void TakeScreenshot(const string&in eventName);
+
+    // Takes a screenshot of the GTA V window
+    void TakeScreenshotGameOnly(ScreenshotCallback@ callback);
+
+    // Takes a screenshot of the GTA V window and emits the result to the specified event
+    void TakeScreenshotGameOnly(const string&in eventName);
+
+    // Emits an event to the server (Max 32 args)
+    void EmitServer(const string&in event, ...);
+
+    // Gets the state of the specified key
+    KeyState GetKeyState(uint key);
+
+    // Toggles whether the game receives control inputs
+    void SetGameControlsEnabled(bool state);
+
+    // Adds a gxt text
+    void AddGxtText(const string&in gxt, const string&in text);
+
+    // Adds a gxt text
+    void AddGxtText(Hash hash, const string&in text);
+
+    // Removes a gxt text
+    void RemoveGxtText(const string&in gxt);
+
+    // Removes a gxt text
+    void RemoveGxtText(Hash hash);
+
+    // Gets a gxt text value
+    bool GetGxtText(const string&in gxt);
+
+    // Gets a gxt text value
+    void GetGxtText(Hash hash);
+
+    // Shows or hides the cursor, returns whether the operation succeeded or not
+    bool ShowCursor(bool state);
+
+    // Sets the specified config flag, returns whether the operation succeded or not
+    bool SetConfigFlag(const string&in flag, bool state);
+
+    // Gets the value of the specified config flag
+    bool GetConfigFlag(const string&in flag);
+
+    // Returns whether the given config flag exists
+    bool DoesConfigFlagExist(const string&in flag);
+
+    // Mutes/Unmutes the voice input in the alt:V voice chat
+    void SetVoiceInputMuted(bool state);
+
+    // Toggles whether the voice controls are enabled or not
+    void SetVoiceControlsEnabled(bool state);
+
+    // Gets the entity with the specified script id, or null if not found
+    Entity@ GetEntityByScriptId(int scriptId);
+
+    // Checks if the given model with the given texture exists
+    bool DoesTextureExistInArchetype(uint model, const string&in texture);
+
+    // Checks if the given model with the given texture exists
+    bool DoesTextureExistInArchetype(const string&in model, const string&in texture);
+
+    // Loads the given ipl
+    void RequestIpl(const string&in ipl);
+
+    // Unloads the given ipl
+    void RemoveIpl(const string&in ipl);
+
+    // Starts a movie method on the minimap
+    bool BeginScaleformMovieMethodMinimap(const string&in method);
+
+    // Sets the time required in milliseconds for one game minute to pass
+    void SetMsPerGameMinute(int amount);
+
+    // Gets the time required in milliseconds for one game minute to pass
+    int GetMsPerGameMinute();
+
+    // Sets the current weather cycle
+    void SetWeatherCycle(array<uint8>@ weathers, array<uint8>@ multipliers);
+
+    // Toggles whether the weather sync is enabled
+    void SetWeatherSyncActive(bool state);
+
+    // Toggles whether the cam is frozen
+    void SetCamFrozen(bool state);
+
+    // Gets the state of the given permission
+    PermissionState GetPermissionState(Permission permission);
+
+    // Sets the angular velocity of the specified entity
+    void SetAngularVelocity(ScriptID entity, const Vector3&in velocity);
+
+    // Loads the given model into memory
+    void LoadModel(Hash hash, bool async = false);
+
+    // Loads the YTYP at the given path into memory
+    bool LoadYtyp(const string&in path);
+
+    // Unloads the YTYP at the given path out of memory
+    bool UnloadYtyp(const string&in path);
+
+    // Gets the base64 encoded image of the given headshot
+    string GetHeadshotBase64(uint8 id);
+
     // ********** Objects **********
 
-    // Three-dimensional vector
-    class Vector3
+    // Discord data
+    class DiscordData
     {
-        float x;
-        float y;
-        float z;
+        bool ready;
+        string userID;
+        string username;
+        string discriminator;
+        string avatar;
 
-        Vector3(float x, float y, float z);
-        Vector3(int x, int y, int z);
-        float Length();
-        Vector3 Add(Vector3 vector);
-        Vector3 Add(float x, float y, float z);
-        Vector3 Add(float value);
-        Vector3 Sub(Vector3 vector);
-        Vector3 Sub(float x, float y, float z);
-        Vector3 Sub(float value);
-        Vector3 Mult(Vector3 vector);
-        Vector3 Mult(float x, float y, float z);
-        Vector3 Mult(float value);
-        float Distance(Vector3 vector);
-        string opImplConv() const;
     };
 
-    // Two-dimensional vector
-    class Vector2
+    // The current state of a keyboard key
+    class KeyState
     {
-        float x;
-        float y;
+        bool down;
+        bool toggled;
 
-        Vector2(float x, float y);
-        Vector2(int x, int y);
-        float Length();
-        Vector2 Add(Vector2 vector);
-        Vector2 Add(float x, float y);
-        Vector2 Add(float value);
-        Vector2 Sub(Vector2 vector);
-        Vector2 Sub(float x, float y);
-        Vector2 Sub(float value);
-        Vector2 Mult(Vector2 vector);
-        Vector2 Mult(float x, float y);
-        Vector2 Mult(float value);
-        float Distance(Vector2 vector);
-        string opImplConv() const;
     };
 
     // R(ed), G(reen), B(lue), A(lpha) color
@@ -222,14 +369,53 @@ namespace altClient
         RGBA toBGRA();
     };
 
-    // Benchmarking utility
-    class Benchmark
+    // Two-dimensional vector
+    class Vector2
     {
-        bool ended;
+        float x;
+        float y;
 
-        Benchmark(const string&in name = "Unnamed_Benchmark", bool autoStart = true, bool showLog = true);
-        void Start();
-        double End();
+        Vector2(float x, float y);
+        Vector2(int x, int y);
+        Vector2 Add(Vector2 vector);
+        Vector2 Add(float x, float y);
+        Vector2 Add(float value);
+        Vector2 Sub(Vector2 vector);
+        Vector2 Sub(float x, float y);
+        Vector2 Sub(float value);
+        Vector2 Mult(Vector2 vector);
+        Vector2 Mult(float x, float y);
+        Vector2 Mult(float value);
+        float Distance(Vector2 vector);
+        float Length();
+        Vector2 ToRadians();
+        Vector2 ToDegrees();
+        string opImplConv() const;
+    };
+
+    // Three-dimensional vector
+    class Vector3
+    {
+        float x;
+        float y;
+        float z;
+
+        Vector3(float x, float y, float z);
+        Vector3(int x, int y, int z);
+        Vector3 Add(Vector3 vector);
+        Vector3 Add(float x, float y, float z);
+        Vector3 Add(float value);
+        Vector3 Sub(Vector3 vector);
+        Vector3 Sub(float x, float y, float z);
+        Vector3 Sub(float value);
+        Vector3 Mult(Vector3 vector);
+        Vector3 Mult(float x, float y, float z);
+        Vector3 Mult(float value);
+        float Distance(Vector3 vector);
+        float Length();
+        Vector3 ToRadians();
+        Vector3 ToDegrees();
+        string opImplConv() const;
     };
 
     // Base object superclass for all alt:V base objects
@@ -276,9 +462,10 @@ namespace altClient
         Vector3 pos;
         int dimension;
         uint16 id;
-        uint model;
+        Hash model;
         Vector3 rot;
         bool visible;
+        ScriptID scriptID;
 
         bool HasMeta(const string&in key);
         bool GetMeta(const string&in key, ?&out outValue);
@@ -289,7 +476,7 @@ namespace altClient
         void SetData(const string&in key, ?&in value);
         void DeleteData(const string&in key);
         void Destroy();
-        Player@+ GetNetOwner() const;
+        Player@ GetNetOwner() const;
         bool HasSyncedMeta(const string&in key);
         bool GetSyncedMeta(const string&in key, ?&out outValue);
         bool HasStreamSyncedMeta(const string&in key);
@@ -306,9 +493,10 @@ namespace altClient
         Vector3 pos;
         int dimension;
         uint16 id;
-        uint model;
+        Hash model;
         Vector3 rot;
         bool visible;
+        ScriptID scriptID;
         string name;
         uint health;
         uint maxHealth;
@@ -332,6 +520,10 @@ namespace altClient
         Entity@ entityAimingAt;
         Vector3 entityAimOffset;
         bool flashlightActive;
+        bool isTalking;
+        float micLevel;
+        float spatialVolume;
+        float nonSpatialVolume;
 
         bool HasMeta(const string&in key);
         bool GetMeta(const string&in key, ?&out outValue);
@@ -342,14 +534,14 @@ namespace altClient
         void SetData(const string&in key, ?&in value);
         void DeleteData(const string&in key);
         void Destroy();
-        Player@+ GetNetOwner() const;
+        Player@ GetNetOwner() const;
         bool HasSyncedMeta(const string&in key);
         bool GetSyncedMeta(const string&in key, ?&out outValue);
         bool HasStreamSyncedMeta(const string&in key);
         bool GetStreamSyncedMeta(const string&in key, ?&out outValue);
-        string opImplConv() const;
         bool HasWeaponComponent(uint weapon, uint component);
         uint GetWeaponTint(uint weapon);
+        string opImplConv() const;
     };
 
     // alt:V Vehicle Entity
@@ -360,10 +552,11 @@ namespace altClient
         Vector3 pos;
         int dimension;
         uint16 id;
-        uint model;
+        Hash model;
         Vector3 rot;
         bool visible;
-        Player@+ driver;
+        ScriptID scriptID;
+        Player@ driver;
         bool destroyed;
         uint8 modKitsCount;
         uint8 modKit;
@@ -411,6 +604,13 @@ namespace altClient
         uint additionalBodyHealth;
         bool armoredWindows;
         bool manualEngineControl;
+        float wheelSpeed;
+        uint16 gear;
+        uint16 maxGear;
+        float rpm;
+        Vector3 speedVector;
+        uint8 lightsIndicator;
+        bool handlingModified;
 
         bool HasMeta(const string&in key);
         bool GetMeta(const string&in key, ?&out outValue);
@@ -421,11 +621,73 @@ namespace altClient
         void SetData(const string&in key, ?&in value);
         void DeleteData(const string&in key);
         void Destroy();
-        Player@+ GetNetOwner() const;
+        Player@ GetNetOwner() const;
         bool HasSyncedMeta(const string&in key);
         bool GetSyncedMeta(const string&in key, ?&out outValue);
         bool HasStreamSyncedMeta(const string&in key);
         bool GetStreamSyncedMeta(const string&in key, ?&out outValue);
+        string opImplConv() const;
+        void ResetHandling();
+        void ReplaceHandling();
+    };
+
+    // alt:V Local Player instance
+    class LocalPlayer : Player
+    {
+        uint8 type;
+        bool valid;
+        Vector3 pos;
+        int dimension;
+        uint16 id;
+        Hash model;
+        Vector3 rot;
+        bool visible;
+        ScriptID scriptID;
+        string name;
+        uint health;
+        uint maxHealth;
+        uint armour;
+        uint maxArmour;
+        uint weapon;
+        array<uint>@ weaponComponents;
+        uint8 weaponTint;
+        bool dead;
+        bool jumping;
+        bool inRagdoll;
+        bool aiming;
+        bool shooting;
+        bool reloading;
+        float moveSpeed;
+        Vector3 aimPos;
+        Vector3 headRot;
+        bool inVehicle;
+        Vehicle@ vehicle;
+        uint8 seat;
+        Entity@ entityAimingAt;
+        Vector3 entityAimOffset;
+        bool flashlightActive;
+        bool isTalking;
+        float micLevel;
+        float spatialVolume;
+        float nonSpatialVolume;
+        uint16 currentAmmo;
+
+        bool HasMeta(const string&in key);
+        bool GetMeta(const string&in key, ?&out outValue);
+        void SetMeta(const string&in key, ?&in value);
+        void DeleteMeta(const string&in key);
+        bool HasData(const string&in key);
+        bool GetData(const string&in key, ?&out outValue);
+        void SetData(const string&in key, ?&in value);
+        void DeleteData(const string&in key);
+        void Destroy();
+        Player@ GetNetOwner() const;
+        bool HasSyncedMeta(const string&in key);
+        bool GetSyncedMeta(const string&in key, ?&out outValue);
+        bool HasStreamSyncedMeta(const string&in key);
+        bool GetStreamSyncedMeta(const string&in key, ?&out outValue);
+        bool HasWeaponComponent(uint weapon, uint component);
+        uint GetWeaponTint(uint weapon);
         string opImplConv() const;
     };
 
@@ -438,9 +700,9 @@ namespace altClient
         int dimension;
         uint16 blipType;
         bool global;
-        Player@+ target;
+        Player@ target;
         bool attached;
-        Entity@+ attachedTo;
+        Entity@ attachedTo;
 
         bool HasMeta(const string&in key);
         bool GetMeta(const string&in key, ?&out outValue);

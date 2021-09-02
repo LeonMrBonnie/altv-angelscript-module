@@ -1,3 +1,6 @@
 [submodule "deps/cpp-sdk"]
 	path = deps/cpp-sdk
 	url = https://github.com/altmp/cpp-sdk.git
+[submodule "deps/angelscript"]
+	path = deps/angelscript
+	url = https://github.com/LeonMrBonnie/angelscript.git

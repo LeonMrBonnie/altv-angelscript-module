@@ -1,6 +1,6 @@
 #pragma once
 #include "runtime.h"
-#include "angelscript/addon/scriptdictionary/scriptdictionary.h"
+#include "angelscript/add_on/scriptdictionary/scriptdictionary.h"
 
 #include "httplib/httplib.h"
 

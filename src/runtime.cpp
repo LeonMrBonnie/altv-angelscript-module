@@ -10,18 +10,13 @@
 #include "bindings/data/benchmark.h"
 #include "bindings/data/discord.h"
 #include "bindings/data/keyState.h"
-#include "angelscript/addon/scriptstdstring/scriptstdstring.h"
-#include "angelscript/addon/scripthelper/scripthelper.h"
-#include "angelscript/addon/scriptarray/scriptarray.h"
-#include "angelscript/addon/scriptdictionary/scriptdictionary.h"
-#include "angelscript/addon/scriptmath/scriptmath.h"
-#include "angelscript/addon/scriptany/scriptany.h"
-#include "angelscript/addon/datetime/datetime.h"
 #include "angelscript-jit-compiler/as_jit.h"
 
 AngelScriptRuntime::AngelScriptRuntime()
 {
     using namespace Helpers;
+
+    asSetGlobalMemoryFunctions(MemoryAlloc, MemoryFree);
 
     // Create a new AngelScript engine
     engine = asCreateScriptEngine();
@@ -36,10 +31,13 @@ AngelScriptRuntime::AngelScriptRuntime()
     // Optimization
     engine->SetEngineProperty(asEP_BUILD_WITHOUT_LINE_CUES, true);
 
+    if(alt::ICore::Instance().IsDebug()) engine->SetCircularRefDetectedCallback(CircularRefDetectedHandler);
+
     RegisterScriptInterfaces(engine);
 }
 
-void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine)
+extern StdExtension stringExtension;
+void                AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine)
 {
 #ifdef SERVER_MODULE
     Helpers::DocsGenerator docs("altServer");
@@ -48,18 +46,13 @@ void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine)
     Helpers::DocsGenerator docs("altClient");
 #endif
 
-    // Register add-ons
-    RegisterScriptArray(engine, true);
-    RegisterStdString(engine);
-    RegisterStdStringUtils(engine);
-    RegisterScriptDictionary(engine);
-    RegisterScriptMath(engine);
-    RegisterScriptAny(engine);
-    RegisterScriptDateTime(engine);
-    RegisterExceptionRoutines(engine);
+    // Register standard library
+    Helpers::DocsGenerator stdDocs("");
+    stringExtension.Register(engine, &stdDocs);
+    ModuleExtension::RegisterAllStd(engine, &stdDocs);
 
     // Register data
-    Helpers::ModuleExtension::RegisterAllData(engine, &docs);
+    ModuleExtension::RegisterAllData(engine, &docs);
 
     // Register ref classes
     REGISTER_REF_CLASS("BaseObject", alt::IBaseObject, asOBJ_REF, "Base object superclass for all alt:V base objects", "");
@@ -67,6 +60,9 @@ void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine)
     REGISTER_REF_CLASS("Entity", alt::IEntity, asOBJ_REF, "Entity superclass for all alt:V entities", "WorldObject");
     REGISTER_REF_CLASS("Player", alt::IPlayer, asOBJ_REF, "alt:V Player Entity", "Entity");
     REGISTER_REF_CLASS("Vehicle", alt::IVehicle, asOBJ_REF, "alt:V Vehicle Entity", "Entity");
+#ifdef CLIENT_MODULE
+    REGISTER_REF_CLASS("LocalPlayer", alt::ILocalPlayer, asOBJ_REF, "alt:V Local Player instance", "Player");
+#endif
 #ifdef SERVER_MODULE
     REGISTER_REF_CLASS("VoiceChannel", alt::IVoiceChannel, asOBJ_REF, "alt:V Voice Channel", "BaseObject");
     REGISTER_REF_CLASS("ColShape", alt::IColShape, asOBJ_REF, "alt:V Generic ColShape", "WorldObject");
@@ -86,6 +82,7 @@ void AngelScriptRuntime::RegisterScriptInterfaces(asIScriptEngine* engine)
     ModuleExtension::RegisterAll("http", engine);
     ModuleExtension::RegisterAll("json", engine);
     ModuleExtension::RegisterAll("file", engine);
+    ModuleExtension::RegisterAll("natives", engine);
 
     // Set default namespace back to alt namespace
     engine->SetDefaultNamespace("alt");
@@ -177,4 +174,16 @@ void AngelScriptRuntime::DestroyImpl(alt::IResource::Impl* impl)
         resources.erase(resource->GetIResource());
         delete resource;
     }
+}
+
+void AngelScriptRuntime::OnTick()
+{
+    asUINT curSize, totalDestroyed, totalDetected, newObjs, totalNewDestroyed;
+    engine->GetGCStatistics(&curSize, &totalDestroyed, &totalDetected, &newObjs, &totalNewDestroyed);
+    if(curSize > 100 && newObjs > 10)
+    {
+        Log::Warning << "A lot of objects detected by the garbage collector" << Log::Endl;
+    }
+
+    engine->GarbageCollect(asGC_ONE_STEP, 1);
 }

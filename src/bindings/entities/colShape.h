@@ -31,8 +31,8 @@ namespace Helpers
         REGISTER_PROPERTY_WRAPPER_GET(type, "bool", "playersOnly", (GenericWrapper<T, alt::IColShape, &alt::IColShape::IsPlayersOnly, bool>));
         REGISTER_PROPERTY_WRAPPER_SET(type, "bool", "playersOnly", (GenericWrapper<T, alt::IColShape, &alt::IColShape::SetPlayersOnly, void, bool>));
 
-        REGISTER_METHOD_WRAPPER(type, "bool IsPointIn(Vector3 point)", IsPointIn);
+        REGISTER_METHOD_WRAPPER(type, "bool IsPointIn(Vector3 point) const", IsPointIn);
         REGISTER_METHOD_WRAPPER(
-          type, "bool IsEntityIn(Entity@ entity)", (GenericWrapper<T, alt::IColShape, &alt::IColShape::IsEntityIn, bool, alt::IEntity*>));
+          type, "bool IsEntityIn(Entity@ entity) const", (GenericWrapper<T, alt::IColShape, &alt::IColShape::IsEntityIn, bool, alt::IEntity*>));
     }
 }  // namespace Helpers

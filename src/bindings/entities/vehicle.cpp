@@ -1,6 +1,7 @@
 #include "Log.h"
 #include "../../helpers/module.h"
 #include "entity.h"
+#include "../data/vehicleNeon.h"
 
 using namespace Helpers;
 using namespace Data;
@@ -22,16 +23,6 @@ static alt::IVehicle* VehicleFactory(uint32_t model, Vector3& pos, Vector3& rot)
     vehicle->AddRef();
     return vehicle.Get();
 }
-static alt::IVehicle* VehicleFactoryString(const std::string& modelStr, Vector3& pos, Vector3& rot)
-{
-    GET_RESOURCE();
-    auto model   = alt::ICore::Instance().Hash(modelStr);
-    auto vehicle = alt::ICore::Instance().CreateVehicle(model, { pos.x, pos.y, pos.z }, { rot.x, rot.y, rot.z });
-    AS_ASSERT(!vehicle.IsEmpty(), "Invalid model hash", nullptr);
-
-    vehicle->AddRef();
-    return vehicle.Get();
-}
 #endif
 
 static alt::IPlayer* GetDriver(alt::IVehicle* vehicle)
@@ -46,12 +37,19 @@ static std::string GetNumberplateText(alt::IVehicle* vehicle)
     return vehicle->GetNumberplateText().ToString();
 }
 
-static void GetActiveNeon(alt::IVehicle* vehicle, bool& left, bool& right, bool& front, bool& back)
+#ifdef SERVER_MODULE
+static VehicleNeon GetActiveNeon(alt::IVehicle* vehicle)
 {
+    bool front, back, left, right;
     vehicle->GetNeonActive(&left, &right, &front, &back);
+    return VehicleNeon(front, back, left, right);
 }
 
-#ifdef SERVER_MODULE
+static void SetActiveNeon(alt::IVehicle* vehicle, VehicleNeon& neon)
+{
+    vehicle->SetNeonActive(neon.left, neon.right, neon.front, neon.back);
+}
+
 static alt::IVehicle* GetAttached(alt::IVehicle* vehicle)
 {
     auto attached = vehicle->GetAttached();
@@ -67,12 +65,19 @@ static alt::IVehicle* GetAttachedTo(alt::IVehicle* vehicle)
 }
 #endif
 
+#ifdef CLIENT_MODULE
+static Data::Vector3 GetSpeedVector(alt::IVehicle* vehicle)
+{
+    auto speedVector = vehicle->GetSpeedVector();
+    return Data::Vector3(speedVector[0], speedVector[1], speedVector[2]);
+}
+#endif
+
 static ModuleExtension playerExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs) {
     RegisterAsEntity<alt::IVehicle>(engine, docs, "Vehicle");
 
 #ifdef SERVER_MODULE
-    REGISTER_FACTORY("Vehicle", "Hash model, Vector3 pos, Vector3 rot", VehicleFactory);
-    REGISTER_FACTORY("Vehicle", "const string&in model, Vector3 pos, Vector3 rot", VehicleFactoryString);
+    REGISTER_FACTORY("Vehicle", "Hash model, Vector3&in pos, Vector3&in rot", VehicleFactory);
 #endif
 
     // Implicit conversion to string
@@ -296,105 +301,139 @@ static ModuleExtension playerExtension("alt", [](asIScriptEngine* engine, DocsGe
 
 #ifdef SERVER_MODULE
     REGISTER_METHOD_WRAPPER(
-      "Vehicle", "uint8 GetMod(uint8 category)", (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::GetMod, uint8_t, uint8_t>));
+      "Vehicle", "uint8 GetMod(uint8 category) const", (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::GetMod, uint8_t, uint8_t>));
     REGISTER_METHOD_WRAPPER("Vehicle",
                             "bool SetMod(uint8 category, uint8 mod)",
                             (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::SetMod, bool, uint8_t, uint8_t>));
     REGISTER_METHOD_WRAPPER("Vehicle",
-                            "uint8 GetModsCount(uint8 category)",
+                            "uint8 GetModsCount(uint8 category) const",
                             (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::GetModsCount, uint8_t, uint8_t>));
     REGISTER_METHOD_WRAPPER(
-      "Vehicle", "bool IsExtraOn(uint8 extra)", (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::IsExtraOn, bool, uint8_t>));
+      "Vehicle", "bool IsExtraOn(uint8 extra) const", (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::IsExtraOn, bool, uint8_t>));
     REGISTER_METHOD_WRAPPER("Vehicle",
                             "void SetExtraOn(uint8 extra, bool toggle)",
                             (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::ToggleExtra, void, uint8_t, bool>));
-    REGISTER_METHOD_WRAPPER("Vehicle", "void GetActiveNeon(bool&out left, bool&out right, bool&out front, bool&out back)", GetActiveNeon);
+    REGISTER_METHOD_WRAPPER("Vehicle", "VehicleNeon GetActiveNeon() const", GetActiveNeon);
     REGISTER_METHOD_WRAPPER("Vehicle",
                             "void SetActiveNeon(bool left, bool right, bool front, bool back)",
                             (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::SetNeonActive, void, bool, bool, bool, bool>));
-    REGISTER_METHOD_WRAPPER(
-      "Vehicle", "uint8 GetDoorState(uint8 door)", (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::GetDoorState, uint8_t, uint8_t>));
+    REGISTER_METHOD_WRAPPER("Vehicle", "void SetActiveNeon(VehicleNeon&in neon)", SetActiveNeon);
+    REGISTER_METHOD_WRAPPER("Vehicle",
+                            "uint8 GetDoorState(uint8 door) const",
+                            (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::GetDoorState, uint8_t, uint8_t>));
     REGISTER_METHOD_WRAPPER("Vehicle",
                             "void SetDoorState(uint8 door, uint8 state)",
                             (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::SetDoorState, void, uint8_t, uint8_t>));
-    REGISTER_METHOD_WRAPPER(
-      "Vehicle", "bool IsWindowOpened(uint8 window)", (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::IsWindowOpened, bool, uint8_t>));
+    REGISTER_METHOD_WRAPPER("Vehicle",
+                            "bool IsWindowOpened(uint8 window) const",
+                            (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::IsWindowOpened, bool, uint8_t>));
     REGISTER_METHOD_WRAPPER("Vehicle",
                             "void SetWindowOpened(uint8 window, bool opened)",
                             (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::SetWindowOpened, void, uint8_t, bool>));
     REGISTER_METHOD_WRAPPER(
-      "Vehicle", "bool IsWheelBurst(uint8 wheel)", (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::IsWheelBurst, bool, uint8_t>));
+      "Vehicle", "bool IsWheelBurst(uint8 wheel) const", (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::IsWheelBurst, bool, uint8_t>));
     REGISTER_METHOD_WRAPPER("Vehicle",
                             "void SetWheelBurst(uint8 wheel, bool state)",
                             (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::SetWheelBurst, void, uint8_t, bool>));
     REGISTER_METHOD_WRAPPER("Vehicle",
-                            "bool DoesWheelHaveTire(uint8 wheel)",
+                            "bool DoesWheelHaveTire(uint8 wheel) const",
                             (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::DoesWheelHasTire, bool, uint8_t>));
     REGISTER_METHOD_WRAPPER("Vehicle",
                             "void SetWheelHasTire(uint8 wheel, bool state)",
                             (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::SetWheelHasTire, void, uint8_t, bool>));
-    REGISTER_METHOD_WRAPPER(
-      "Vehicle", "bool IsWheelDetached(uint8 wheel)", (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::IsWheelDetached, bool, uint8_t>));
+    REGISTER_METHOD_WRAPPER("Vehicle",
+                            "bool IsWheelDetached(uint8 wheel) const",
+                            (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::IsWheelDetached, bool, uint8_t>));
     REGISTER_METHOD_WRAPPER("Vehicle",
                             "void SetWheelDetached(uint8 wheel, bool state)",
                             (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::SetWheelDetached, void, uint8_t, bool>));
-    REGISTER_METHOD_WRAPPER(
-      "Vehicle", "bool IsWheelOnFire(uint8 wheel)", (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::IsWheelOnFire, bool, uint8_t>));
+    REGISTER_METHOD_WRAPPER("Vehicle",
+                            "bool IsWheelOnFire(uint8 wheel) const",
+                            (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::IsWheelOnFire, bool, uint8_t>));
     REGISTER_METHOD_WRAPPER("Vehicle",
                             "void SetWheelOnFire(uint8 wheel, bool state)",
                             (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::SetWheelOnFire, void, uint8_t, bool>));
-    REGISTER_METHOD_WRAPPER(
-      "Vehicle", "float GetWheelHealth(uint8 wheel)", (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::GetWheelHealth, float, uint8_t>));
+    REGISTER_METHOD_WRAPPER("Vehicle",
+                            "float GetWheelHealth(uint8 wheel) const",
+                            (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::GetWheelHealth, float, uint8_t>));
     REGISTER_METHOD_WRAPPER("Vehicle",
                             "void SetWheelHealth(uint8 wheel, float health)",
                             (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::SetWheelHealth, void, uint8_t, float>));
     REGISTER_METHOD_WRAPPER("Vehicle",
-                            "uint8 GetPartDamageLevel(uint8 part)",
+                            "uint8 GetPartDamageLevel(uint8 part) const",
                             (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::GetPartDamageLevel, uint8_t, uint8_t>));
     REGISTER_METHOD_WRAPPER("Vehicle",
                             "void SetPartDamageLevel(uint8 part, uint8 level)",
                             (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::SetPartDamageLevel, void, uint8_t, uint8_t>));
     REGISTER_METHOD_WRAPPER("Vehicle",
-                            "uint8 GetPartBulletholes(uint8 part)",
+                            "uint8 GetPartBulletholes(uint8 part) const",
                             (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::GetPartBulletHoles, uint8_t, uint8_t>));
     REGISTER_METHOD_WRAPPER("Vehicle",
                             "void SetPartBulletholes(uint8 part, uint8 amount)",
                             (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::SetPartBulletHoles, void, uint8_t, uint8_t>));
-    REGISTER_METHOD_WRAPPER(
-      "Vehicle", "bool IsLightDamaged(uint8 light)", (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::IsLightDamaged, bool, uint8_t>));
+    REGISTER_METHOD_WRAPPER("Vehicle",
+                            "bool IsLightDamaged(uint8 light) const",
+                            (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::IsLightDamaged, bool, uint8_t>));
     REGISTER_METHOD_WRAPPER("Vehicle",
                             "void SetLightDamaged(uint8 light, bool state)",
                             (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::SetLightDamaged, void, uint8_t, bool>));
     REGISTER_METHOD_WRAPPER("Vehicle",
-                            "bool IsWindowDamaged(uint8 window)",
+                            "bool IsWindowDamaged(uint8 window) const",
                             (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::IsWindowDamaged, bool, uint8_t>));
     REGISTER_METHOD_WRAPPER("Vehicle",
                             "void SetWindowDamaged(uint8 window, bool state)",
                             (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::SetWindowDamaged, void, uint8_t, bool>));
     REGISTER_METHOD_WRAPPER("Vehicle",
-                            "bool IsSpecialLightDamaged(uint8 light)",
+                            "bool IsSpecialLightDamaged(uint8 light) const",
                             (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::IsSpecialLightDamaged, bool, uint8_t>));
     REGISTER_METHOD_WRAPPER("Vehicle",
                             "void SetSpecialLightDamaged(uint8 light, bool state)",
                             (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::SetSpecialLightDamaged, void, uint8_t, bool>));
     REGISTER_METHOD_WRAPPER("Vehicle",
-                            "float GetArmoredWindowHealth(uint8 window)",
+                            "float GetArmoredWindowHealth(uint8 window) const",
                             (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::GetArmoredWindowHealth, float, uint8_t>));
     REGISTER_METHOD_WRAPPER("Vehicle",
                             "float SetArmoredWindowHealth(uint8 window, float health)",
                             (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::SetArmoredWindowHealth, void, uint8_t, float>));
     REGISTER_METHOD_WRAPPER("Vehicle",
-                            "uint8 GetArmoredWindowBulletholes(uint8 window)",
+                            "uint8 GetArmoredWindowBulletholes(uint8 window) const",
                             (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::GetArmoredWindowShootCount, uint8_t, uint8_t>));
     REGISTER_METHOD_WRAPPER("Vehicle",
                             "void SetArmoredWindowBulletholes(uint8 window, uint8 amount)",
                             (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::SetArmoredWindowShootCount, void, uint8_t, uint8_t>));
     REGISTER_METHOD_WRAPPER("Vehicle",
-                            "uint8 GetBumperDamageLevel(uint8 bumper)",
+                            "uint8 GetBumperDamageLevel(uint8 bumper) const",
                             (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::GetBumperDamageLevel, uint8_t, uint8_t>));
     REGISTER_METHOD_WRAPPER("Vehicle",
                             "void SetBumperDamageLevel(uint8 bumper, uint8 level)",
                             (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::SetBumperDamageLevel, void, uint8_t, uint8_t>));
     REGISTER_METHOD_WRAPPER("Vehicle", "void Repair()", (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::SetFixed, void>));
+#endif
+
+#ifdef CLIENT_MODULE
+    REGISTER_PROPERTY_WRAPPER_GET(
+      "Vehicle", "float", "wheelSpeed", (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::GetWheelSpeed, float>));
+
+    REGISTER_PROPERTY_WRAPPER_GET(
+      "Vehicle", "uint16", "gear", (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::GetCurrentGear, uint16_t>));
+    REGISTER_PROPERTY_WRAPPER_SET(
+      "Vehicle", "uint16", "gear", (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::SetCurrentGear, void, uint16_t>));
+    REGISTER_PROPERTY_WRAPPER_GET(
+      "Vehicle", "uint16", "maxGear", (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::GetMaxGear, uint16_t>));
+    REGISTER_PROPERTY_WRAPPER_SET(
+      "Vehicle", "uint16", "maxGear", (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::SetMaxGear, void, uint16_t>));
+
+    REGISTER_PROPERTY_WRAPPER_GET("Vehicle", "float", "rpm", (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::GetCurrentRPM, float>));
+    REGISTER_PROPERTY_WRAPPER_GET("Vehicle", "Vector3", "speedVector", GetSpeedVector);
+
+    REGISTER_PROPERTY_WRAPPER_GET(
+      "Vehicle", "uint8", "lightsIndicator", (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::GetLightsIndicator, uint8_t>));
+    REGISTER_PROPERTY_WRAPPER_SET(
+      "Vehicle", "uint8", "lightsIndicator", (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::SetLightsIndicator, void, uint8_t>));
+
+    REGISTER_METHOD_WRAPPER("Vehicle", "void ResetHandling()", (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::ResetHandling>));
+    REGISTER_METHOD_WRAPPER("Vehicle", "void ReplaceHandling()", (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::ReplaceHandling>));
+    REGISTER_PROPERTY_WRAPPER_GET(
+      "Vehicle", "bool", "handlingModified", (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::IsHandlingModified, bool>));
 #endif
 });

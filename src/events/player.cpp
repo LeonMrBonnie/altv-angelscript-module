@@ -35,16 +35,18 @@ REGISTER_EVENT_HANDLER(alt::CEvent::Type::PLAYER_DISCONNECT,
 REGISTER_EVENT_HANDLER(alt::CEvent::Type::PLAYER_DAMAGE,
                        PlayerDamage,
                        "void",
-                       "Player@ player, Entity@ attacker, uint&in damage, uint&in weapon",
+                       "Player@ player, Entity@ attacker, uint16&in healthDamage, uint16&in armorDamage, uint&in weapon",
                        [](AngelScriptResource* resource, const alt::CEvent* event, asIScriptContext* context) {
                            auto ev = static_cast<const alt::CPlayerDamageEvent*>(event);
 
                            context->SetArgObject(0, ev->GetTarget().Get());
                            context->SetArgObject(1, ev->GetAttacker().Get());
-                           auto dmg = ev->GetDamage();
+                           auto dmg = ev->GetHealthDamage();
                            context->SetArgAddress(2, &dmg);
+                           auto armorDmg = ev->GetArmourDamage();
+                           context->SetArgAddress(3, &armorDmg);
                            auto weapon = ev->GetWeapon();
-                           context->SetArgAddress(3, &weapon);
+                           context->SetArgAddress(4, &weapon);
                            return context->Execute();
                        });
 

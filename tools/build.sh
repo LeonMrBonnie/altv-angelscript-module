@@ -1,7 +1,7 @@
 # Set version
 VERSION=DEBUG
 
-if [ $# -eq 1 ]
+if [ $# -eq 1 ]; then
     VERSION=$1
 fi
 

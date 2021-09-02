@@ -4,16 +4,16 @@
 #include "Log.h"
 #include "helpers/timer.h"
 #include "angelscript/include/angelscript.h"
-#include "angelscript/addon/scriptarray/scriptarray.h"
-#include "angelscript/addon/scriptbuilder/scriptbuilder.h"
-#include "angelscript/addon/scripthelper/scripthelper.h"
+#include "angelscript/add_on/scriptarray/scriptarray.h"
+#include "angelscript/add_on/scriptbuilder/scriptbuilder.h"
+#include "angelscript/add_on/scripthelper/scripthelper.h"
 #include "cpp-sdk/events/CWebSocketClientEvent.h"
 
 class AngelScriptRuntime;
 class AngelScriptResource : public alt::IResource::Impl
 {
     using ObjectsMap    = std::unordered_multimap<alt::IBaseObject::Type, alt::Ref<alt::IBaseObject>>;
-    using ObjectDataMap = std::unordered_map<alt::Ref<alt::IBaseObject>, std::map<std::string, std::pair<int, void*>>>;
+    using ObjectDataMap = std::unordered_map<alt::Ref<alt::IBaseObject>, std::unordered_map<std::string, std::pair<int, void*>>>;
 
     AngelScriptRuntime* runtime;
     alt::IResource*     resource;
@@ -36,6 +36,17 @@ class AngelScriptResource : public alt::IResource::Impl
     std::unordered_multimap<std::string, asIScriptFunction*> customLocalEventHandlers;
     std::unordered_multimap<std::string, asIScriptFunction*> customRemoteEventHandlers;
 
+    // Functions that should be evaled in next tick
+    std::vector<asIScriptFunction*> evalFunctions;
+
+    // Keep track of all imported functions, to release them on resource stop
+    std::vector<asIScriptFunction*> importedFunctions;
+
+    // Keep track of all library import functions, we need to remove them on resource stop
+    std::vector<asIScriptFunction*> libraryImportFunctions;
+    // Keep track of the imported libraries, to free them on resource stop
+    std::vector<void*> importedLibraries;
+
 public:
     AngelScriptResource(AngelScriptRuntime* runtime, alt::IResource* resource) : runtime(runtime), resource(resource){};
     ~AngelScriptResource() = default;
@@ -48,27 +59,33 @@ public:
     }
 
     // Gets the alt:V IResource instance
-    alt::IResource* GetIResource()
+    alt::IResource* GetIResource() const
     {
         return resource;
     }
     // Gets the module runtime that instantiated this resource
-    AngelScriptRuntime* GetRuntime()
+    AngelScriptRuntime* GetRuntime() const
     {
         return runtime;
     }
     // Gets the AngelScript context of this resource
-    asIScriptContext* GetContext()
+    asIScriptContext* GetContext() const
     {
         return context;
     }
     // Gets the AngelScript module of this resource
-    asIScriptModule* GetModule()
+    asIScriptModule* GetModule() const
     {
         return module;
     }
 
-    bool DoesObjectExist(alt::IBaseObject* obj)
+    void AddLibraryImportFunction(asIScriptFunction* func, void* lib)
+    {
+        libraryImportFunctions.push_back(func);
+        importedLibraries.push_back(lib);
+    }
+
+    bool DoesObjectExist(alt::IBaseObject* obj) const
     {
         auto range = objects.equal_range(obj->GetType());
         for(auto it = range.first; it != range.second; it++)
@@ -86,15 +103,12 @@ public:
     // Registers the resource exports
     void RegisterExports(CScriptBuilder& builder);
 
-    alt::String ReadFile(alt::String path);
+    alt::String ReadFile(alt::String path) const;
 
     // Registers a new script callback for the specified event
-    void RegisterEventHandler(alt::CEvent::Type event, asIScriptFunction* handler)
-    {
-        eventHandlers.insert({ event, handler });
-    }
+    void RegisterEventHandler(alt::CEvent::Type event, asIScriptFunction* handler);
     // Gets all script event handlers of the specified type
-    std::vector<asIScriptFunction*> GetEventHandlers(const alt::CEvent::Type event)
+    std::vector<asIScriptFunction*> GetEventHandlers(const alt::CEvent::Type event) const
     {
         std::vector<asIScriptFunction*> events;
         auto                            range = eventHandlers.equal_range(event);
@@ -148,21 +162,23 @@ public:
     std::pair<int, void*> GetObjectData(alt::IBaseObject* object, const std::string& key);
     void                  DeleteObjectData(alt::IBaseObject* object, const std::string& key);
 
+    bool Eval(const std::string& code);
+
     // Yoinked from v8 helpers
-    int64_t GetTime()
+    int64_t GetTime() const
     {
         return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
     }
 
     // Shows some debug info about the resource
     // Only used by the debug console command
-    void ShowDebugInfo();
+    void ShowDebugInfo() const;
 
     bool Start();
     bool Stop();
 
     bool OnEvent(const alt::CEvent* event);
-    void OnTick();
+    void OnTick() override;
 
     void OnCreateBaseObject(alt::Ref<alt::IBaseObject> object) override;
     void OnRemoveBaseObject(alt::Ref<alt::IBaseObject> object) override;

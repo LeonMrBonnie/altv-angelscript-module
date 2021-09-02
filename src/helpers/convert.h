@@ -8,7 +8,7 @@
 #include "../bindings/data/vector3.h"
 #include "../bindings/data/vector2.h"
 #include "../runtime.h"
-#include "angelscript/addon/scriptdictionary/scriptdictionary.h"
+#include "angelscript/add_on/scriptdictionary/scriptdictionary.h"
 #include "angelscript.h"
 
 namespace Helpers
@@ -236,50 +236,6 @@ namespace Helpers
                      << Log::Endl;
         return core.CreateMValueNone();
     }
-    static bool IsTypePrimitive(int type)
-    {
-        switch(type)
-        {
-            // Bool
-            case asTYPEID_BOOL:
-            // Int
-            case asTYPEID_INT8:
-            case asTYPEID_INT16:
-            case asTYPEID_INT32:
-            case asTYPEID_INT64:
-            // Uint
-            case asTYPEID_UINT8:
-            case asTYPEID_UINT16:
-            case asTYPEID_UINT32:
-            case asTYPEID_UINT64:
-            // Float
-            case asTYPEID_FLOAT:
-            case asTYPEID_DOUBLE: return true;
-            default: return false;
-        }
-    }
-    static bool IsTypeUInt(int type)
-    {
-        switch(type)
-        {
-            case asTYPEID_UINT8:
-            case asTYPEID_UINT16:
-            case asTYPEID_UINT32:
-            case asTYPEID_UINT64: return true;
-            default: return false;
-        }
-    }
-    static bool IsTypeInt(int type)
-    {
-        switch(type)
-        {
-            case asTYPEID_INT8:
-            case asTYPEID_INT16:
-            case asTYPEID_INT32:
-            case asTYPEID_INT64: return true;
-            default: return false;
-        }
-    }
 
     class MValueFunc : public alt::IMValueFunction::Impl
     {
@@ -291,34 +247,36 @@ namespace Helpers
 
         alt::MValue Call(alt::MValueArgs args) const override
         {
-            auto context = resource->GetContext();
-            context->Prepare(func);
+            auto                               context = resource->GetContext();
+            std::vector<std::pair<void*, int>> funcArgs;
             for(uint32_t i = 0; i < args.GetSize(); i++)
             {
                 int  ret;
                 auto arg         = args[i];
                 auto [type, val] = MValueToValue(resource->GetRuntime(), arg);
-                if(IsTypePrimitive(type)) ret = context->SetArgAddress(i, val);
-                else
-                    ret = context->SetArgObject(i, val);
-                CHECK_AS_RETURN("Call MValue function", ret, nullptr);
+                funcArgs.push_back({ val, type });
             }
-            int r = context->Execute();
-            CHECK_FUNCTION_RETURN(r, alt::ICore::Instance().CreateMValueNone());
-            auto value = ValueToMValue(func->GetReturnTypeId(), context->GetReturnAddress());
-            context->Unprepare();
+            void* result = CallFunction(context, func, funcArgs);
+            auto  value  = ValueToMValue(func->GetReturnTypeId(), result);
+            for(auto [ptr, typeId] : funcArgs)
+            {
+                if(typeId != -1 && typeId != AngelScriptRuntime::Instance().GetBaseObjectTypeId()) delete ptr;
+            }
             return value;
         }
     };
 
-    static std::vector<std::string> SplitString(const std::string& input, const std::string& delimiter)
+    static std::vector<std::string> SplitString(const std::string& input, const std::string& delimiter, size_t max = 0)
     {
         std::vector<std::string> parts;
         size_t                   last = 0, next = 0;
+        size_t                   idx = 0;
         while((next = input.find(delimiter, last)) != std::string::npos)
         {
             parts.push_back(input.substr(last, next - last));
             last = next + 1;
+            idx++;
+            if(max != 0 && max - 1 == idx) break;
         }
         parts.push_back(input.substr(last));
         return parts;
@@ -339,5 +297,24 @@ namespace Helpers
         }
 
         return random_string;
+    }
+
+    // Checks if all primitive type args of the function are marked as &in ref values,
+    // otherwise it might cause a crash
+    static inline bool CheckEventFunctionParams(asIScriptFunction* func)
+    {
+        asUINT paramCount = func->GetParamCount();
+        for(asUINT i = 0; i < paramCount; i++)
+        {
+            int     typeId = 0;
+            asDWORD flags  = 0;
+            func->GetParam(i, &typeId, &flags);
+            if(!IsTypePrimitive(typeId)) continue;
+            if(flags == asETypeModifiers::asTM_INREF) continue;
+            Log::Error << "Parameter " << i << " of event handler function '" << func->GetDeclaration()
+                       << "' is a primitive and has to be a '&in' ref value" << Log::Endl;
+            return false;
+        }
+        return true;
     }
 }  // namespace Helpers

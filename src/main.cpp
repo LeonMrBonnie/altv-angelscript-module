@@ -1,7 +1,12 @@
 #include "main.h"
 #include "Log.h"
 #include "./helpers/benchmark.h"
+#include "./helpers/angelscript.h"
 #include "angelscript/include/angelscript.h"
+
+#ifdef DEBUG_MEMORY
+extern bool Helpers::showAllocationMessages = false;
+#endif
 
 #define DEBUG_USAGE_MSG Log::Colored << "~y~Usage: ~w~as-module [general/resource] [resourceName?]" << Log::Endl
 void CommandHandler(alt::Array<alt::StringView> args, void* userData)
@@ -67,6 +72,27 @@ void CommandHandler(alt::Array<alt::StringView> args, void* userData)
             resource->ShowDebugInfo();
         }
     }
+#ifdef DEBUG_MEMORY
+    else if(args[0] == "--allocations")
+    {
+        std::string state;
+        if(Helpers::showAllocationMessages)
+        {
+            Helpers::showAllocationMessages = false;
+            state                           = "~lr~Disabled";
+        }
+        else
+        {
+            Helpers::showAllocationMessages = true;
+            state                           = "~lg~Enabled";
+        }
+        Log::Colored << state << "~w~ memory allocation messages" << Log::Endl;
+    }
+#endif
+    else
+    {
+        Log::Warning << "Option '" << args[0] << "' does not exist" << Log::Endl;
+    }
 }
 
 #ifdef SERVER_MODULE
@@ -102,6 +128,7 @@ EXPORT void CreateScriptRuntime(alt::ICore* core)
     // Create instance of runtime and register
     auto& runtime = AngelScriptRuntime::Instance();
     core->RegisterScriptRuntime(MODULE_TYPE, &runtime);
+    Log::Colored << "Loaded AngelScript client module. Version ~y~" MODULE_VERSION << Log::Endl;
 
     // Register command
     core->SubscribeCommand("angelscript-module", CommandHandler);

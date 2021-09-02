@@ -63,6 +63,11 @@ namespace Helpers
             return executeCallback(resource, event, resource->GetContext());
         }
 
+        bool InvokeEventHandlers(AngelScriptResource*            resource,
+                                 const alt::CEvent*              ev,
+                                 std::vector<asIScriptFunction*> handlers,
+                                 asIScriptObject*                object = nullptr);
+
         const char* GetReturnType()
         {
             return returnType;
