@@ -8,9 +8,11 @@ on:
       - 'release/*.*'
 
 jobs:
-  build-windows-server:
-    name: Build windows (server)
-    runs-on: windows-2019
+  get-version:
+    name: Get release version
+    runs-on: ubuntu-18.04
+    outputs:
+      version: ${{ steps.version.VERSION }}
     steps:
       - name: Extract version
         id: version
@@ -20,6 +22,11 @@ jobs:
           echo ::set-output name=BRANCH::${TAG/\/*}
           echo ::set-output name=VERSION::${TAG/*\/}
 
+  build-windows-server:
+    name: Build windows (server)
+    runs-on: windows-2019
+    needs: [get-version]
+    steps:
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
@@ -32,7 +39,7 @@ jobs:
           cd .\\tools
           .\\build-server.bat %VERSION%
         env:
-          VERSION: ${{ steps.version.outputs.VERSION }}
+          VERSION: ${{ needs.get-version.outputs.version }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
@@ -43,15 +50,8 @@ jobs:
   build-windows-client:
     name: Build windows (client)
     runs-on: windows-2019
+    needs: [get-version]
     steps:
-      - name: Extract version
-        id: version
-        shell: bash
-        run: |
-          TAG=${GITHUB_REF/refs\/tags\//}
-          echo ::set-output name=BRANCH::${TAG/\/*}
-          echo ::set-output name=VERSION::${TAG/*\/}
-
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
@@ -64,7 +64,7 @@ jobs:
           cd .\\tools
           .\\build-client.bat %VERSION%
         env:
-          VERSION: ${{ steps.version.outputs.VERSION }}
+          VERSION: ${{ needs.get-version.outputs.version }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
@@ -75,14 +75,8 @@ jobs:
   build-linux:
     name: Build linux
     runs-on: ubuntu-18.04
+    needs: [get-version]
     steps:
-      - name: Extract version
-        id: version
-        run: |
-          TAG=${GITHUB_REF/refs\/tags\//}
-          echo ::set-output name=BRANCH::${TAG/\/*}
-          echo ::set-output name=VERSION::${TAG/*\/}
-
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
@@ -95,7 +89,7 @@ jobs:
           cd ./tools
           ./build.sh %VERSION%
         env:
-          VERSION: ${{ steps.version.outputs.VERSION }}
+          VERSION: ${{ needs.get-version.outputs.version }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
@@ -106,15 +100,8 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-18.04
-    needs: [build-windows-server, build-windows-client, build-linux]
+    needs: [get-version, build-windows-server, build-windows-client, build-linux]
     steps:
-      - name: Extract version
-        id: version
-        run: |
-          TAG=${GITHUB_REF/refs\/tags\//}
-          echo ::set-output name=BRANCH::${TAG/\/*}
-          echo ::set-output name=VERSION::${TAG/*\/}
-
       - name: Download artifacts
         uses: actions/download-artifact@v2
         with:
@@ -127,7 +114,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
-          release_name: ${{ steps.version.outputs.VERSION }}
+          release_name: ${{ needs.get-version.outputs.version }}
 
       - name: Upload windows server artifacts
         uses: actions/upload-release-asset@v1
