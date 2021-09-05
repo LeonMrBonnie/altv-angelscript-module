@@ -176,6 +176,9 @@ namespace Helpers
         REGISTER_PROPERTY_WRAPPER_GET(type, "uint64", "hwidEx", (GenericWrapper<T, alt::IPlayer, &alt::IPlayer::GetHwidExHash, uint64_t>));
         REGISTER_PROPERTY_WRAPPER_GET(type, "string", "authToken", GetAuthToken);
 
+        REGISTER_PROPERTY_WRAPPER_GET(type, "bool", "invincible", (GenericWrapper<T, alt::IPlayer, &alt::IPlayer::GetInvincible, bool>));
+        REGISTER_PROPERTY_WRAPPER_SET(type, "bool", "invincible", (GenericWrapper<T, alt::IPlayer, &alt::IPlayer::SetInvincible, void, bool>));
+
         REGISTER_METHOD_WRAPPER(type, "void Spawn(float x, float y, float z, uint delay = 0)", SpawnPlayer<float>);
         REGISTER_METHOD_WRAPPER(type, "void Spawn(int x, int y, int z, uint delay = 0)", SpawnPlayer<int>);
         REGISTER_METHOD_WRAPPER(type, "void Spawn(Vector3 pos, uint delay = 0)", SpawnPlayerVector);
