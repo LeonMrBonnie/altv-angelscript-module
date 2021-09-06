@@ -20,6 +20,11 @@ class AngelScriptRuntime : public alt::IScriptRuntime
 
 public:
     AngelScriptRuntime();
+    AngelScriptRuntime(const AngelScriptRuntime&) = delete;
+    AngelScriptRuntime(AngelScriptRuntime&&)      = delete;
+    AngelScriptRuntime& operator=(const AngelScriptRuntime&) = delete;
+    AngelScriptRuntime& operator=(AngelScriptRuntime&&) = delete;
+
     alt::IResource::Impl* CreateImpl(alt::IResource* resource) override;
     void                  DestroyImpl(alt::IResource::Impl* impl) override;
     void                  OnTick() override;
