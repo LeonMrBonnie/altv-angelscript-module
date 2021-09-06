@@ -181,7 +181,7 @@ namespace Helpers
 
         REGISTER_METHOD_WRAPPER(type, "void Spawn(float x, float y, float z, uint delay = 0)", SpawnPlayer<float>);
         REGISTER_METHOD_WRAPPER(type, "void Spawn(int x, int y, int z, uint delay = 0)", SpawnPlayer<int>);
-        REGISTER_METHOD_WRAPPER(type, "void Spawn(Vector3 pos, uint delay = 0)", SpawnPlayerVector);
+        REGISTER_METHOD_WRAPPER(type, "void Spawn(Vector3&in pos, uint delay = 0)", SpawnPlayerVector);
         REGISTER_METHOD_WRAPPER(type, "void Despawn()", (GenericWrapper<T, alt::IPlayer, &alt::IPlayer::Despawn>));
 #endif
 
