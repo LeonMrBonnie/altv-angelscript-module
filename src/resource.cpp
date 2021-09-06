@@ -455,7 +455,7 @@ void AngelScriptResource::HandleCustomEvent(const alt::CEvent* event, bool local
 
     for(auto [ptr, typeId] : handlerArgs)
     {
-        if(typeId != -1 && typeId != runtime->GetBaseObjectTypeId()) delete ptr;
+        if(typeId != -1 && typeId != runtime->GetTypeInfoCache().Get("alt::BaseObject@")->GetTypeId()) delete ptr;
     }
 }
 
