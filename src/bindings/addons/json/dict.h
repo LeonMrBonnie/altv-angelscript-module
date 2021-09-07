@@ -73,7 +73,7 @@ namespace JSON
                 default:
                 {
                     if(it.GetTypeId() == jsonTypeId) map.insert({ it.GetKey(), *(json*)it.GetAddressOfValue() });
-                    if(it.GetTypeId() == AngelScriptRuntime::Instance().GetStringTypeId())
+                    if(it.GetTypeId() == AngelScriptRuntime::Instance().GetTypeInfoCache().Get("string")->GetTypeId())
                         map.insert({ it.GetKey(), *(std::string*)it.GetAddressOfValue() });
                     break;
                 }

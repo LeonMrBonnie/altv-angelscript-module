@@ -18,7 +18,7 @@ namespace HTTP
 
     static httplib::Result GetRequest(httplib::Client* client, const std::string& path, CScriptDictionary* headersDict)
     {
-        const int        stringTypeId = AngelScriptRuntime::Instance().GetStringTypeId();
+        const int        stringTypeId = AngelScriptRuntime::Instance().GetTypeInfoCache().Get("string")->GetTypeId();
         httplib::Headers headers;
         for(auto it : *headersDict)
         {
@@ -31,7 +31,7 @@ namespace HTTP
 
     static httplib::Result PostRequest(httplib::Client* client, const std::string& path, CScriptDictionary* paramsDict)
     {
-        const int       stringTypeId = AngelScriptRuntime::Instance().GetStringTypeId();
+        const int       stringTypeId = AngelScriptRuntime::Instance().GetTypeInfoCache().Get("string")->GetTypeId();
         httplib::Params params;
         for(auto it : *paramsDict)
         {
@@ -44,7 +44,7 @@ namespace HTTP
 
     static httplib::Result PutRequest(httplib::Client* client, const std::string& path, CScriptDictionary* paramsDict)
     {
-        const int       stringTypeId = AngelScriptRuntime::Instance().GetStringTypeId();
+        const int       stringTypeId = AngelScriptRuntime::Instance().GetTypeInfoCache().Get("string")->GetTypeId();
         httplib::Params params;
         for(auto it : *paramsDict)
         {
@@ -57,7 +57,7 @@ namespace HTTP
 
     static httplib::Result DeleteRequest(httplib::Client* client, const std::string& path, CScriptDictionary* headersDict)
     {
-        const int        stringTypeId = AngelScriptRuntime::Instance().GetStringTypeId();
+        const int        stringTypeId = AngelScriptRuntime::Instance().GetTypeInfoCache().Get("string")->GetTypeId();
         httplib::Headers headers;
         for(auto it : *headersDict)
         {

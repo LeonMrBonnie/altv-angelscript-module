@@ -104,11 +104,11 @@ static inline int GetNativeTypeId(alt::INative::Type type)
         case alt::INative::Type::ARG_VECTOR3:
         case alt::INative::Type::ARG_VECTOR3_PTR:
         {
-            return AngelScriptRuntime::Instance().GetVector3TypeId();
+            return AngelScriptRuntime::Instance().GetTypeInfoCache().Get("alt::Vector3")->GetTypeId();
         }
         case alt::INative::Type::ARG_STRING:
         {
-            return AngelScriptRuntime::Instance().GetStringTypeId();
+            return AngelScriptRuntime::Instance().GetTypeInfoCache().Get("string")->GetTypeId();
         }
         case alt::INative::Type::ARG_STRUCT:
         {

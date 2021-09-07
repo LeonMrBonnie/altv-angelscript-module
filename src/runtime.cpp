@@ -121,41 +121,51 @@ void AngelScriptRuntime::ShowDebugInfo()
 
 void AngelScriptRuntime::RegisterTypeInfos()
 {
-    // Register all commonly used types once to save performance
-    arrayStringTypeInfo = engine->GetTypeInfoByDecl("array<string>");
-    arrayStringTypeInfo->AddRef();
-    arrayIntTypeInfo = engine->GetTypeInfoByDecl("array<int>");
-    arrayIntTypeInfo->AddRef();
-    arrayUintTypeInfo = engine->GetTypeInfoByDecl("array<uint>");
-    arrayUintTypeInfo->AddRef();
-    arrayByteTypeInfo = engine->GetTypeInfoByDecl("array<uint8>");
-    arrayByteTypeInfo->AddRef();
+    // Common types
+    typeInfoCache.Add(engine, "string");
+    typeInfoCache.Add(engine, "dictionary");
+
+    // Custom types
+    typeInfoCache.Add(engine, "alt::BaseObject@");
+    typeInfoCache.Add(engine, "alt::WorldObject@");
+    typeInfoCache.Add(engine, "alt::Entity@");
+    typeInfoCache.Add(engine, "alt::Player@");
+    typeInfoCache.Add(engine, "alt::Vehicle@");
+    typeInfoCache.Add(engine, "alt::Vector3");
+    typeInfoCache.Add(engine, "alt::Vector2");
+    typeInfoCache.Add(engine, "alt::RGBA");
+
+    // Arrays
+    typeInfoCache.Add(engine, "array<string>");
+    typeInfoCache.Add(engine, "array<int>");
+    typeInfoCache.Add(engine, "array<uint>");
+    typeInfoCache.Add(engine, "array<uint8>");
 }
 
 // Creates an array of strings
 CScriptArray* AngelScriptRuntime::CreateStringArray(uint32_t len)
 {
-    auto arr = CScriptArray::Create(arrayStringTypeInfo, len);
+    auto arr = CScriptArray::Create(typeInfoCache.Get("array<string>"), len);
     return arr;
 }
 
 // Creates an array of ints
 CScriptArray* AngelScriptRuntime::CreateIntArray(uint32_t len)
 {
-    auto arr = CScriptArray::Create(arrayIntTypeInfo, len);
+    auto arr = CScriptArray::Create(typeInfoCache.Get("array<int>"), len);
     return arr;
 }
 
 // Creates an array of unsigned ints
 CScriptArray* AngelScriptRuntime::CreateUIntArray(uint32_t len)
 {
-    auto arr = CScriptArray::Create(arrayUintTypeInfo, len);
+    auto arr = CScriptArray::Create(typeInfoCache.Get("array<uint>"), len);
     return arr;
 }
 
 CScriptArray* AngelScriptRuntime::CreateByteArray(uint8_t* data)
 {
-    auto arr = CScriptArray::Create(arrayByteTypeInfo, data);
+    auto arr = CScriptArray::Create(typeInfoCache.Get("array<uint8>"), data);
     return arr;
 }
 
