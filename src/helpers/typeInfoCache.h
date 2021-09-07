@@ -27,7 +27,7 @@ namespace Helpers
             }
             cache.insert({ name, typeInfo });
 #ifdef DEBUG_MODE
-            Log::Info << "TypeInfoCache: Added cached type info for '" << name << "'" << Log::Endl;
+            Log::Colored << "~lc~[DEBUG] Added cached type info for '~lk~" << name << "~lc~'" << Log::Endl;
 #endif
         }
 
