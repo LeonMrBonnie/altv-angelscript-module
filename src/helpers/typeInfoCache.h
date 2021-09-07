@@ -10,13 +10,12 @@ namespace Helpers
     {
         std::unordered_map<std::string, asITypeInfo*> cache;
 
+    public:
+        TypeInfoCache() {}
         TypeInfoCache(const TypeInfoCache&) = delete;
         TypeInfoCache(TypeInfoCache&&)      = delete;
         TypeInfoCache& operator=(const TypeInfoCache&) = delete;
         TypeInfoCache& operator=(TypeInfoCache&&) = delete;
-
-    public:
-        TypeInfoCache() {}
 
         void Add(asIScriptEngine* engine, const std::string& name)
         {
