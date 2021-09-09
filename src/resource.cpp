@@ -571,14 +571,19 @@ void AngelScriptResource::OnRemoveBaseObject(alt::Ref<alt::IBaseObject> object)
             break;
         }
     }
-    for(auto& [key, pair] : objectData.at(object))
+
+    if(objectData.count(object) != 0)
     {
-        if(pair.first & asTYPEID_SCRIPTOBJECT)
-            runtime->GetEngine()->ReleaseScriptObject(pair.second, runtime->GetEngine()->GetTypeInfoById(pair.first));
-        else
-            delete pair.second;
+        auto& data = objectData.at(object);
+        for(auto& [key, pair] : data)
+        {
+            if(pair.first & asTYPEID_SCRIPTOBJECT)
+                runtime->GetEngine()->ReleaseScriptObject(pair.second, runtime->GetEngine()->GetTypeInfoById(pair.first));
+            else
+                delete pair.second;
+        }
+        objectData.erase(object);
     }
-    objectData.erase(object);
 }
 
 bool AngelScriptResource::RegisterMetadata(CScriptBuilder& builder, asIScriptContext* context)
