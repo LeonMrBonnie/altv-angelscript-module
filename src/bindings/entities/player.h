@@ -176,9 +176,12 @@ namespace Helpers
         REGISTER_PROPERTY_WRAPPER_GET(type, "uint64", "hwidEx", (GenericWrapper<T, alt::IPlayer, &alt::IPlayer::GetHwidExHash, uint64_t>));
         REGISTER_PROPERTY_WRAPPER_GET(type, "string", "authToken", GetAuthToken);
 
+        REGISTER_PROPERTY_WRAPPER_GET(type, "bool", "invincible", (GenericWrapper<T, alt::IPlayer, &alt::IPlayer::GetInvincible, bool>));
+        REGISTER_PROPERTY_WRAPPER_SET(type, "bool", "invincible", (GenericWrapper<T, alt::IPlayer, &alt::IPlayer::SetInvincible, void, bool>));
+
         REGISTER_METHOD_WRAPPER(type, "void Spawn(float x, float y, float z, uint delay = 0)", SpawnPlayer<float>);
         REGISTER_METHOD_WRAPPER(type, "void Spawn(int x, int y, int z, uint delay = 0)", SpawnPlayer<int>);
-        REGISTER_METHOD_WRAPPER(type, "void Spawn(Vector3 pos, uint delay = 0)", SpawnPlayerVector);
+        REGISTER_METHOD_WRAPPER(type, "void Spawn(Vector3&in pos, uint delay = 0)", SpawnPlayerVector);
         REGISTER_METHOD_WRAPPER(type, "void Despawn()", (GenericWrapper<T, alt::IPlayer, &alt::IPlayer::Despawn>));
 #endif
 
@@ -244,6 +247,10 @@ namespace Helpers
         REGISTER_METHOD_WRAPPER(type,
                                 "void SetDlcProps(uint8 component, uint16 drawable, uint8 texture, uint8 palette, uint dlc)",
                                 (GenericWrapper<T, alt::IPlayer, &alt::IPlayer::SetDlcProps, void, uint8_t, uint16_t, uint8_t, uint32_t>));
+
+        REGISTER_METHOD_WRAPPER(type,
+                                "void SetIntoVehicle(Vehicle@ vehicle, uint8 seat)",
+                                (GenericWrapper<T, alt::IPlayer, &alt::IPlayer::SetIntoVehicle, void, alt::IVehicle*, uint8_t>));
 #endif
 
 #ifdef CLIENT_MODULE

@@ -73,7 +73,7 @@ namespace Helpers
             }
             case alt::IMValue::Type::STRING:
             {
-                type     = runtime->GetStringTypeId();
+                type     = runtime->GetTypeInfoCache().Get("string")->GetTypeId();
                 auto str = new std::string(val.As<alt::IMValueString>()->Value().ToString());
                 valuePtr = str;
                 break;
@@ -91,7 +91,7 @@ namespace Helpers
                     if(type == asTYPEID_UINT64) type = asTYPEID_INT64;
                     dict->Set(std::to_string(i), val, type);
                 }
-                type     = runtime->GetDictTypeId();
+                type     = runtime->GetTypeInfoCache().Get("dictionary")->GetTypeId();
                 valuePtr = dict;
                 break;
             }
@@ -107,41 +107,41 @@ namespace Helpers
                     if(type == asTYPEID_UINT64) type = asTYPEID_INT64;
                     dict->Set(it->GetKey().ToString(), val, type);
                 }
-                type     = runtime->GetDictTypeId();
+                type     = runtime->GetTypeInfoCache().Get("dictionary")->GetTypeId();
                 valuePtr = dict;
                 break;
             }
             case alt::IMValue::Type::BASE_OBJECT:
             {
-                type       = runtime->GetBaseObjectTypeId();
+                type       = runtime->GetTypeInfoCache().Get("alt::BaseObject@")->GetTypeId();
                 auto value = val.As<alt::IMValueBaseObject>()->Value();
                 valuePtr   = value.Get();
                 break;
             }
             case alt::IMValue::Type::VECTOR3:
             {
-                type       = runtime->GetVector3TypeId();
+                type       = runtime->GetTypeInfoCache().Get("alt::Vector3")->GetTypeId();
                 auto value = val.As<alt::IMValueVector3>()->Value();
                 valuePtr   = new Data::Vector3(value[0], value[1], value[2]);
                 break;
             }
             case alt::IMValue::Type::VECTOR2:
             {
-                type       = runtime->GetVector2TypeId();
+                type       = runtime->GetTypeInfoCache().Get("alt::Vector2")->GetTypeId();
                 auto value = val.As<alt::IMValueVector2>()->Value();
                 valuePtr   = new Data::Vector2(value[0], value[1]);
                 break;
             }
             case alt::IMValue::Type::RGBA:
             {
-                type       = runtime->GetRGBATypeId();
+                type       = runtime->GetTypeInfoCache().Get("alt::RGBA")->GetTypeId();
                 auto value = val.As<alt::IMValueRGBA>()->Value();
                 valuePtr   = new alt::RGBA(value.r, value.g, value.b, value.a);
                 break;
             }
             case alt::IMValue::Type::BYTE_ARRAY:
             {
-                type       = runtime->GetByteArrayTypeId();
+                type       = runtime->GetTypeInfoCache().Get("array<uint8>")->GetTypeId();
                 auto value = val.As<alt::IMValueByteArray>()->GetData();
                 valuePtr   = runtime->CreateByteArray(const_cast<uint8_t*>(value));
                 break;
@@ -177,23 +177,23 @@ namespace Helpers
             {
                 // Because these type ids are not constant and can change with every update, we have to check
                 // them in an if chain here, instead of directly in the switch expression
-                if(type == runtime.GetStringTypeId()) return core.CreateMValueString(*static_cast<std::string*>(value));
-                else if(type == runtime.GetVector3TypeId())
+                if(type == runtime.GetTypeInfoCache().Get("string")->GetTypeId()) return core.CreateMValueString(*static_cast<std::string*>(value));
+                else if(type == runtime.GetTypeInfoCache().Get("alt::Vector3")->GetTypeId())
                 {
                     auto vector = *static_cast<Data::Vector3*>(value);
                     return core.CreateMValueVector3({ vector.x, vector.y, vector.z });
                 }
-                else if(type == runtime.GetVector2TypeId())
+                else if(type == runtime.GetTypeInfoCache().Get("alt::Vector2")->GetTypeId())
                 {
                     auto vector = *static_cast<Data::Vector2*>(value);
                     return core.CreateMValueVector2({ vector.x, vector.y });
                 }
-                else if(type == runtime.GetRGBATypeId())
+                else if(type == runtime.GetTypeInfoCache().Get("alt::RGBA")->GetTypeId())
                 {
                     auto rgba = *static_cast<alt::RGBA*>(value);
                     return core.CreateMValueRGBA(rgba);
                 }
-                else if(type == runtime.GetDictTypeId())
+                else if(type == runtime.GetTypeInfoCache().Get("dictionary")->GetTypeId())
                 {
                     auto dict = static_cast<CScriptDictionary*>(value);
                     auto list = core.CreateMValueDict();
@@ -203,7 +203,7 @@ namespace Helpers
                     }
                     return list;
                 }
-                else if(type == runtime.GetByteArrayTypeId())
+                else if(type == runtime.GetTypeInfoCache().Get("array<uint8>")->GetTypeId())
                 {
                     std::vector<uint8_t> arr;
                     auto                 byteArray = static_cast<CScriptArray*>(value);
@@ -213,7 +213,7 @@ namespace Helpers
                     }
                     return core.CreateMValueByteArray(arr.data(), byteArray->GetSize());
                 }
-                else if(type == runtime.GetIntArrayTypeId() || type == runtime.GetUintArrayTypeId() || type == runtime.GetStringArrayTypeId())
+                else if(GetTypeName(type) == "array")
                 {
                     auto mvalue = core.CreateMValueList();
                     auto arr    = static_cast<CScriptArray*>(value);
@@ -223,8 +223,11 @@ namespace Helpers
                     }
                     return mvalue;
                 }
-                else if(type == runtime.GetBaseObjectTypeId() || type == runtime.GetWorldObjectTypeId() || type == runtime.GetEntityTypeId() ||
-                        type == runtime.GetPlayerTypeId() || type == runtime.GetVehicleTypeId())
+                else if(type == runtime.GetTypeInfoCache().Get("alt::BaseObject@")->GetTypeId() ||
+                        type == runtime.GetTypeInfoCache().Get("alt::WorldObject@")->GetTypeId() ||
+                        type == runtime.GetTypeInfoCache().Get("alt::Entity@")->GetTypeId() ||
+                        type == runtime.GetTypeInfoCache().Get("alt::Player@")->GetTypeId() ||
+                        type == runtime.GetTypeInfoCache().Get("alt::Vehicle@")->GetTypeId())
                     return core.CreateMValueBaseObject(static_cast<alt::IBaseObject*>(value));
 
                 break;
@@ -260,7 +263,7 @@ namespace Helpers
             auto  value  = ValueToMValue(func->GetReturnTypeId(), result);
             for(auto [ptr, typeId] : funcArgs)
             {
-                if(typeId != -1 && typeId != AngelScriptRuntime::Instance().GetBaseObjectTypeId()) delete ptr;
+                if(typeId != -1 && typeId != AngelScriptRuntime::Instance().GetTypeInfoCache().Get("alt::BaseObject@")->GetTypeId()) delete ptr;
             }
             return value;
         }

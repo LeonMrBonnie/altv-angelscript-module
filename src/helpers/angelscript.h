@@ -165,40 +165,43 @@ namespace Helpers
             {
                 // Because these type ids are not constant and can change with every update, we have to check
                 // them in an if chain here, instead of directly in the switch expression
-                if(typeId == runtime.GetStringTypeId())
+                if(typeId == runtime.GetTypeInfoCache().Get("string")->GetTypeId())
                 {
                     result = *(std::string*)val;
                 }
-                else if(typeId == runtime.GetVector3TypeId())
+                else if(typeId == runtime.GetTypeInfoCache().Get("alt::Vector3")->GetTypeId())
                 {
                     auto              vector = *static_cast<Data::Vector3*>(val);
                     std::stringstream stream;
                     stream << "Vector3{ x: " << vector.x << ", y: " << vector.y << ", z: " << vector.z << " }";
                     result = stream.str();
                 }
-                else if(typeId == runtime.GetVector2TypeId())
+                else if(typeId == runtime.GetTypeInfoCache().Get("alt::Vector2")->GetTypeId())
                 {
                     auto              vector = *static_cast<Data::Vector2*>(val);
                     std::stringstream stream;
                     stream << "Vector2{ x: " << vector.x << ", y: " << vector.y << " }";
                     result = stream.str();
                 }
-                else if(typeId == runtime.GetRGBATypeId())
+                else if(typeId == runtime.GetTypeInfoCache().Get("alt::RGBA")->GetTypeId())
                 {
                     auto              rgba = *static_cast<alt::RGBA*>(val);
                     std::stringstream stream;
                     stream << "RGBA{ r: " << rgba.r << ", g: " << rgba.g << ", b: " << rgba.b << ", a: " << rgba.a << " }";
                     result = stream.str();
                 }
-                else if(typeId == runtime.GetBaseObjectTypeId() || typeId == runtime.GetWorldObjectTypeId() || typeId == runtime.GetEntityTypeId() ||
-                        typeId == runtime.GetPlayerTypeId() || typeId == runtime.GetVehicleTypeId())
+                else if(typeId == runtime.GetTypeInfoCache().Get("alt::BaseObject@")->GetTypeId() ||
+                        typeId == runtime.GetTypeInfoCache().Get("alt::WorldObject@")->GetTypeId() ||
+                        typeId == runtime.GetTypeInfoCache().Get("alt::Entity@")->GetTypeId() ||
+                        typeId == runtime.GetTypeInfoCache().Get("alt::Player@")->GetTypeId() ||
+                        typeId == runtime.GetTypeInfoCache().Get("alt::Vehicle@")->GetTypeId())
                 {
                     auto              obj = static_cast<alt::IBaseObject*>(val);
                     std::stringstream stream;
                     stream << "BaseObject{ type: " << (uint16_t)obj->GetType() << " }";
                     result = stream.str();
                 }
-                else if(typeId == runtime.GetDictTypeId())
+                else if(typeId == runtime.GetTypeInfoCache().Get("dictionary")->GetTypeId())
                 {
                     auto              dict = static_cast<CScriptDictionary*>(val);
                     std::stringstream stream;

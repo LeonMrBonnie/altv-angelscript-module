@@ -458,7 +458,7 @@ static void SetStat(const std::string& stat, void* ref, int typeId)
     }
     else if(type == "STRING")
     {
-        AS_ASSERT(typeId == AngelScriptRuntime::Instance().GetStringTypeId(), "Invalid type, expected float", );
+        AS_ASSERT(typeId == AngelScriptRuntime::Instance().GetTypeInfoCache().Get("string")->GetTypeId(), "Invalid type, expected float", );
         statData->SetStringValue(static_cast<std::string*>(ref)->c_str());
     }
     else if(type == "UINT8")
@@ -517,7 +517,7 @@ static void GetStat(const std::string& stat, void* ref, int typeId)
     }
     else if(type == "STRING")
     {
-        AS_ASSERT(typeId == AngelScriptRuntime::Instance().GetStringTypeId(), "Invalid type, expected float", );
+        AS_ASSERT(typeId == AngelScriptRuntime::Instance().GetTypeInfoCache().Get("string")->GetTypeId(), "Invalid type, expected float", );
         auto ptr = new std::string(statData->GetStringValue());
         Helpers::CopyAngelscriptValue(engine, ptr, typeId, ref, typeId);
     }
