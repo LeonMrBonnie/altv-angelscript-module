@@ -247,6 +247,10 @@ namespace Helpers
         REGISTER_METHOD_WRAPPER(type,
                                 "void SetDlcProps(uint8 component, uint16 drawable, uint8 texture, uint8 palette, uint dlc)",
                                 (GenericWrapper<T, alt::IPlayer, &alt::IPlayer::SetDlcProps, void, uint8_t, uint16_t, uint8_t, uint32_t>));
+
+        REGISTER_METHOD_WRAPPER(type,
+                                "void SetIntoVehicle(Vehicle@ vehicle, uint8 seat)",
+                                (GenericWrapper<T, alt::IPlayer, &alt::IPlayer::SetIntoVehicle, void, alt::IVehicle*, uint8_t>));
 #endif
 
 #ifdef CLIENT_MODULE
