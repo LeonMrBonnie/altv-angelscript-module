@@ -137,6 +137,12 @@
         docs->PushVariable(type, prop);                                                                          \
     }
 
+#define REGISTER_GLOBAL_VARIABLE(type, prop, val)                     \
+    {                                                                 \
+        engine->RegisterGlobalProperty("const " type " " prop, &val); \
+        docs->PushVariable(type, prop);                               \
+    }
+
 // Registers a new global enum
 #define REGISTER_ENUM(name, desc)       \
     {                                   \

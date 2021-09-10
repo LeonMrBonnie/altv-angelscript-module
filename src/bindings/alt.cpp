@@ -887,8 +887,10 @@ static ModuleExtension altExtension("alt", [](asIScriptEngine* engine, DocsGener
     REGISTER_GLOBAL_FUNC("Vehicle@+ GetVehicleByID(uint16 id)", (GetByID<alt::IVehicle>), "Gets the vehicle with the specified ID");
     REGISTER_GLOBAL_FUNC("Entity@+ GetEntityByID(uint16 id)", (GetByID<alt::IEntity>), "Gets the entity with the specified ID");
 #ifdef SERVER_MODULE
-    REGISTER_GLOBAL_PROPERTY_READ_ONLY("int", "defaultDimension", GetDefaultDimension);
-    REGISTER_GLOBAL_PROPERTY_READ_ONLY("int", "globalDimension", GetGlobalDimension);
+    static int32_t globalDimension = alt::GLOBAL_DIMENSION;
+    REGISTER_GLOBAL_VARIABLE("int", "globalDimension", globalDimension);
+    static int32_t defaultDimension = alt::DEFAULT_DIMENSION;
+    REGISTER_GLOBAL_VARIABLE("int", "defaultDimension", defaultDimension);
 #endif
     REGISTER_GLOBAL_PROPERTY_READ_ONLY("string", "version", GetVersion);
     REGISTER_GLOBAL_PROPERTY_READ_ONLY("string", "branch", GetBranch);
