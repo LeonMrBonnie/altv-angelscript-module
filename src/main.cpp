@@ -3,6 +3,7 @@
 #include "./helpers/benchmark.h"
 #include "./helpers/angelscript.h"
 #include "angelscript/include/angelscript.h"
+#include "profiler/profiler.h"
 
 #ifdef DEBUG_MEMORY
 extern bool Helpers::showAllocationMessages = false;
@@ -98,9 +99,7 @@ void CommandHandler(alt::Array<alt::StringView> args, void* userData)
 #ifdef SERVER_MODULE
 EXPORT bool altMain(alt::ICore* core)
 {
-    #ifdef DEBUG_MODE
-    Helpers::Benchmark benchmark("Main_Init");
-    #endif
+    TimeIt();
 
     alt::ICore::SetInstance(core);
 
@@ -119,9 +118,7 @@ EXPORT bool altMain(alt::ICore* core)
 #ifdef CLIENT_MODULE
 EXPORT void CreateScriptRuntime(alt::ICore* core)
 {
-    #ifdef DEBUG_MODE
-    Helpers::Benchmark benchmark("Main_Init");
-    #endif
+    TimeIt();
 
     alt::ICore::SetInstance(core);
 

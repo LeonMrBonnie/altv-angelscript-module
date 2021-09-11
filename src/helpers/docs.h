@@ -5,7 +5,7 @@
 #include "Log.h"
 #include "angelscript/include/angelscript.h"
 #include "../resource.h"
-#ifdef AS_GENERATE_DOCUMENTATION
+#ifdef GENERATE_DOCUMENTATION
     #include <chrono>
     #include <ctime>
     #include <iostream>
@@ -38,74 +38,74 @@ namespace Helpers
 
         void PushDeclaration(std::string decl, std::string desc)
         {
-#ifdef AS_GENERATE_DOCUMENTATION
+#ifdef GENERATE_DOCUMENTATION
             declarations.push_back(std::pair(decl, desc));
 #endif
         }
         void PushVariable(std::string type, std::string prop)
         {
-#ifdef AS_GENERATE_DOCUMENTATION
+#ifdef GENERATE_DOCUMENTATION
             variables.push_back({ type, prop });
 #endif
         }
         void PushFuncDef(std::string funcdef, std::string desc)
         {
-#ifdef AS_GENERATE_DOCUMENTATION
+#ifdef GENERATE_DOCUMENTATION
             funcDefs.push_back(std::pair(funcdef, desc));
 #endif
         }
         void PushTypedef(std::string type, std::string original)
         {
-#ifdef AS_GENERATE_DOCUMENTATION
+#ifdef GENERATE_DOCUMENTATION
             typeDefs.push_back(std::pair(type, original));
 #endif
         }
         void PushEventDeclaration(std::string funcDef, std::string globalFunc)
         {
-#ifdef AS_GENERATE_DOCUMENTATION
+#ifdef GENERATE_DOCUMENTATION
             eventDeclarations.push_back(std::pair(funcDef.insert(0, "funcdef "), globalFunc));
 #endif
         }
         void PushObjectType(std::string name, std::string desc, std::string base)
         {
-#ifdef AS_GENERATE_DOCUMENTATION
+#ifdef GENERATE_DOCUMENTATION
             objectTypes.push_back(std::tuple(name, desc, base));
 #endif
         }
         void PushObjectProperty(std::string object, std::string propertyDecl)
         {
-#ifdef AS_GENERATE_DOCUMENTATION
+#ifdef GENERATE_DOCUMENTATION
             objectDeclarations.insert({ object, propertyDecl });
 #endif
         }
         void PushObjectConstructor(std::string object, std::string constructorDecl)
         {
-#ifdef AS_GENERATE_DOCUMENTATION
+#ifdef GENERATE_DOCUMENTATION
             objectConstructors.insert({ object, constructorDecl });
 #endif
         }
         void PushObjectMethod(std::string object, std::string methodDecl)
         {
-#ifdef AS_GENERATE_DOCUMENTATION
+#ifdef GENERATE_DOCUMENTATION
             objectMethods.insert({ object, methodDecl });
 #endif
         }
         void PushEnumValue(std::string enumName, std::string name, int value)
         {
-#ifdef AS_GENERATE_DOCUMENTATION
+#ifdef GENERATE_DOCUMENTATION
             enumValues.insert({ enumName, { name, value } });
 #endif
         }
         void PushEnumType(std::string name, std::string desc)
         {
-#ifdef AS_GENERATE_DOCUMENTATION
+#ifdef GENERATE_DOCUMENTATION
             enumTypes.push_back({ name, desc });
 #endif
         }
 
         void Generate()
         {
-#ifdef AS_GENERATE_DOCUMENTATION
+#ifdef GENERATE_DOCUMENTATION
             if(moduleName == "") return;
             std::stringstream stream;
 

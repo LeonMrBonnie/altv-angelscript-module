@@ -11,6 +11,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_definitions(-DAS_MIPS)
 add_definitions(-DMODULE_VERSION="${MODULE_VERSION}")
 
+# Toggles debug features
+#add_definitions(-DDEBUG_MODE)                 # General debug features
+#add_definitions(-DSHOW_PROFILE)               # Profiling
+# todo: toggle this via server.cfg later
+#add_definitions(-DDEBUG_MEMORY)               # Memory debugging
+#add_definitions(-DGENERATE_DOCUMENTATION)     # Documentation generation
+
 if(SERVER_MODULE)
 	set(PROJECT_MODULE_NAME "angelscript-module")
 	set(COMPILE_FOLDER "server")
@@ -32,6 +39,7 @@ else()
 	set(JIT_COMPILER_FILE ${PROJECT_SOURCE_DIR}/deps/angelscript-jit-compiler/virtual_asm_windows.cpp)
 	set(ANGELSCRIPT_LIB angelscript.lib)
 	set(CRYPTOPP_LIB ${PROJECT_SOURCE_DIR}/deps/cryptopp/cryptlib.lib)
+    set(PROFILER_LIB winmm.lib)
 endif()
 set(ANGELSCRIPT_LIB_PATH ${PROJECT_SOURCE_DIR}/deps/angelscript/lib/${ANGELSCRIPT_LIB})
 
@@ -48,12 +56,19 @@ include_directories(
     "${PROJECT_SOURCE_DIR}/deps/angelscript"
 )
 
+# Add profiler if windows
+if(WIN32)
+    set(PROFILER_FILE ${PROJECT_SOURCE_DIR}/deps/profiler/profiler.cpp)
+endif()
+
 add_library(${PROJECT_MODULE_NAME} SHARED
 	${PROJECT_SOURCE_FILES}
 	# AngelScript JIT Compiler
 	${PROJECT_SOURCE_DIR}/deps/angelscript-jit-compiler/as_jit.cpp
 	${PROJECT_SOURCE_DIR}/deps/angelscript-jit-compiler/virtual_asm_x64.cpp
 	${JIT_COMPILER_FILE}
+    # Profiler
+    ${PROFILER_FILE}
 )
 
 if(WIN32)
@@ -71,4 +86,5 @@ endif()
 target_link_libraries(${PROJECT_MODULE_NAME} PRIVATE
   ${ANGELSCRIPT_LIB_PATH}
   ${CRYPTOPP_LIB}
+  ${PROFILER_LIB}
 )

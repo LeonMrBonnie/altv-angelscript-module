@@ -13,9 +13,10 @@
                 "ALT_CLIENT_API",
                 "SERVER_MODULE",
                 "CLIENT_MODULE",
-                "AS_GENERATE_DOCUMENTATION",
+                "GENERATE_DOCUMENTATION",
                 "DEBUG_MODE",
-                "DEBUG_MEMORY"
+                "DEBUG_MEMORY",
+                "SHOW_PROFILE"
             ],
             "windowsSdkVersion": "10.0.18362.0",
             "cStandard": "c17",

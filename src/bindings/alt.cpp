@@ -1,13 +1,14 @@
 #include "Log.h"
-#include "../helpers/module.h"
 #include "../runtime.h"
-#include "angelscript/add_on/scriptdictionary/scriptdictionary.h"
-#include "angelscript/add_on/scriptany/scriptany.h"
+#include "../helpers/module.h"
 #include "../helpers/convert.h"
 #include "../helpers/angelscript.h"
 #include "../helpers/benchmark.h"
 #include "data/discord.h"
 #include "data/keyState.h"
+#include "angelscript/add_on/scriptdictionary/scriptdictionary.h"
+#include "angelscript/add_on/scriptany/scriptany.h"
+#include "profiler/profiler.h"
 
 using namespace Helpers;
 
@@ -239,9 +240,7 @@ static void OnClient(const std::string& name, const std::string& handlerName)
 
 static void Emit(asIScriptGeneric* gen)
 {
-#ifdef DEBUG_MODE
-    Helpers::Benchmark benchmark("Emit");
-#endif
+    TimeIt();
 
     GET_RESOURCE();
     void*           ref    = gen->GetArgAddress(0);
@@ -336,9 +335,7 @@ static bool GetSyncedMeta(const std::string& key, void* ref, int typeId)
 #ifdef SERVER_MODULE
 static void EmitToAllClients(asIScriptGeneric* gen)
 {
-    #ifdef DEBUG_MODE
-    Helpers::Benchmark benchmark("EmitToAllClients");
-    #endif
+    TimeIt();
 
     GET_RESOURCE();
     void*           ref    = gen->GetArgAddress(0);
@@ -365,9 +362,7 @@ static void EmitToAllClients(asIScriptGeneric* gen)
 
 static void EmitToClients(asIScriptGeneric* gen)
 {
-    #ifdef DEBUG_MODE
-    Helpers::Benchmark benchmark("EmitToClients");
-    #endif
+    TimeIt();
 
     GET_RESOURCE();
     void*         ref     = gen->GetArgAddress(0);
@@ -630,9 +625,7 @@ static void TakeScreenshotGameOnlyEvent(const std::string& eventName)
 
 static void EmitServer(asIScriptGeneric* gen)
 {
-    #ifdef DEBUG_MODE
-    Helpers::Benchmark benchmark("EmitServer");
-    #endif
+    TimeIt();
 
     GET_RESOURCE();
     void*           ref    = gen->GetArgAddress(0);
