@@ -532,6 +532,8 @@ void AngelScriptResource::ShowDebugInfo() const
 
 void AngelScriptResource::OnTick()
 {
+    TimeIt();
+
     // Execute eval functions
     for(auto func : evalFunctions)
     {
@@ -585,6 +587,8 @@ void AngelScriptResource::OnRemoveBaseObject(alt::Ref<alt::IBaseObject> object)
 
 bool AngelScriptResource::RegisterMetadata(CScriptBuilder& builder, asIScriptContext* context)
 {
+    TimeIt();
+
     std::regex customEventLocalRegex("Event\\(\"(.*)\"\\)");
 #ifdef SERVER_MODULE
     std::regex customEventRemoteRegex("ClientEvent\\(\"(.*)\"\\)");
