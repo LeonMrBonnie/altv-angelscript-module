@@ -8,15 +8,7 @@ project ("altv-angelscript-module")
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_definitions(-DAS_MIPS)
 add_definitions(-DMODULE_VERSION="${MODULE_VERSION}")
-
-# Toggles debug features
-#add_definitions(-DDEBUG_MODE)                 # General debug features
-#add_definitions(-DSHOW_PROFILE)               # Profiling
-# todo: toggle this via server.cfg later
-#add_definitions(-DDEBUG_MEMORY)               # Memory debugging
-#add_definitions(-DGENERATE_DOCUMENTATION)     # Documentation generation
 
 if(SERVER_MODULE)
 	set(PROJECT_MODULE_NAME "angelscript-module")
@@ -43,10 +35,15 @@ else()
 endif()
 set(ANGELSCRIPT_LIB_PATH ${PROJECT_SOURCE_DIR}/deps/angelscript/lib/${ANGELSCRIPT_LIB})
 
-# Download dependencies
+# Set include path
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+
+# Download dependencies
 include(DownloadDeps)
 download_deps()
+
+# Set debug config options
+include(DebugConfig)
 
 file(GLOB_RECURSE PROJECT_SOURCE_FILES "./src/*.h" "./src/*.cpp")
 
