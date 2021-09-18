@@ -60,7 +60,8 @@ namespace Helpers
 
     static std::string GetTypeName(int typeId)
     {
-        if(typeNameMap.count(typeId) != 0) return typeNameMap.at(typeId);
+        auto result = typeNameMap.find(typeId);
+        if(result != typeNameMap.end()) return result->second;
         auto&        runtime  = AngelScriptRuntime::Instance();
         asITypeInfo* typeInfo = runtime.GetEngine()->GetTypeInfoById(typeId);
         if(typeInfo != nullptr) return typeInfo->GetName();

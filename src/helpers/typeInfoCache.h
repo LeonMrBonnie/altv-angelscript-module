@@ -33,8 +33,9 @@ namespace Helpers
 
         asITypeInfo* Get(const std::string& name)
         {
-            if(cache.count(name) == 0) return nullptr;
-            return cache.at(name);
+            auto result = cache.find(name);
+            if(result == cache.end()) return nullptr;
+            return result->second;
         }
     };
 }  // namespace Helpers

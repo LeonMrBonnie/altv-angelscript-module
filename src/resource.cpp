@@ -571,9 +571,10 @@ void AngelScriptResource::OnRemoveBaseObject(alt::Ref<alt::IBaseObject> object)
         }
     }
 
-    if(objectData.count(object) != 0)
+    auto result = objectData.find(object);
+    if(result != objectData.end())
     {
-        auto& data = objectData.at(object);
+        auto& data = result->second;
         for(auto& [key, pair] : data)
         {
             if(pair.first & asTYPEID_SCRIPTOBJECT)

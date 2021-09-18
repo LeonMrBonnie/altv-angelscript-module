@@ -45,8 +45,9 @@ public:
 
     AngelScriptResource* GetResource(alt::IResource* resource)
     {
-        if(!resources.count(resource)) return nullptr;
-        return resources.at(resource);
+        auto result = resources.find(resource);
+        if(result == resources.end()) return nullptr;
+        return result->second;
     }
     AngelScriptResource* GetResourceByModule(asIScriptModule* module)
     {
