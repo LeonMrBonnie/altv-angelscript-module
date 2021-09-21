@@ -75,7 +75,7 @@ if(WIN32)
         COMPILE_FLAGS_DEBUG
             "/MDd /Od /Ob0 /Zi"
         COMPILE_FLAGS_RELEASE
-            "/MD /O2 /Ob2"
+            "/MD /O3 /Ob2"
     )
     set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /DEBUG")
 endif()
