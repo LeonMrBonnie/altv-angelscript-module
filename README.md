@@ -14,12 +14,10 @@
 
 ### Instructions
 
-1. Run `git clone https://github.com/LeonMrBonnie/altv-angelscript-module.git` to clone the repository
+1. Run `git clone --recurse-submodules https://github.com/LeonMrBonnie/altv-angelscript-module.git` to clone the repository
 2. Navigate to the folder with `cd altv-angelscript-module`
-3. Run `git submodule init` to initialize the submodules
-4. Then run `git submodule update` to fetch the submodules
-5. Run the `build.bat` *(Windows)* or the `build.sh` *(Linux)* to build the project using CMake
-6. The built project `.dll` / `.so` can now be found in the `dist` subdirectory
+3. Run the `build.bat` *(Windows)* or the `build.sh` *(Linux)* to build the project using CMake
+4. The built project `.dll` / `.so` can now be found in the `dist` subdirectory
 
 If any errors persist, make sure to follow steps closely.
 
