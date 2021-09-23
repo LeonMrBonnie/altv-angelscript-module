@@ -94,13 +94,14 @@ public:
 
     static Log& Endl(Log& log)
     {
+        static constexpr const char* prefix = "[AngelScript] ";
         switch(log.type)
         {
-            case INFO: alt::ICore::Instance().LogInfo(log.buf.str()); break;
+            case INFO: alt::ICore::Instance().LogInfo(prefix + log.buf.str()); break;
             case DEBUG: alt::ICore::Instance().LogColored("~g~[DEBUG] ~w~" + log.buf.str()); break;
-            case WARNING: alt::ICore::Instance().LogWarning(log.buf.str().c_str()); break;
-            case ERROR: alt::ICore::Instance().LogError(log.buf.str().c_str()); break;
-            case COLORED: alt::ICore::Instance().LogColored(log.buf.str().c_str()); break;
+            case WARNING: alt::ICore::Instance().LogWarning(prefix + log.buf.str()); break;
+            case ERROR: alt::ICore::Instance().LogError(prefix + log.buf.str()); break;
+            case COLORED: alt::ICore::Instance().LogColored(prefix + log.buf.str()); break;
         }
 
         log.buf.str("");

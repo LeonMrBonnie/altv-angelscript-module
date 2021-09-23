@@ -14,17 +14,17 @@ using namespace Helpers;
 
 static void Log(const std::string& msg)
 {
-    Log::Colored << msg << Log::Endl;
+    alt::ICore::Instance().LogColored(msg);
 }
 
 static void LogWarning(const std::string& msg)
 {
-    Log::Warning << msg << Log::Endl;
+    alt::ICore::Instance().LogWarning(msg);
 }
 
 static void LogError(const std::string& msg)
 {
-    Log::Error << msg << Log::Endl;
+    alt::ICore::Instance().LogError(msg);
 }
 
 static uint32_t SetTimeout(asIScriptFunction* callback, uint32_t timeout)
