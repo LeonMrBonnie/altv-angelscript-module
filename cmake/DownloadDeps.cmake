@@ -1,6 +1,6 @@
 # Deps download
 
-set(__deps_version "v2")
+set(__deps_version "v4")
 
 function(download_deps)
     if(EXISTS "${ANGELSCRIPT_LIB_PATH}")
