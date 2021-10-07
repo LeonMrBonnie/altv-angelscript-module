@@ -264,5 +264,9 @@ namespace Helpers
         REGISTER_PROPERTY_WRAPPER_SET(
           type, "float", "nonSpatialVolume", (GenericWrapper<T, alt::IPlayer, &alt::IPlayer::SetNonSpatialVolume, void, float>));
 #endif
+
+        REGISTER_PROPERTY_WRAPPER_GET(type, "bool", "isSuperJumpEnabled", (GenericWrapper<T, alt::IPlayer, &alt::IPlayer::IsSuperJumpEnabled, bool>));
+        REGISTER_PROPERTY_WRAPPER_GET(type, "bool", "isCrouching", (GenericWrapper<T, alt::IPlayer, &alt::IPlayer::IsCrouching, bool>));
+        REGISTER_PROPERTY_WRAPPER_GET(type, "bool", "isStealthy", (GenericWrapper<T, alt::IPlayer, &alt::IPlayer::IsStealthy, bool>));
     }
 }  // namespace Helpers
