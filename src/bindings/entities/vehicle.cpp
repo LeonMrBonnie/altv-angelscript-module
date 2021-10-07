@@ -73,6 +73,12 @@ static Data::Vector3 GetSpeedVector(alt::IVehicle* vehicle)
 }
 #endif
 
+static Data::Vector3 GetVelocity(alt::IVehicle* vehicle)
+{
+    auto velocity = vehicle->GetVelocity();
+    return Data::Vector3(velocity[0], velocity[1], velocity[2]);
+}
+
 static ModuleExtension playerExtension("alt", [](asIScriptEngine* engine, DocsGenerator* docs) {
     RegisterAsEntity<alt::IVehicle>(engine, docs, "Vehicle");
 
@@ -436,4 +442,6 @@ static ModuleExtension playerExtension("alt", [](asIScriptEngine* engine, DocsGe
     REGISTER_PROPERTY_WRAPPER_GET(
       "Vehicle", "bool", "handlingModified", (GenericWrapper<alt::IVehicle, alt::IVehicle, &alt::IVehicle::IsHandlingModified, bool>));
 #endif
+
+    REGISTER_PROPERTY_WRAPPER_GET("Vehicle", "Vector3", "velocity", GetVelocity);
 });
